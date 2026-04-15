@@ -1,6 +1,6 @@
 # ChatGPT Codex Workspace 遷移 / 維護 / 發布藍圖
 
-> 文件用途：可直接執行的 Codex workspace 遷移與維護藍圖。更新基準：2026-04-13。
+> 文件用途：可直接執行的 Codex workspace 遷移與維護藍圖。更新基準：2026-04-15。
 
 ## A. 目標與範圍
 
