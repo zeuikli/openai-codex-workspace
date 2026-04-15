@@ -2,6 +2,28 @@
 
 > Codex 交接摘要（手動維護）
 
+## 最新狀態（2026-04-15，Codex Cloud 再驗證 + docs 整理）
+
+- 已新增 `docs/README.md`，建立 docs 有效性總覽：
+  - 列出每份文件的角色、狀態（Active）、最後檢視日期與驗證方式。
+  - 收斂本次「Codex Cloud 再驗證」命令清單，固定成可重跑批次。
+  - 附上官方來源連結（best-practices / agents-md / customization / subagents / hooks / config-reference）。
+- `README.md` 的「Codex 讀取入口」已新增 `docs/README.md`，讓 Agent 啟動時可先判斷 docs 是否最新有效。
+- 更新文件時間戳記：
+  - `docs/codex-workspace-blueprint.md` 更新基準改為 2026-04-15。
+  - `docs/workspace-performance-report.md` 更新基準改為 2026-04-15。
+
+## 驗證狀態（本輪）
+
+- 已驗證：
+  - `python3 scripts/validate_codex_workspace.py`
+  - `python3 -m unittest -v tests/test_codex_hooks_behavior.py tests/test_subagent_checks.py`
+  - `python3 scripts/run_subagent_checks.py`
+  - `python3 scripts/compare_subagent_trends.py`
+  - `rg -n "Goal|Context|Constraints|Done when" docs/codex-best-practices.md AGENTS.md`
+- 未驗證：
+  - 真正由 Codex Cloud UI 觸發的遠端作業執行紀錄（本輪為在本地環境重跑 Cloud 相容命令）
+
 ## 最新狀態（2026-04-14，Terraform 使用手冊 + 介面驗證補強）
 
 - 已新增 `terraform-optimized/README.md`，補齊方案 C 使用手冊（架構、快速啟動、安全預設、驗證流程、故障排除、後續作業）。

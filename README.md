@@ -220,6 +220,7 @@ rg -n "Codex Cloud 實踐對照|Karpathy 文章落地|Codex Cloud 執行指令" 
 
 | 情境 | 要讀的檔案 |
 | --- | --- |
+| 先確認 docs 哪些仍有效（最新整理入口） | `docs/README.md` |
 | 需要完整治理規範 | `AGENTS.full.md` |
 | 要套用 Karpathy 九條硬性守則 | `docs/karpathy-codex-principles.md` |
 | 角色分工 / 模型路由 | `.codex/config.toml` + `.codex/agents/*.toml` |
