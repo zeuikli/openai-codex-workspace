@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-04-15",
+  "baseline_tokens": 77,
+  "parallel_worker_elapsed_ms": 4.48,
+  "levels": {
+    "lite": {
+      "tokens": 36,
+      "save_vs_baseline": 0.5325
+    },
+    "full": {
+      "tokens": 26,
+      "save_vs_baseline": 0.6623
+    },
+    "ultra": {
+      "tokens": 17,
+      "save_vs_baseline": 0.7792
+    }
+  },
+  "model_level_grid_top5": [
+    {
+      "model": "gpt-5.4-nano",
+      "level": "ultra",
+      "expected_tokens": 17,
+      "estimated_output_cost_usd": 2.125e-05,
+      "quality_perf_score": 0.4143,
+      "fitness_score": 19496.0
+    },
+    {
+      "model": "gpt-5.4-nano",
+      "level": "full",
+      "expected_tokens": 26,
+      "estimated_output_cost_usd": 3.25e-05,
+      "quality_perf_score": 0.4484,
+      "fitness_score": 13797.17
+    },
+    {
+      "model": "gpt-5.4-nano",
+      "level": "lite",
+      "expected_tokens": 36,
+      "estimated_output_cost_usd": 4.5e-05,
+      "quality_perf_score": 0.4777,
+      "fitness_score": 10614.49
+    },
+    {
+      "model": "gpt-5-mini",
+      "level": "ultra",
+      "expected_tokens": 17,
+      "estimated_output_cost_usd": 3.4e-05,
+      "quality_perf_score": 0.3502,
+      "fitness_score": 10300.0
+    },
+    {
+      "model": "gpt-5-mini",
+      "level": "full",
+      "expected_tokens": 26,
+      "estimated_output_cost_usd": 5.2e-05,
+      "quality_perf_score": 0.379,
+      "fitness_score": 7289.23
+    }
+  ],
+  "load_test": {
+    "hooks": {
+      "manual_steps": 0,
+      "autoload": 1,
+      "payload_chars": 405,
+      "activation_latency_score": -9.75
+    },
+    "agents": {
+      "manual_steps": 0,
+      "autoload": 1,
+      "payload_chars": 120,
+      "activation_latency_score": -24.0
+    },
+    "skills": {
+      "manual_steps": 1,
+      "autoload": 0,
+      "payload_chars": 2800,
+      "activation_latency_score": 240.0
+    },
+    "rules": {
+      "manual_steps": 1,
+      "autoload": 0,
+      "payload_chars": 380,
+      "activation_latency_score": 119.0
+    }
+  },
+  "load_ranking_fastest_first": [
+    "agents",
+    "hooks",
+    "rules",
+    "skills"
+  ],
+  "assumptions": [
+    "Token count uses offline approximation; not API usage meter.",
+    "Cost uses OpenAI public output-token prices only.",
+    "Load test compares activation friction (steps + payload), not network latency."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "baseline_elapsed_ms": 17.63,
+  "optimized_elapsed_ms": 15.54,
+  "speedup_pct": 11.88,
+  "baseline_scanned_repo_chars": 131219,
+  "optimized_scanned_repo_chars": 81951,
+  "scanned_repo_chars_delta": -49268,
+  "baseline_tracked_text_files": 47,
+  "optimized_tracked_text_files": 40,
+  "optimized_skipped_file_count": 7
+}

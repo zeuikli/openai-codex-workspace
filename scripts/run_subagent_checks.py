@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import os
 import re
@@ -12,6 +13,15 @@ from pathlib import Path
 from typing import Any
 
 from validate_codex_workspace import validate_workspace
+
+DEFAULT_EXCLUDES = (
+    'docs/reports/*.json',
+    'docs/reports/*.md',
+    'Memory.md',
+    'README.md',
+    'AGENTS.full.md',
+    'scripts/run_subagent_checks.py',
+)
 
 
 @dataclass
@@ -65,6 +75,10 @@ def _find_latest_session_log(explicit: str | None) -> Path | None:
         return None
     logs = sorted(sessions_root.glob('**/*.jsonl'), key=lambda p: p.stat().st_mtime, reverse=True)
     return logs[0] if logs else None
+
+
+def _is_excluded(rel: str, exclude_patterns: tuple[str, ...]) -> bool:
+    return any(fnmatch.fnmatch(rel, pattern) for pattern in exclude_patterns)
 
 
 def _extract_usage_snapshot(obj: Any) -> dict[str, int] | None:
@@ -206,14 +220,18 @@ def implement_worker(root: Path) -> WorkerResult:
     )
 
 
-def review_worker(root: Path, token_metrics: SessionTokenMetrics | None) -> tuple[WorkerResult, dict[str, Any]]:
+def review_worker(
+    root: Path, token_metrics: SessionTokenMetrics | None, exclude_patterns: tuple[str, ...]
+) -> tuple[WorkerResult, dict[str, Any]]:
     tracked = subprocess.run(
         ['git', 'ls-files'], cwd=root, capture_output=True, text=True, check=False
     )
     files = [line.strip() for line in tracked.stdout.splitlines() if line.strip()]
 
     total_tokens = 0
+    scanned_chars = 0
     unreadable = 0
+    skipped = 0
     conflict_files: list[str] = []
     todo_files: list[str] = []
     hot_files: list[tuple[str, int]] = []
@@ -231,6 +249,10 @@ def review_worker(root: Path, token_metrics: SessionTokenMetrics | None) -> tupl
         path = root / rel
         if not path.is_file():
             continue
+        total_tokens += path.stat().st_size
+        if _is_excluded(rel, exclude_patterns):
+            skipped += 1
+            continue
         try:
             text = path.read_text(encoding='utf-8')
         except UnicodeDecodeError:
@@ -238,7 +260,7 @@ def review_worker(root: Path, token_metrics: SessionTokenMetrics | None) -> tupl
             continue
 
         chars = len(text)
-        total_tokens += chars
+        scanned_chars += chars
         hot_files.append((rel, chars))
 
         if re.search(r'^(<{7}|={7}|>{7})', text, flags=re.MULTILINE):
@@ -281,7 +303,9 @@ def review_worker(root: Path, token_metrics: SessionTokenMetrics | None) -> tupl
 
     details = [
         f'tracked_text_files={len(hot_files)} unreadable_files={unreadable}',
-        f'total_repo_chars={total_tokens}',
+        f'total_repo_bytes={total_tokens}',
+        f'scanned_repo_chars={scanned_chars}',
+        f'skipped_files={skipped}',
         'top_context_hotspots_by_chars=' + ', '.join(f'{name}({tok})' for name, tok in top_hot),
     ]
     if token_metrics:
@@ -318,7 +342,9 @@ def review_worker(root: Path, token_metrics: SessionTokenMetrics | None) -> tupl
     metrics = {
         'tracked_text_files': len(hot_files),
         'unreadable_files': unreadable,
-        'total_repo_chars': total_tokens,
+        'total_repo_bytes': total_tokens,
+        'scanned_repo_chars': scanned_chars,
+        'skipped_file_count': skipped,
         'top_context_hotspots_by_chars': [{'path': name, 'chars': tok} for name, tok in top_hot],
         'todo_or_fixme_file_count': len(todo_files),
         'merge_conflict_file_count': len(conflict_files),
@@ -372,7 +398,9 @@ def render_markdown(results: list[WorkerResult], metrics: dict[str, Any], action
             '',
             '## Token Efficiency Snapshot (Session Log)',
             f"- tracked_text_files: {metrics['tracked_text_files']}",
-            f"- total_repo_chars: {metrics['total_repo_chars']}",
+            f"- total_repo_bytes: {metrics['total_repo_bytes']}",
+            f"- scanned_repo_chars: {metrics['scanned_repo_chars']}",
+            f"- skipped_file_count: {metrics['skipped_file_count']}",
             f"- todo_or_fixme_file_count: {metrics['todo_or_fixme_file_count']}",
             f"- merge_conflict_file_count: {metrics['merge_conflict_file_count']}",
             f"- docs_drift_signal_count: {metrics['docs_drift_signal_count']}",
@@ -434,6 +462,12 @@ def main() -> int:
         default=None,
         help='Codex session JSONL log path. If omitted, auto-detect from CODEX_SESSION_LOG or ~/.codex/sessions.',
     )
+    parser.add_argument(
+        '--exclude',
+        nargs='*',
+        default=list(DEFAULT_EXCLUDES),
+        help='File patterns to exclude from heavy scan for faster repo-wide checks.',
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
@@ -443,7 +477,7 @@ def main() -> int:
     research = research_worker(root)
     implement = implement_worker(root)
     token_metrics = load_session_token_metrics(_find_latest_session_log(args.session_log))
-    review, metrics = review_worker(root, token_metrics)
+    review, metrics = review_worker(root, token_metrics, tuple(args.exclude))
     actions = optimization_actions(metrics)
 
     results = [research, implement, review]
