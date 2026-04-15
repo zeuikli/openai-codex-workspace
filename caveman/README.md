@@ -386,6 +386,79 @@ Real token counts from the Claude API ([reproduce it yourself](benchmarks/)):
 
 A March 2026 paper ["Brevity Constraints Reverse Performance Hierarchies in Language Models"](https://arxiv.org/abs/2604.00025) found that constraining large models to brief responses **improved accuracy by 26 percentage points** on certain benchmarks and completely reversed performance hierarchies. Verbose not always better. Sometimes less word = more correct.
 
+## Workspace Integration (Unified)
+
+### AGENTS vs SKILL vs HOOKS (for this repo)
+
+Recommended stack:
+1. **SKILL** (primary): best runtime control for `lite/full/ultra`.
+2. **AGENTS.md** (secondary): stable process/policy guardrails.
+3. **HOOKS** (optional): convenience only; keep blast radius small.
+
+Latest workspace-fit score:
+
+| Surface | Score |
+|---|---:|
+| SKILL | 4.65 |
+| AGENTS | 3.30 |
+| HOOKS | 3.00 |
+
+### OpenAI benchmark command (models × levels)
+
+```bash
+# optional, local only (never commit)
+cat > .env.local <<'EOF'
+OPENAI_API_KEY=sk-...
+EOF
+
+python3 benchmarks/openai_workspace_benchmark.py
+```
+
+`benchmarks/openai_workspace_benchmark.py` auto-loads `.env.local` and falls back to deterministic dry-run when key is missing.
+
+Latest run (`2026-04-15`, mode=`dry_run`) median output tokens:
+
+| Model | lite | full | ultra |
+|---|---:|---:|---:|
+| gpt-5.4 | 27 | 18 | 13 |
+| gpt-5.4-mini | 25 | 16 | 13 |
+| gpt-5.4-nano | 22 | 14 | 12 |
+| gpt-5.3-codex | 24 | 16 | 12 |
+
+Best combo in latest run: **gpt-5.4-nano + ultra** (median `12`).
+
+Artifacts:
+- `benchmarks/results/openai_workspace_benchmark_<timestamp>.json`
+- `benchmarks/results/openai_workspace_benchmark_<timestamp>.md`
+
+### Codex Cloud load test command
+
+```bash
+python3 scripts/run_codex_cloud_load_test.py
+```
+
+Runs:
+- `python3 tests/verify_repo.py`
+- `python3 -m unittest -v tests/test_hooks.py`
+
+Script exits non-zero on failure (CI-friendly). Latest run (`2026-04-15`) status is **PASS** after hook-compatibility fixes.
+
+Artifacts:
+- `benchmarks/results/codex_cloud_load_test_<timestamp>.json`
+- `benchmarks/results/codex_cloud_load_test_<timestamp>.md`
+
+### Upstream Repo Parity (Reference)
+
+Compared against upstream `JuliusBrussee/caveman` on `2026-04-15`.
+
+- Upstream files missing in this workspace: **0** ✅
+- Workspace-only files: **3**
+- Same-path content differences: **4**
+
+Detailed report:
+- `docs/repo-parity-report.md`
+- `docs/repo-parity-report.json`
+
 ## Evals
 
 Caveman not just claim 75%. Caveman **prove** it.
