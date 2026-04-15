@@ -12,6 +12,20 @@
 - CI 守門（`.github/workflows/fetch-blog.yml`）延伸到 SKILL.md frontmatter 與 slug 一致性，封堵 Codex CLI 靜默載入失敗的風險。
 - SessionStart hook 內嵌 Karpathy 九條硬性守則的一句話提醒，減少對 AGENTS.md 被讀到的單點依賴。
 
+## 官方基線
+
+這個 workspace 目前以 OpenAI 官方 Codex 文件作為第一手規範來源，並把 `claude-code-workspace` 視為遷移樣本，而不是直接照搬的設定來源。
+
+- `AGENTS.md` 分層與覆寫順序：<https://developers.openai.com/codex/guides/agents-md>
+- Codex 最佳實踐：<https://developers.openai.com/codex/learn/best-practices>
+- Customization 建議導入順序：<https://developers.openai.com/codex/concepts/customization#next-step>
+- Skills 結構與 progressive disclosure：<https://developers.openai.com/codex/concepts/customization#skills>
+- Subagents 與自訂 agent schema：<https://developers.openai.com/codex/subagents>
+- Hooks 能力與限制：<https://developers.openai.com/codex/hooks>
+- `.codex/config.toml` 參數定義：<https://developers.openai.com/codex/config-reference#configtoml>
+
+對 `claude-code-workspace` 的遷移判準與不適用項目，統一整理在 `docs/codex-migration-guide.md`。
+
 ## Anti-timeout 實務（避免長時間無產出）
 
 依 `docs/reports/session-issues-20260414.md`，已將「長任務拆分 + Agent 邊界」納入規範：
@@ -97,7 +111,7 @@ python3 scripts/compare_subagent_trends.py
 
 # 3) 文件可讀性與入口 smoke checks
 rg -n "Karpathy 實作原則|Assumption Ledger|Anti-Bloat|Generation vs Discrimination" AGENTS.md docs/karpathy-codex-principles.md
-rg -n "多 Agent 深度研究與優化流程|Codex CLI / Codex Cloud 完整適配檢查" README.md
+rg -n "多 Agent 深度研究與優化流程|Codex CLI / Codex Cloud 完整適配檢查|官方基線" README.md
 ```
 
 #### Codex Cloud 驗證批次（建議直接貼上）
@@ -128,7 +142,7 @@ rg -n "Karpathy 實作原則|Tenacity Loop|Generation vs Discrimination" AGENTS.
 rg -n "^## 1[1-5]\\." prompts.md
 
 # 4) README 是否提供 Agent 可讀入口與對照說明
-rg -n "Codex 讀取入口|Codex Cloud 實踐對照|最小驗證清單" README.md
+rg -n "Codex 讀取入口|Codex Cloud 實踐對照|最小驗證清單|官方基線" README.md
 ```
 
 ### 遠端 CI / Codex Cloud pipeline（端到端）
@@ -216,6 +230,7 @@ rg -n "Codex Cloud 實踐對照|Karpathy 文章落地|Codex Cloud 執行指令" 
 | 長任務交接 | `.agents/skills/session-handoff/SKILL.md` |
 | 成本與 token 回顧 | `.agents/skills/cost-tracker/SKILL.md` + `docs/token-usage-report.md` |
 | 其他治理策略 | `docs/advisor-strategy.md`、`docs/codex-workspace-blueprint.md`、`docs/codex-best-practices.md` |
+| 做 Claude → Codex 遷移判讀 | `docs/codex-migration-guide.md` |
 
 ### 通則
 
@@ -321,12 +336,11 @@ openai-codex-workspace/
 - Tier 2（中頻）：`Modernizing your Codebase with Codex`
 - Tier 3（低頻）：其他治理/案例文章（不阻塞主線）
 
-## 分支整併紀錄
+## 遷移策略
 
-- 當前分支 `claude/karpathy-optimization-merged` 已把以下兩條線收斂：
-  - `claude/codex-karpathy-optimization-M7POy`：Karpathy 九條原則導入 + 本機路徑修正。
-  - `claude/optimize-karpathy-repo-k6Vbz`：CI 守門擴充（skill frontmatter / slug）、SessionStart hook 提醒、文件索引修正。
-- 合併方式為 `--no-ff`，保留兩段歷史方便回溯；衝突處採「優化 followup 版本」（frontmatter 驗證、prompt 索引 11+12~15、CHANGELOG / Memory 最新狀態）。
+- `claude-code-workspace` 的 `CLAUDE.md`、`.claude/rules/*`、`.claude/settings.json`、hooks 與 skills，已改寫為 Codex 原生的 `AGENTS.md`、`.codex/config.toml`、`.codex/hooks.json`、`.codex/agents/*.toml` 與 `.agents/skills/`。
+- Claude 專屬能力，例如 `PreCompact`、`PostCompact`、`InstructionsLoaded`、`autoMemoryEnabled` 與 `SubagentStart/Stop`，不再視為 Codex 的既有能力。
+- 官方文件有明確限制的區塊，像是 Hooks 目前仍屬 experimental，且 `PreToolUse` / `PostToolUse` 實際上只保證 Bash matcher，已在本 repo 實作與驗證層同步對齊。
 
 ## 官方參考
 

@@ -23,10 +23,11 @@
 2. 再讀與任務直接相關的程式與設定檔。
 3. `SKILL.md` 採按需載入：只讀與當前任務直接相關的 skill，禁止全量預讀。
 4. 文檔查證預設優先交由 `docs_researcher`（`gpt-5.4-mini`）；只有在多文件衝突、規格不一致或高風險決策時才升級 `gpt-5.4`。
-5. 長任務每完成一個里程碑要做一次上下文摘要，避免重複回灌舊上下文。
-6. 複雜任務先規劃，再實作。
-7. 先做最小可驗證修改，再擴大範圍。
-8. 除非被阻塞，不以「只給計畫」結束回合。
+5. 若任務涉及 Codex 規範、Claude → Codex 遷移、hooks、skills、subagents 或官方能力判讀，優先查 `docs/codex-migration-guide.md` 與 OpenAI 官方文件。
+6. 長任務每完成一個里程碑要做一次上下文摘要，避免重複回灌舊上下文。
+7. 複雜任務先規劃，再實作。
+8. 先做最小可驗證修改，再擴大範圍。
+9. 除非被阻塞，不以「只給計畫」結束回合。
 
 ## Rollout 溝通
 
@@ -100,10 +101,19 @@
 ## 結構邊界
 
 - `AGENTS.md`：持久規範（短、準、可執行）。
+- `AGENTS.full.md`：完整治理規範與補充說明。
 - `.agents/skills/`：可重用 workflow。
 - `.codex/agents/*.toml`：custom agents 定義。
+- `docs/codex-migration-guide.md`：Claude → Codex 遷移判讀與不適用清單。
 - Automations：排程單位。
 - Hooks 為 experimental，不作唯一核心依賴。
+
+## 官方對齊規則
+
+- `AGENTS.md` 應保持實用、精簡、可驗證；若規範變得太長，改把細節轉移到補充文件或 skill。
+- Skills 使用 `.agents/skills`，並遵循 progressive disclosure：先 metadata、再 `SKILL.md`、最後才讀 references 或 scripts。
+- Hooks 目前只把 `PreToolUse` / `PostToolUse` 視為 Bash matcher guardrail，不假設 Claude 專屬事件存在。
+- Subagents 只在使用者明確要求或任務可平行拆分時啟用，不把「所有能委派都先委派」寫成硬規則。
 
 ## 長任務管理
 

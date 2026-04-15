@@ -24,6 +24,7 @@
 - 固定啟動載入：`AGENTS.md`、`Memory.md`、`prompts.md`。
 - 再讀與任務直接相關的檔案，不憑印象改動。
 - `SKILL.md` 僅按需載入：只載入當前任務需要的 skill，避免全量預讀。
+- 涉及 Codex 規範、Claude → Codex 遷移、hooks、skills、subagents 或 config 能力判讀時，優先讀 `docs/codex-migration-guide.md` 與 OpenAI 官方文件。
 - 需求不清時先澄清，再實作。
 - 預設採「先執行再回報」：除非任務本質是規劃題，避免只停在分析。
 
@@ -96,6 +97,7 @@
 - `AGENTS.md`：持久規範（短、準、可執行）。
 - `.agents/skills/`：可重用工作流（每個 skill 聚焦一件事）。
 - `.codex/agents/*.toml`：custom agents（每檔一個 agent）。
+- `docs/codex-migration-guide.md`：Claude 設計如何落到 Codex、以及哪些功能不直接對應。
 - Automations：Codex app 背景排程（先手動穩定再排程）。
 - `.codex/hooks.json`：experimental（可輔助，不作唯一核心依賴）。
 

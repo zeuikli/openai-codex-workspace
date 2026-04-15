@@ -1,13 +1,17 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
 model = "gpt-5.4"
+model_reasoning_effort = "medium"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
+web_search = "cached"
 
 [features]
 multi_agent = true
 # Hooks 仍屬 under development；本 workspace 已提供 hooks.json 與腳本，故啟用。
 codex_hooks = true
+
+project_doc_fallback_filenames = [".agents.md"]
 
 [agents]
 max_threads = 6

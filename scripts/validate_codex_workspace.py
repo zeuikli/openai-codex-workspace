@@ -3,11 +3,37 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
-try:
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
-    import tomli as tomllib
+
+
+def parse_simple_toml(text: str) -> dict[str, object]:
+    data: dict[str, object] = {}
+    current: dict[str, object] | None = None
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith('#'):
+            continue
+
+        section_match = re.match(r'^\[([^\]]+)\]$', line)
+        if section_match:
+            path = section_match.group(1).split('.')
+            current = data
+            for part in path:
+                next_value = current.get(part)
+                if not isinstance(next_value, dict):
+                    next_value = {}
+                    current[part] = next_value
+                current = next_value
+            continue
+
+        key_match = re.match(r'^([A-Za-z0-9_]+)\s*=\s*(.+)$', line)
+        if key_match:
+            target = current if current is not None else data
+            target[key_match.group(1)] = key_match.group(2).strip()
+
+    return data
 
 
 def validate_workspace(root: Path) -> list[str]:
@@ -79,7 +105,7 @@ def validate_workspace(root: Path) -> list[str]:
             errors.append(f'Missing custom agent: {agent_file.as_posix()}')
             continue
         try:
-            data = tomllib.loads(agent_file.read_text(encoding='utf-8'))
+            data = parse_simple_toml(agent_file.read_text(encoding='utf-8'))
         except Exception as exc:
             errors.append(f'Invalid TOML ({agent_file.as_posix()}): {exc}')
             continue
@@ -92,7 +118,7 @@ def validate_workspace(root: Path) -> list[str]:
         errors.append('Missing .codex/config.toml')
     else:
         try:
-            config = tomllib.loads(config_file.read_text(encoding='utf-8'))
+            config = parse_simple_toml(config_file.read_text(encoding='utf-8'))
         except Exception as exc:
             errors.append(f'Invalid TOML (.codex/config.toml): {exc}')
             config = {}
@@ -103,6 +129,10 @@ def validate_workspace(root: Path) -> list[str]:
         feature_flags = config.get('features', {})
         if 'codex_hooks' not in feature_flags:
             errors.append('Missing features.codex_hooks in .codex/config.toml')
+        if 'web_search' not in config:
+            errors.append('Missing top-level web_search in .codex/config.toml')
+        if 'model_reasoning_effort' not in config:
+            errors.append('Missing top-level model_reasoning_effort in .codex/config.toml')
 
         for role in [
             'architecture_explorer',
@@ -151,6 +181,21 @@ def validate_workspace(root: Path) -> list[str]:
             continue
         if not os.access(script, os.X_OK):
             errors.append(f'Hook script is not executable: {script.as_posix()}')
+
+    migration_guide = root / 'docs' / 'codex-migration-guide.md'
+    if not migration_guide.exists():
+        errors.append('Missing docs/codex-migration-guide.md')
+    else:
+        content = migration_guide.read_text(encoding='utf-8')
+        for marker in [
+            'developers.openai.com/codex/guides/agents-md',
+            'developers.openai.com/codex/learn/best-practices',
+            'developers.openai.com/codex/subagents',
+            'developers.openai.com/codex/hooks',
+            'developers.openai.com/codex/config-reference#configtoml',
+        ]:
+            if marker not in content:
+                errors.append(f'Migration guide missing official source: {marker}')
 
     return errors
 
