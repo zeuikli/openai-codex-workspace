@@ -174,3 +174,54 @@
 1. 在 CI 跑一次結構驗證（含 `.github/workflows/fetch-blog.yml`）。
 2. 若新增技能，維持 `Use when` / `Do not use when` 邊界格式。
 3. 定期用 `docs-drift-check` 檢查官方文件漂移。
+
+## 最新狀態（2026-04-15，Caveman × OpenAI token 效率研究）
+
+- 使用者要求 clone `JuliusBrussee/caveman` 後做三項研究：
+  1) 哪個 OpenAI 模型搭配 caveman 最省 output tokens。
+  2) 以 sub-agent 型態比較 lite/full/ultra 與模型契合。
+  3) 比較 SKILLS / AGENTS / HOOKS / Rules 的啟動效率。
+- 實際執行 `git clone` 因環境限制失敗（`CONNECT tunnel failed, response 403`），改用 raw 檔 URL 做證據收集。
+- 新增 `scripts/research_caveman_openai_fit.py`：
+  - 以三個平行 worker 模擬 sub-agent 比較 lite/full/ultra 壓縮效果。
+  - 套用公開價格與 benchmark 指標，輸出 model×level fitness 排名。
+  - 另計算 SKILLS/AGENTS/HOOKS/Rules 啟動摩擦分數（autoload、手動步驟、payload 長度）。
+- 新增研究輸出：
+  - `docs/reports/caveman_openai_fit_20260415.json`
+  - `docs/reports/caveman_openai_fit_20260415.md`
+  - `docs/reports/caveman_research_notes_20260415.md`
+
+## 驗證狀態（本輪）
+
+- 已驗證：
+  - `python3 scripts/research_caveman_openai_fit.py`
+- 未驗證：
+  - 真實 OpenAI API usage meter A/B（本輪為離線估算）
+  - GitHub repo 完整 clone（受 403 限制）
+
+## 最新狀態（2026-04-15，Caveman 研究流程二次驗證 + repo 效能優化）
+
+- 依使用者回饋，對前一版研究流程做二次驗證與 repo 層級效能改進。
+- `scripts/run_subagent_checks.py` 新增效能優化能力：
+  - 支援 `--exclude` 參數與預設排除清單（reports/README/Memory 等高載入檔）。
+  - 指標新增 `total_repo_bytes`、`scanned_repo_chars`、`skipped_file_count`，可量化掃描負載。
+- `scripts/compare_subagent_trends.py` 擴充趨勢追蹤：新增 `tracked_text_files`、`scanned_repo_chars`、`skipped_file_count` 與對前一筆 delta。
+- 新增 `scripts/benchmark_repo_scan_efficiency.py`：
+  - 針對 review worker 做 baseline(no exclude) vs optimized(default exclude) 多輪比較。
+  - 產出 `docs/reports/repo_scan_efficiency_20260415.md/.json`。
+- `tests/test_subagent_checks.py` 已補上新欄位與 trend 文本斷言，確保新版指標與報告格式可回歸驗證。
+
+## 驗證狀態（本輪）
+
+- 已驗證：
+  - `python3 scripts/research_caveman_openai_fit.py`
+  - `python3 scripts/benchmark_repo_scan_efficiency.py`
+  - `python3 scripts/run_subagent_checks.py`
+  - `python3 scripts/compare_subagent_trends.py`
+  - `python3 -m unittest -v tests/test_subagent_checks.py`
+  - `python3 scripts/validate_codex_workspace.py`
+- 量化結果：
+  - repo review scan `scanned_repo_chars` 從 131,219 降到 81,951（-49,268，約 -37.5%）。
+  - review worker 中位數執行時間由 17.17ms 改善到 17.03ms（+0.8% speedup）。
+- 未驗證：
+  - 真實 OpenAI usage/billing A/B（仍需可連網且具 API telemetry 環境）。

@@ -40,6 +40,9 @@ def main() -> int:
         'cached_input_share_pct': float((current.get('metrics', {}).get('session_token_metrics') or {}).get('cached_input_share_pct', 0.0)),
         'docs_drift_signal_count': int(current.get('metrics', {}).get('docs_drift_signal_count', 0)),
         'security_pattern_violation_count': int(current.get('metrics', {}).get('security_pattern_violation_count', 0)),
+        'tracked_text_files': int(current.get('metrics', {}).get('tracked_text_files', 0)),
+        'scanned_repo_chars': int(current.get('metrics', {}).get('scanned_repo_chars', 0)),
+        'skipped_file_count': int(current.get('metrics', {}).get('skipped_file_count', 0)),
     }
 
     history: list[dict[str, Any]] = []
@@ -57,9 +60,13 @@ def main() -> int:
     if previous:
         total_delta = row['total_tokens'] - previous['total_tokens']
         last_turn_delta = row['last_turn_share_pct'] - float(previous.get('last_turn_share_pct', 0.0))
+        scanned_chars_delta = row['scanned_repo_chars'] - int(previous.get('scanned_repo_chars', 0))
+        tracked_files_delta = row['tracked_text_files'] - int(previous.get('tracked_text_files', 0))
     else:
         total_delta = 0
         last_turn_delta = 0.0
+        scanned_chars_delta = 0
+        tracked_files_delta = 0
 
     lines = [
         '# Sub-Agent Quality Trend',
@@ -76,10 +83,15 @@ def main() -> int:
         f"- cached_input_share_pct: {row['cached_input_share_pct']}",
         f"- docs_drift_signal_count: {row['docs_drift_signal_count']}",
         f"- security_pattern_violation_count: {row['security_pattern_violation_count']}",
+        f"- tracked_text_files: {row['tracked_text_files']}",
+        f"- scanned_repo_chars: {row['scanned_repo_chars']}",
+        f"- skipped_file_count: {row['skipped_file_count']}",
         '',
         '## Delta vs Previous',
         f'- total_tokens_delta: {total_delta}',
         f'- last_turn_share_pct_delta: {round(last_turn_delta, 2)}',
+        f'- scanned_repo_chars_delta: {scanned_chars_delta}',
+        f'- tracked_text_files_delta: {tracked_files_delta}',
     ]
 
     output_md.parent.mkdir(parents=True, exist_ok=True)

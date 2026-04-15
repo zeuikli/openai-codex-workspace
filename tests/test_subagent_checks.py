@@ -70,6 +70,8 @@ class SubAgentChecksScriptTest(unittest.TestCase):
                 payload['metrics']['session_token_metrics']['uncached_input_tokens'],
                 400,
             )
+            self.assertIn('scanned_repo_chars', payload['metrics'])
+            self.assertIn('skipped_file_count', payload['metrics'])
 
     def test_trend_script_generates_history_and_report(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -115,7 +117,9 @@ class SubAgentChecksScriptTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, msg=result.stdout + '\n' + result.stderr)
             self.assertTrue(history.exists())
             self.assertTrue(trend.exists())
-            self.assertIn('Latest Snapshot', trend.read_text(encoding='utf-8'))
+            trend_text = trend.read_text(encoding='utf-8')
+            self.assertIn('Latest Snapshot', trend_text)
+            self.assertIn('scanned_repo_chars', trend_text)
 
 
 if __name__ == '__main__':
