@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "generated_at": "2026-04-15",
+    "workspace_root": "/workspace/openai-codex-workspace/caveman",
+    "upstream_root": "/tmp/tmp.VuGlIMDCUR/upstream",
+    "excluded_names": [
+      ".DS_Store",
+      ".git",
+      "__pycache__"
+    ],
+    "excluded_suffixes": [
+      ".pyc"
+    ],
+    "excluded_prefixes": [
+      "benchmarks/results"
+    ]
+  },
+  "summary": {
+    "workspace_file_count": 105,
+    "upstream_file_count": 102,
+    "missing_from_workspace_count": 0,
+    "extra_in_workspace_count": 3,
+    "content_differences_count": 4
+  },
+  "missing_from_workspace": [],
+  "extra_in_workspace": [
+    "benchmarks/openai_workspace_benchmark.py",
+    "docs/repo-parity-report.json",
+    "scripts/run_codex_cloud_load_test.py"
+  ],
+  "content_differences": [
+    ".gitignore",
+    "README.md",
+    "hooks/caveman-activate.js",
+    "hooks/caveman-mode-tracker.js"
+  ]
+}
