@@ -1,0 +1,24 @@
+[
+  {
+    "generated_at": "2026-04-14T17:01:21.770033+00:00",
+    "total_tokens": 0,
+    "total_cached_input_tokens": 0,
+    "uncached_input_tokens": 0,
+    "last_turn_total_tokens": 0,
+    "last_turn_share_pct": 0.0,
+    "cached_input_share_pct": 0.0,
+    "docs_drift_signal_count": 0,
+    "security_pattern_violation_count": 0
+  },
+  {
+    "generated_at": "2026-04-14T17:01:45.070582+00:00",
+    "total_tokens": 0,
+    "total_cached_input_tokens": 0,
+    "uncached_input_tokens": 0,
+    "last_turn_total_tokens": 0,
+    "last_turn_share_pct": 0.0,
+    "cached_input_share_pct": 0.0,
+    "docs_drift_signal_count": 0,
+    "security_pattern_violation_count": 0
+  }
+]

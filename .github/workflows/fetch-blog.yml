@@ -1,0 +1,62 @@
+name: CI Guard - Subagent Quality
+
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - 'docs/**'
+      - '.codex/**'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'prompts.md'
+      - '.github/workflows/fetch-blog.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - 'docs/**'
+      - '.codex/**'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'prompts.md'
+      - '.github/workflows/fetch-blog.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *'
+
+jobs:
+  subagent-quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate workspace structure
+        run: python3 scripts/validate_codex_workspace.py
+
+      - name: Run hooks behavior tests
+        run: python3 -m unittest -v tests/test_codex_hooks_behavior.py tests/test_subagent_checks.py
+
+      - name: Run subagent quality checks
+        run: python3 scripts/run_subagent_checks.py
+
+      - name: Build trend report
+        run: python3 scripts/compare_subagent_trends.py
+
+      - name: Upload quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: subagent-quality-report
+          path: |
+            docs/reports/subagent-quality-report.md
+            docs/reports/subagent-quality-report.json
+            docs/reports/subagent-quality-trend.md
+            docs/reports/subagent-quality-history.json

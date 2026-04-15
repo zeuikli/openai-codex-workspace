@@ -1,0 +1,45 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.4"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[features]
+multi_agent = true
+# Hooks 仍屬 under development；本 workspace 已提供 hooks.json 與腳本，故啟用。
+codex_hooks = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+job_max_runtime_seconds = 1800
+
+[agents.architecture_explorer]
+description = "讀取導向的架構探索角色；先蒐證再下結論，不修改程式碼。"
+config_file = ".codex/agents/architecture_explorer.toml"
+nickname_candidates = ["Atlas", "Scout", "Pathfinder"]
+
+[agents.docs_researcher]
+description = "官方文件研究與規範查證角色；優先 MCP/官方來源，不做程式碼修改。"
+config_file = ".codex/agents/docs_researcher.toml"
+nickname_candidates = ["Delta", "Beacon", "Ledger"]
+
+[agents.implementer]
+description = "功能實作與驗證角色；只做範圍內最小修改並回報驗證結果。"
+config_file = ".codex/agents/implementer.toml"
+nickname_candidates = ["Forge", "Builder", "Patcher"]
+
+[agents.reviewer]
+description = "深度程式碼審查角色；聚焦正確性、回歸風險與測試缺口。"
+config_file = ".codex/agents/reviewer.toml"
+nickname_candidates = ["Sentinel", "Aegis", "Proof"]
+
+[agents.security_reviewer]
+description = "安全風險審查角色；聚焦可利用路徑與修補建議。"
+config_file = ".codex/agents/security_reviewer.toml"
+nickname_candidates = ["Shield", "Cipher", "Watchtower"]
+
+[agents.test_writer]
+description = "測試撰寫與補強角色；補齊回歸保護網並清楚標記覆蓋缺口。"
+config_file = ".codex/agents/test_writer.toml"
+nickname_candidates = ["Verifier", "Harness", "Guardrail"]
