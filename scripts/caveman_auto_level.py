@@ -24,9 +24,14 @@ from dataclasses import dataclass, field
 
 
 # ── Signal tables ─────────────────────────────────────────────────────────────
+#
+# NOTE: \b word-boundary anchors do NOT work with Chinese/CJK characters.
+# Chinese patterns use explicit anchors (^/$) or rely on character context.
+# _count_matches() calls text.lower() — harmless for CJK (no case change).
 
 # OFF: security / destructive — highest priority, checked first
 OFF_PATTERNS = [
+    # English
     r"\bdrop\s+table\b",
     r"\brm\s+-rf?\b",
     r"\bdelete\s+(all|everything|database|db|table|users)\b",
@@ -36,10 +41,19 @@ OFF_PATTERNS = [
     r"\b(warning|caution|danger)\s*:",
     r"\bdestructive\b",
     r"\bformat\s+(disk|drive|partition)\b",
+    # Traditional Chinese
+    r"刪除(所有|全部|資料庫|資料表|用戶|帳號|所有資料)",
+    r"清空(資料庫|資料表|所有|全部)",
+    r"格式化(硬碟|磁碟|分區|系統磁碟)",
+    r"不可逆",
+    r"無法復原",
+    r"(警告|注意|危險)\s*[：:]",
+    r"(危險|破壞性)(操作|指令|命令)",
 ]
 
 # ULTRA: high-compression signals
 ULTRA_PATTERNS = [
+    # English
     r"\bsummarize\b",
     r"\bsummar[yi]",
     r"\blist\s+(all|every)",
@@ -47,12 +61,11 @@ ULTRA_PATTERNS = [
     r"\bshort(ly)?\b",
     r"\btl;?dr\b",
     r"tl;dr\s*:",                       # "tl;dr: what is..."
-
     r"\boverview\b",
     r"\bquick(ly)?\b",
     r"\bbatch\b",
     r"\bmulti[- ]file\b",
-    r"\ball\s+\w+\s+in\s+",  # "all files in", "all tests in"
+    r"\ball\s+\w+\s+in\s+",            # "all files in", "all tests in"
     r"\benumerate\b",
     r"\bcompact\b",
     r"\bcondense\b",
@@ -64,10 +77,21 @@ ULTRA_PATTERNS = [
     r"keep\s+it\s+short",
     r"less\s+words?",
     r"fewer\s+words?",
+    # Traditional Chinese
+    r"(摘要|摘錄|總結)(一下|說明|這個|以下)?",
+    r"列出(所有|全部|每個|每一個)",
+    r"(簡短|簡要|扼要)(說明|解釋|介紹|描述)",
+    r"(快速|速速)(說明|概述|介紹|解釋)",
+    r"(概述|概覽|概要)",
+    r"重點(整理|列出|說明|條列)",
+    r"(一句話|幾個字)(說明|解釋|描述|介紹)",
+    r"用(一句話|幾個字)(說明|解釋|描述)",
+    r"條列(式|出)",
 ]
 
 # LITE: simple / conversational signals
 LITE_PATTERNS = [
+    # English
     r"^yes$",
     r"^no$",
     r"^ok$",
@@ -89,12 +113,33 @@ LITE_PATTERNS = [
     r"\bshould\s+i\b",
     r"^is\s+\w[\w\s]{0,40}\??\s*$",        # "Is Python interpreted?" (short is-question)
     r"^are\s+\w[\w\s]{0,40}\??\s*$",       # "Are hooks experimental?"
-
     r"\bwhat\s+language\b",
+    # Traditional Chinese — single-char confirmations
+    r"^[是否好對不嗯喔唷]$",
+    r"^(好的|是的|對的|沒問題|可以|不用|不必|不需要)[。！]?\s*$",
+    r"^(好啊|好喔|好呀|嗯嗯|嗯啊)[。！]?\s*$",
+    # Traditional Chinese — thank-you / acknowledgment
+    r"謝謝",
+    r"感謝",
+    # Traditional Chinese — definition / what-is
+    # Note: use \s* to handle space between Chinese and ASCII (e.g. 什麼是 TCP？)
+    r"什麼是\s*[\u4e00-\u9fff\w]",
+    r"是什麼[？?]?\s*$",                   # "TCP 是什麼？" ends with 是什麼
+    r"定義[\u4e00-\u9fff\w\s]+",
+    r"[\u4e00-\u9fff\w]+的定義",
+    r"是啥[？?]?\s*$",
+    # Traditional Chinese — yes/no / confirm
+    r"需要[\u4e00-\u9fff\w]*嗎[？]?\s*$",  # allow content between 需要 and 嗎
+    r"(可以|能)(嗎|不可以|不能)[？]?\s*$",
+    r"確認(一下)?[？]?\s*$",
+    r"(這樣)?對(嗎|不對)[？]?\s*$",
+    r"(是或否|是還是否)[？]?\s*$",
+    r"(正確|對)(嗎|不)[？]?\s*$",
 ]
 
 # FULL: default technical signals (explicit, not just "not lite or ultra")
 FULL_PATTERNS = [
+    # English
     r"\bexplain\b",
     r"\bhow\s+(does|do|to)\b",
     r"\bwhy\s+(does|do|is|are)\b",
@@ -120,6 +165,18 @@ FULL_PATTERNS = [
     r"\bsecurity\b",
     r"\btest\b",
     r"\bvalidate\b",
+    # Traditional Chinese
+    # Note: complement is NON-OPTIONAL to avoid matching 簡短說明/快速說明 (those are ultra)
+    r"(解釋|說明)(一下|為什麼|如何|這個|原因|步驟)",
+    r"為(什麼|何)[\u4e00-\u9fff\w\s]{0,30}(會|是|有|不|產生|發生)",
+    r"如何(做|實作|設定|配置|修復|除錯|使用|建立|部署)",
+    r"(怎麼|怎樣)(做|修|設定|除錯|實作|部署|配置)",
+    r"(步驟|流程|程序)(是什麼|有哪些)",   # require complement; standalone 流程 is ambiguous
+    r"比較[\u4e00-\u9fff\w\s]+[和與跟][\u4e00-\u9fff\w\s]+",
+    r"(設計|架構)(模式|說明|概念|原則)",
+    r"(除錯|調試)",
+    r"(錯誤|問題)(原因|怎麼|如何|在哪)",
+    r"(優化|效能|性能)(調整|改善|問題)",
 ]
 
 

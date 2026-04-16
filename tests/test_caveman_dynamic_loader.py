@@ -85,6 +85,7 @@ class DynamicLoaderDecideTest(unittest.TestCase):
     """Verify classify-and-decide routing is correct."""
 
     CASES: list[tuple[str, str]] = [
+        # ── English ──────────────────────────────────────────────────────────
         # lite
         ("What is TCP?", "lite"),
         ("Is Python interpreted?", "lite"),
@@ -109,6 +110,31 @@ class DynamicLoaderDecideTest(unittest.TestCase):
         ("DROP TABLE users;", "off"),
         ("This action is irreversible and cannot be undone.", "off"),
         ("delete all database records", "off"),
+        # ── Traditional Chinese (繁體中文) ────────────────────────────────────
+        # lite
+        ("什麼是 TCP？", "lite"),
+        ("好", "lite"),
+        ("這樣對嗎？", "lite"),
+        ("需要重啟嗎？", "lite"),
+        ("TCP 是什麼？", "lite"),
+        # full
+        ("解釋一下 connection pooling", "full"),
+        ("為什麼 React 每次都重新渲染？", "full"),
+        ("如何修復 memory leak？", "full"),
+        ("如何設定 nginx 反向代理？", "full"),
+        ("比較 TCP 和 UDP 的差異", "full"),
+        # ultra
+        ("摘要一下 REST 和 GraphQL 的差異", "ultra"),
+        ("列出所有 HTTP 狀態碼", "ultra"),
+        ("簡短說明 CI/CD 流程", "ultra"),
+        ("重點整理微服務的優缺點", "ultra"),
+        ("一句話解釋 Kubernetes", "ultra"),
+        # off
+        ("警告：執行此命令將刪除所有資料表", "off"),
+        ("清空資料庫", "off"),
+        ("格式化硬碟", "off"),
+        ("不可逆操作，請確認", "off"),
+        ("無法復原，是否繼續？", "off"),
     ]
 
     def setUp(self):
