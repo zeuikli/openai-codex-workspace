@@ -35,6 +35,18 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/user_prompt_submit_caveman.sh\"",
+            "statusMessage": "Caveman per-turn reinforcement"
+          }
+        ]
+      }
     ]
   }
 }

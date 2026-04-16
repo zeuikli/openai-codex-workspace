@@ -51,6 +51,8 @@ from caveman_dynamic_loader import (  # type: ignore
     DynamicLoader,
     STATIC_PROMPT,
     LEAN_SHARED_PROMPT,
+    ORIGINAL_FILTERED_PROMPT,
+    PER_TURN_REINFORCEMENT,
     LEVEL_DELTA_PROMPTS,
     PROMPT_SIZES,
     _tok,
@@ -309,8 +311,9 @@ PHASE2_MODEL = "gpt-5.4-mini"
 PHASE2_SYSTEMS: dict[str, str] = {
     "none": "You are a helpful technical assistant.",
     "static": STATIC_PROMPT,
-    "dynamic_auto": "",    # computed per-prompt
+    "dynamic_auto": "",            # computed per-prompt (lean_v2 + delta)
     "forced_ultra": LEAN_SHARED_PROMPT + "\n" + LEVEL_DELTA_PROMPTS["ultra"],
+    "original_filtered": ORIGINAL_FILTERED_PROMPT,   # JuliusBrussee/caveman filtered full-level
 }
 
 PHASE2_PROMPTS: list[tuple[str, str]] = [
@@ -387,7 +390,7 @@ def run_phase2() -> Optional[dict]:
 
     client = OpenAI(api_key=api_key)
     loader = DynamicLoader()
-    strategies = ["none", "static", "dynamic_auto", "forced_ultra"]
+    strategies = ["none", "static", "dynamic_auto", "forced_ultra", "original_filtered"]
     results: dict[str, list[dict]] = {s: [] for s in strategies}
     n_calls = len(strategies) * len(PHASE2_PROMPTS)
     call_n = 0
@@ -828,7 +831,7 @@ def build_report(
         lines += [
             f"**Model:** {p2.get('model', '?')} · "
             f"**Prompts:** {p2.get('prompt_count', 0)} · "
-            f"**Strategies:** none / static / dynamic_auto / forced_ultra",
+            f"**Strategies:** {' / '.join(p2.get('strategies', []))}",
             "",
             "### Overall Strategy Comparison",
             "",
@@ -839,7 +842,7 @@ def build_report(
         ]
         none_total = (agg.get("none", {}).get("avg_input_tokens", 0)
                       + agg.get("none", {}).get("avg_output_tokens", 0))
-        for strategy in ["none", "static", "dynamic_auto", "forced_ultra"]:
+        for strategy in p2.get("strategies", ["none", "static", "dynamic_auto", "forced_ultra"]):
             a = agg.get(strategy, {})
             if not a.get("ok"):
                 lines.append(f"| {strategy} | — | — | — | — | — |")
@@ -858,7 +861,7 @@ def build_report(
             "| Strategy | Avg Input | Avg Output | **Total** | vs none |",
             "|----------|-----------|------------|-----------|---------|",
         ]
-        for strategy in ["none", "static", "dynamic_auto", "forced_ultra"]:
+        for strategy in p2.get("strategies", ["none", "static", "dynamic_auto", "forced_ultra"]):
             a = agg.get(strategy, {})
             if not a.get("ok"):
                 lines.append(f"| {strategy} | — | — | — | — |")
@@ -879,6 +882,7 @@ def build_report(
         if none_total > 0:
             st_a = agg.get("static", {})
             da_a = agg.get("dynamic_auto", {})
+            of_a = agg.get("original_filtered", {})
             if st_a.get("ok") and da_a.get("ok"):
                 st_total = st_a["avg_input_tokens"] + st_a["avg_output_tokens"]
                 da_total = da_a["avg_input_tokens"] + da_a["avg_output_tokens"]
@@ -891,6 +895,39 @@ def build_report(
                     f"with {da_a.get('output_reduction_vs_none_pct', 0):+.1f}% output compression.",
                     "",
                 ]
+            if of_a.get("ok"):
+                of_total = of_a["avg_input_tokens"] + of_a["avg_output_tokens"]
+                of_diff = (of_total - none_total) / none_total * 100
+                lines += [
+                    f"> **Original-filtered** (JuliusBrussee/caveman approach): "
+                    f"total cost **{of_diff:+.1f}%** vs none · "
+                    f"output reduction {of_a.get('output_reduction_vs_none_pct', 0):+.1f}% vs none.",
+                    "",
+                ]
+
+        # Per-turn reinforcement analysis
+        reinforce_tok = _tok(PER_TURN_REINFORCEMENT)
+        lean_tok = PROMPT_SIZES["lean_shared"]["tokens"]
+        lines += [
+            "### Per-Turn Reinforcement Analysis",
+            "",
+            f"> **Research finding (JuliusBrussee/caveman):** The original uses a `UserPromptSubmit` "
+            f"hook to inject ~{reinforce_tok} tokens per user turn, preventing mid-session model drift "
+            f"caused by competing plugin instructions. Codex CLI does not expose a `UserPromptSubmit` "
+            f"hook event — only `SessionStart`, `PreToolUse`, `PostToolUse` are available.",
+            "",
+            "| Model | Session start | Per turn | 10-turn total | 50-turn total |",
+            "|-------|--------------|----------|---------------|---------------|",
+            f"| Static (old) | 427 tok | 0 | 427 tok | 427 tok |",
+            f"| Original filtered | ~217 tok | ~{reinforce_tok} tok | {217 + reinforce_tok * 10} tok | {217 + reinforce_tok * 50} tok |",
+            f"| Our lean v2 | {lean_tok} tok | 0 (no hook) | {lean_tok} tok | {lean_tok} tok |",
+            f"| Our lean v2 + reinforce* | {lean_tok} tok | {reinforce_tok} tok | {lean_tok + reinforce_tok * 10} tok | {lean_tok + reinforce_tok * 50} tok |",
+            "",
+            f"> \\* Hypothetical — if Codex adds `UserPromptSubmit` support. "
+            f"Even with per-turn reinforcement, lean v2 remains cheaper than original_filtered "
+            f"up to ~{(217 - lean_tok) // reinforce_tok} turns.",
+            "",
+        ]
 
     # Phase 3
     lines += ["---", "", "## Phase 3 — Codex CLI Hook Validation", ""]

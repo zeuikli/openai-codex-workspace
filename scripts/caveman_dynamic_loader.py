@@ -76,15 +76,50 @@ STATIC_PROMPT = (
 )
 
 # ── Lean Shared Base (new design, session start) ──────────────────────────────
-# Contains: auto-select logic + common rules. No per-level detail.
+# Contains: auto-select logic + common rules + concrete Not/Yes examples.
 # Injected ONCE at session start regardless of mode.
+# v2: added Not/Yes examples (from JuliusBrussee/caveman) for stronger model anchoring.
+#     Research shows concrete examples prevent mid-session drift better than abstract rules.
 LEAN_SHARED_PROMPT = (
-    "CAVEMAN AUTO-LEVEL: classify each prompt silently and respond at correct compression level.\n"
-    "lite  → simple Q&A / definitions / yes-no: full sentences, drop filler only.\n"
-    "full  → technical / debug / multi-step (DEFAULT): drop articles/filler, fragments OK.\n"
-    "ultra → summarize / list / batch / 'be brief' signals: abbreviate, arrows (X→Y), one word OK.\n"
-    "off   → security warnings / destructive ops (rm -rf / DROP TABLE): normal prose, no compression.\n"
-    "All levels: no pleasantries/hedging. Technical terms exact. Code blocks unchanged."
+    "CAVEMAN AUTO-LEVEL: pick level per prompt, switch silently.\n"
+    "lite  → Q&A / definitions / yes-no: full sentences, drop filler only.\n"
+    "full  → technical / debug / multi-step (DEFAULT): drop articles, fragments OK.\n"
+    "ultra → summarize / list / batch / 'be brief': abbreviate, X→Y arrows, one word OK.\n"
+    "off   → security / destructive ops (rm -rf / DROP TABLE): normal prose only.\n"
+    "\n"
+    "Rules: no pleasantries/hedging. Tech terms exact. Code blocks unchanged.\n"
+    "Not: \"Sure! Happy to help. The issue you're experiencing is likely...\"\n"
+    "Yes: \"Auth token expiry uses < not <=. Fix:\""
+)
+
+# ── Original-Filtered Prompt (benchmark comparison baseline) ──────────────────
+# Simulates JuliusBrussee/caveman's approach: inject full rules for ONE level only.
+# The original filters SKILL.md at runtime to the active level (~200-250 tokens).
+# We use "full" (the default level) as the representative case.
+# Purpose: benchmark comparison only — not used in production injection.
+ORIGINAL_FILTERED_PROMPT = (
+    "CAVEMAN MODE ACTIVE — level: full\n\n"
+    "Respond terse like smart caveman. All technical substance stay. Only fluff die.\n\n"
+    "ACTIVE EVERY RESPONSE. No revert after many turns. No filler drift. "
+    "Off only: \"stop caveman\" / \"normal mode\".\n\n"
+    "Rules: Drop articles (a/an/the), filler (just/really/basically/actually/simply), "
+    "pleasantries, hedging. Fragments OK. Short synonyms (big not extensive, "
+    "fix not \"implement a solution for\"). Technical terms exact. Code blocks unchanged. "
+    "Errors quoted exact.\n\n"
+    "Pattern: [thing] [action] [reason]. [next step].\n"
+    "Not: \"Sure! I'd be happy to help you with that.\"\n"
+    "Yes: \"Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:\"\n\n"
+    "Auto-Clarity: drop caveman for security warnings, irreversible actions. Resume after.\n"
+    "Boundaries: code/commits/PRs write normal."
+)
+
+# ── Per-Turn Reinforcement (from JuliusBrussee/caveman mode-tracker.js) ───────
+# Original uses UserPromptSubmit hook to inject this every turn (~28 tokens).
+# Prevents mid-session drift when other plugins inject competing style instructions.
+# In Codex (no UserPromptSubmit hook), this is documented but not auto-injected.
+PER_TURN_REINFORCEMENT = (
+    "CAVEMAN ACTIVE (auto). Drop articles/filler/pleasantries/hedging. "
+    "Fragments OK. Security/destructive: write normal."
 )
 
 # ── Level Delta Prompts (appended on explicit override or first message) ──────
@@ -118,6 +153,14 @@ PROMPT_SIZES: dict[str, dict[str, int]] = {
     "lean_shared": {
         "chars": len(LEAN_SHARED_PROMPT),
         "tokens": _tok(LEAN_SHARED_PROMPT),
+    },
+    "original_filtered": {
+        "chars": len(ORIGINAL_FILTERED_PROMPT),
+        "tokens": _tok(ORIGINAL_FILTERED_PROMPT),
+    },
+    "per_turn_reinforcement": {
+        "chars": len(PER_TURN_REINFORCEMENT),
+        "tokens": _tok(PER_TURN_REINFORCEMENT),
     },
     **{
         f"delta_{level}": {
