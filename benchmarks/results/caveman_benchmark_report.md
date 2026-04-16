@@ -1,67 +1,77 @@
 # Caveman Compression Benchmark Report
 
-**Run at:** 2026-04-16 00:31 UTC
+**Run at:** 2026-04-16 01:12 UTC
 **Prompts:** 5 standard technical questions
+**Models:** gpt-5.4 · gpt-5.4-mini · gpt-5.4-nano · gpt-5.3-codex
 **Compression levels:** none (baseline) · lite · full · ultra
 
 ## Architecture Decision: AGENTS vs SKILL vs Hooks
 
-For this OpenAI Codex Workspace, **SKILL** is the right primitive for caveman:
-
 | Primitive | Best for | Caveman fit |
 |-----------|----------|-------------|
-| **SKILL** | On-demand behaviour loaded per-task; user-invocable via `/caveman` | ✅ **Best** — loaded only when needed, supports multiple intensity variants, progressive disclosure |
-| **Hooks** | Always-on session-start or per-turn side-effects | ⚠️ Partial — good for SessionStart flag + statusline, but Codex hooks still experimental |
-| **AGENTS.md** | Persistent standing rules for every task | ⚠️ Too broad — bakes compression into every agent, wastes tokens when not wanted |
+| **SKILL** | On-demand, user-invocable via `/caveman` | ✅ **Best** — loaded only when needed, multi-level, progressive disclosure |
+| **Hooks** | SessionStart flag + statusline | ⚠️ Partial — good for activation, hooks still experimental |
+| **AGENTS.md** | Persistent standing rules | ⚠️ Too broad — bakes compression into every agent |
 
-**Recommended pattern for Codex:** SKILL as primary interface + Hook for SessionStart flag write + AGENTS.md one-liner reference.
+> **Recommended pattern:** SKILL as primary interface + Hook for SessionStart flag + AGENTS.md one-liner reference.
 
 ## Results by Model
 
 ### gpt-5.4
 
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
-|-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 435.0 | 291.2 | 7509.2 | — | 0 |
-| lite | 426.8 | 293.0 | 7472.0 | 1.9% | 0 |
-| full | 430.6 | 265.8 | 6608.8 | 1.0% | 0 |
-| ultra | 366.2 | 213.2 | 6553.2 | 15.8% | 0 |
+| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
+|-------|----------------|-----------|------------------|-------------------------|--------|
+| none | 434.8 | 283.2 | 8079.8 | — (baseline) | 0 |
+| lite | 420.6 | 291.4 | 7707.8 | 3.3% | 0 |
+| full | 410.0 | 257.0 | 7540.8 | 5.7% | 0 |
+| ultra | 377.8 | 229.4 | 7323.4 | 13.1% | 0 |
 
 ### gpt-5.4-mini
 
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
-|-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 426.6 | 290.0 | 2967.2 | — | 0 |
-| lite | 345.8 | 233.0 | 2284.0 | 18.9% | 0 |
-| full | 296.6 | 179.8 | 2183.4 | 30.5% | 0 |
-| ultra | 186.8 | 108.0 | 1647.0 | 56.2% | 0 |
+| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
+|-------|----------------|-----------|------------------|-------------------------|--------|
+| none | 403.4 | 270.8 | 2949.8 | — (baseline) | 0 |
+| lite | 355.2 | 241.2 | 2853.0 | 11.9% | 0 |
+| full | 295.8 | 182.6 | 2537.8 | 26.7% | 0 |
+| ultra | 196.0 | 106.4 | 2409.4 | 51.4% | 0 |
 
 ### gpt-5.4-nano
 
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
-|-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 439.0 | 277.2 | 3145.8 | — | 0 |
-| lite | 381.2 | 230.0 | 2709.2 | 13.2% | 0 |
-| full | 411.6 | 251.8 | 2859.0 | 6.2% | 0 |
-| ultra | 224.0 | 114.0 | 1787.0 | 49.0% | 0 |
+| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
+|-------|----------------|-----------|------------------|-------------------------|--------|
+| none | 445.2 | 279.0 | 3669.8 | — (baseline) | 0 |
+| lite | 357.2 | 220.4 | 2891.6 | 19.8% | 0 |
+| full | 392.6 | 240.4 | 3488.4 | 11.8% | 0 |
+| ultra | 217.2 | 120.4 | 2013.8 | 51.2% | 0 |
 
-### gpt-5.3-codex → gpt-5.2 (codex variants are completion-only models)
+### gpt-5.3-codex (Responses API)
 
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
-|-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 468.6 | 280.2 | 7406.0 | — | 0 |
-| lite | 430.6 | 263.0 | 8491.2 | 8.1% | 0 |
-| full | 328.4 | 185.8 | 6244.0 | 29.9% | 0 |
-| ultra | 254.2 | 128.6 | 4967.6 | 45.8% | 0 |
+| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
+|-------|----------------|-----------|------------------|-------------------------|--------|
+| none | 369.8 | 227.2 | 6639.8 | — (baseline) | 0 |
+| lite | 346.2 | 211.6 | 6726.2 | 6.4% | 0 |
+| full | 347.0 | 203.6 | 6523.6 | 6.2% | 0 |
+| ultra | 296.8 | 150.4 | 6291.6 | 19.7% | 0 |
 
-## Cross-Model Summary (full compression level)
+## Cross-Model Summary
 
-| Model | Avg Output Tokens (full) | Token Reduction vs None | Avg Latency (ms) |
-|-------|--------------------------|-------------------------|------------------|
-| gpt-5.4 | 430.6 | 1.0% | 6608.8 |
-| gpt-5.4-mini | 296.6 | 30.5% | 2183.4 |
-| gpt-5.4-nano | 411.6 | 6.2% | 2859.0 |
-| gpt-5.3-codex → gpt-5.2 (codex variants are completion-only models) | 328.4 | 29.9% | 6244.0 |
+### Token Reduction at Each Compression Level vs None (baseline)
+
+| Model | None (baseline) | lite | full | ultra | Best reduction |
+|-------|----------------|------|------|-------|----------------|
+| gpt-5.4 | 435 | 3.3% | 5.7% | 13.1% | **13.1%** |
+| gpt-5.4-mini | 403 | 11.9% | 26.7% | 51.4% | **51.4%** |
+| gpt-5.4-nano | 445 | 19.8% | 11.8% | 51.2% | **51.2%** |
+| gpt-5.3-codex (Responses API) | 370 | 6.4% | 6.2% | 19.7% | **19.7%** |
+
+### Average Latency at `full` Level (ms)
+
+| Model | Avg Latency (ms) |
+|-------|-----------------|
+| gpt-5.4 | 7540.8 |
+| gpt-5.4-mini | 2537.8 |
+| gpt-5.4-nano | 3488.4 |
+| gpt-5.3-codex (Responses API) | 6523.6 |
 
 ## Sample Outputs (first prompt)
 
@@ -69,88 +79,110 @@ For this OpenAI Codex Workspace, **SKILL** is the right primitive for caveman:
 
 ### gpt-5.4
 
-**none:** Because in React, **when a parent renders, its children render too by default**.
+**none:** Because in React, a parent re-render normally causes its children to render too.
 
-That doesn’t always mean the DOM changes, but the child component function/class is usually called again unless React can **skip** it.
+Common reasons your child component re-renders when the parent updates:
 
-## Common reasons your child re-renders
+1. Parent rendered again
+- By default, React calls the child component function again whenever the parent renders.
+- This is normal behavior.
 
-### 1. The parent re-rendered
-If the parent updates state or receives new props, React re-runs the parent render, and child components are re…
+2. Props are changing by reference
+Even if the “values” look the same, React sees new references as changed.
 
-**full:** Common cause: parent render creates new props each time.
+Examples:
+- New object each render:
+```jsx
+<Child style={{ color: 'red' }} />
+```
 
-React re-renders child when:
-- parent re-renders, and child not memoized
-- prop identity changes
-- state changes in child
-- context value changes
-- hook inside child triggers update
+- New arr…
 
-Big offenders in parent:
-- inline object props  
-  `style={{ color: 'red' }}`
-- inline array props  
-  `items={[1,2,3]}`
-- inline function props  
-  `onClick={…
-
-**ultra:** Normal.
-
-Parent render → child fn runs again.
+**full:** Common cause: parent render triggers child render.
 
 Why:
-- React re-evals subtree on parent update.
-- Child props same ≠ child skipped, by default.
-- Fn component call = render phase, not always DOM change.
+- In React, when parent renders, React calls child function again too.
+- Child can skip work only if React can prove props/context/state unchanged in way it can compare.
 
-Common triggers:
-- New object/array literal props each parent render.
-  - `{}` `[]` `() => {}`
-- New callback identity.
-- Context value changed.
-- State changed in child.
-- Key changed/remount.
-- S…
+Main reasons child re-renders on parent update:
+
+1. Child not memoized
+- Function component re-runs whenever parent re-runs.
+- Fix: wrap with `React.memo`.
+
+```jsx
+const Child = React.memo(function Child({ value }) {
+  console.log('child render');
+  return <div>{value}</d…
+
+**ultra:** Because parent render → child fn runs again.
+
+Key points:
+
+- In React, parent re-render usually → all children re-render.
+- "Re-render" ≠ DOM update always. React may diff → no real DOM change.
+- Child re-renders unless memoization / bailout.
+
+Common causes:
+
+1. Normal behavior  
+   - Parent state/props change → parent renders → child renders.
+
+2. New prop references  
+   - Parent creates new obj/arr/fn each render.
+   - Example:
+     ```jsx
+     <Child style={{ color: 'red' }} onClick={() => do…
 
 ### gpt-5.4-mini
 
 **none:** Because in React, a parent re-render usually causes its children to be re-rendered too.
 
-That does **not always mean the DOM is updated** — it just means React runs the child component function again to see if anything changed.
+A few common reasons:
 
-## Common reasons
+1. **Normal React behavior**
+   - When a parent component renders again, React will by default call the child component function again as part of reconciling the tree.
+   - This does **not always mean the DOM updates**; it just means the component function runs again.
 
-### 1. Parent re-render triggers child re-render
-If the parent updates state, React re-runs the parent, and by default its children are re-rendered as p…
+2. **New props or new references**
+   - If the parent passes props like:
+     ```jsx
+     <Child onClick={() => doSome…
 
 **full:** Because parent render usually means child render too.
 
-In React, when parent component updates, React re-runs parent function. That creates new child element tree. Child component gets rendered again unless React can skip it.
+In React, when parent component updates, React re-runs parent function. That creates new JSX for children. Unless React can skip child, child component function runs again.
 
 Common reasons:
 
-- Parent state/props changed
-- Child receives new prop reference each render:
-  - inline object: `{}`  
-  - inline array: `[]`
-  - inline function: `() => {…
+- Child is inside parent render tree
+- Props changed by reference
+  - new object `{}` each render
+  - new array `[]` each render
+  - new function `() => {}` each render
+- Context value changed
+- State in child changed
+- No memoization
 
-**ultra:** Because parent update → child fn runs again → React re-renders child by default.
+How to stop extra …
+
+**ultra:** Because parent update → child fn runs again → React re-evals JSX → child re-renders.
 
 Common causes:
 - Parent state/props change
-- New prop refs each render (`{}`, `[]`, `() => {}`) → shallow compare fails
+- New prop refs each render: `{}`, `[]`, `() => {}` → new identity
 - Context value changes
 - Child not memoized
 
 Fixes:
 - `React.memo(Child)`
-- `useMemo` / `useCallback` for stable refs
-- Lift state less / split components
-- Avoid passing inline objs/fns
+- `useMemo` for objects/arrays
+- `useCallback` for fns
+- Split state: keep unrelated state out of parent
+- Avoid changing context value unless needed
 
-Note: re-…
+Note: re-render ≠ DOM update. React may re-render cheaply.
 
 ---
-*Generated by `benchmarks/caveman_benchmark.py` · 2026-04-16 00:31 UTC*
+*Generated by `benchmarks/caveman_benchmark.py` · 2026-04-16 01:12 UTC*
+*gpt-5.3-codex benchmarked via OpenAI Responses API*
