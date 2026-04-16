@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,9 +9,42 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = ROOT / ".agents" / "skills" / "caveman-compress"
-sys.path.insert(0, str(SKILL_DIR))
 
-from scripts import compress, detect, validate  # type: ignore  # noqa: E402
+
+def _load_skill_package():
+    """Load caveman-compress/scripts/ as a package to support relative imports."""
+    pkg_name = "caveman_compress_scripts"
+    if pkg_name in sys.modules:
+        pkg = sys.modules[pkg_name]
+        return pkg.compress, pkg.detect, pkg.validate
+
+    import types
+
+    # Create the package namespace
+    pkg = types.ModuleType(pkg_name)
+    pkg.__path__ = [str(SKILL_DIR / "scripts")]
+    pkg.__package__ = pkg_name
+    sys.modules[pkg_name] = pkg
+
+    def _load(name: str):
+        key = f"{pkg_name}.{name}"
+        spec = importlib.util.spec_from_file_location(
+            key, SKILL_DIR / "scripts" / f"{name}.py",
+            submodule_search_locations=[]
+        )
+        mod = importlib.util.module_from_spec(spec)
+        mod.__package__ = pkg_name
+        sys.modules[key] = mod
+        spec.loader.exec_module(mod)
+        return mod
+
+    detect   = _load("detect")
+    compress = _load("compress")
+    validate = _load("validate")
+    return compress, detect, validate
+
+
+compress, detect, validate = _load_skill_package()
 
 
 class CavemanCompressTests(unittest.TestCase):
