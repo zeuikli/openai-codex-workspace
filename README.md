@@ -1,6 +1,6 @@
 # OpenAI Codex Workspace
 
-Codex-native workspace template. Provides a ready-to-run ruleset: `AGENTS.md` + `.codex/agents` + `.agents/skills`, adapted from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) for OpenAI Codex.
+Codex-native workspace template. Provides a ready-to-run ruleset: `AGENTS.md` + `.codex/agents` + `.agents/skills`, adapted from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) for OpenAI Codex with dynamic auto-level loading.
 
 ---
 
@@ -13,135 +13,134 @@ codex "請先固定讀取 AGENTS.md、Memory.md、prompts.md；接著讀取 .cod
 
 ---
 
-## Architecture: AGENTS vs SKILL vs Hooks
+## Caveman Dynamic Auto-Level System
 
-Based on benchmarking and analysis, **SKILL is the right primitive for caveman compression in Codex**:
+Caveman mode is injected automatically at session start — no manual `/caveman` command needed. The classifier routes each prompt to the right compression level with zero API dependency.
+
+### Architecture
+
+```
+SessionStart hook (139 tokens, once)
+  ↓
+User prompt → regex classifier (0.044ms, no API)
+  ↓
+Classify: lite / full / ultra / off
+  ↓
+Append level delta (45–59 tokens, with Not/Yes examples)
+  ↓
+Model responds at correct compression level
+```
+
+### Compression Levels
+
+| Level | Trigger | Rules |
+|-------|---------|-------|
+| `lite` | Q&A / definitions / yes-no | Keep articles + full sentences, drop filler only |
+| `full` | Technical / debug / multi-step (**DEFAULT**) | Drop articles, fragments OK, short synonyms |
+| `ultra` | Summarize / list / batch / "be brief" | Abbreviate (DB/auth/cfg), X→Y arrows, one word OK |
+| `off` | Security warnings / destructive ops | Normal prose, no compression |
+
+### Token Budget (per session)
+
+| Strategy | Session tokens | vs static (retired) |
+|----------|---------------|---------------------|
+| `static` (retired) | 427 tok | baseline — **net cost loss** |
+| `lean + full delta` (current) | 189 tok | **-55.7%** |
+| `lean + lite delta` | 184 tok | -56.9% |
+| `lean + ultra delta` | 198 tok | -53.6% |
+
+---
+
+## Dynamic Loading Benchmark
+
+**Model:** gpt-5.4-mini · **Prompts:** 16 · **5 strategies**
+Run: **2026-04-16 03:47 UTC** — Phase 1 (offline) + Phase 2 (API) + Phase 3 (hooks)
+
+### Total Token Cost (Input + Output = Real API Cost)
+
+| Strategy | Avg Input | Avg Output | **Total** | vs none | Output reduction |
+|----------|-----------|------------|-----------|---------|-----------------|
+| `none` (baseline) | 25.6 | 283.9 | **309.5** | +0.0% | — |
+| `forced_ultra` | 229.6 | 114.9 | **344.5** | +11.3% | **+59.5%** |
+| `original_filtered`* | 213.6 | 133.1 | **346.7** | +12.0% | +53.1% |
+| **`dynamic_auto`** | **209.1** | **139.7** | **348.8** | **+12.7%** | **+50.8%** |
+| `static` (retired) | 391.6 | 86.9 | **478.5** | +54.6% | +69.4% |
+
+> \* `original_filtered` = JuliusBrussee/caveman approach: single-level static rules (~196 tokens). Requires manual level selection. Our `dynamic_auto` is 0.7 pp behind in total cost while maintaining **automatic classification**.
+
+### Classifier Performance
+
+| Metric | Value |
+|--------|-------|
+| Accuracy (40 prompts, 8 categories) | **100%** (40/40) |
+| Latency | **0.044ms** avg (pure Python regex, zero API) |
+| Hook correctness | **10/10** (100%) |
+| Test suite | **55/55** passing |
+
+### Key Finding: Static Strategy is a Net Loss
+
+Static caveman (+54.6% total cost) injects 392 tokens of system prompt but only saves ~197 output tokens per call — input overhead outweighs output savings. Dynamic auto-level costs only +12.7% above baseline while compressing output by 50.8%.
+
+Full reports: [`benchmarks/results/`](benchmarks/results/)
+
+---
+
+## Benchmark History
+
+### Optimization Timeline
+
+| Version | Key change | `dynamic_auto` total cost vs none |
+|---------|-----------|-----------------------------------|
+| v1 static | 427-token all-level injection | +60.3% |
+| v2 lean migration | 132-token lean shared | +8.0% |
+| v3 lean + examples | Added Not/Yes to lean prompt | +18.6% |
+| **v4 delta + examples** | Added Not/Yes to each delta | **+12.7%** |
+| `original_filtered` ref | JuliusBrussee filtered approach | +12.0% |
+
+### Original Caveman Model Benchmark
+
+Real API results — **80 calls**, 4 models × 4 levels × 5 technical prompts.
+Run: **2026-04-16 01:12 UTC**
+
+| Model | None (baseline) | lite | full | ultra | Best reduction |
+|-------|----------------|------|------|-------|----------------|
+| gpt-5.4 | 435 tok | 3.3% | 5.7% | **13.1%** | 13.1% |
+| gpt-5.4-mini | 403 tok | 11.9% | 26.7% | **51.4%** | 51.4% |
+| gpt-5.4-nano | 445 tok | 19.8% | 11.8% | **51.2%** | 51.2% |
+| gpt-5.3-codex | 370 tok | 6.4% | 6.2% | **19.7%** | 19.7% |
+
+Full report: [`benchmarks/results/caveman_benchmark_report.md`](benchmarks/results/caveman_benchmark_report.md)
+
+---
+
+## Hook Architecture
+
+```
+.codex/hooks.json
+├── SessionStart    → session_start_note.sh       (139-token lean prompt, once)
+├── PreToolUse      → pre_tool_use_guard.sh        (blocks rm-rf, push main, curl|sh)
+├── PostToolUse     → post_tool_use_note.sh        (post-bash notes)
+└── UserPromptSubmit→ user_prompt_submit_caveman.sh (28-token per-turn reinforcement)
+                                                    ↑ registered, activates when Codex
+                                                      adds UserPromptSubmit support
+```
+
+**Per-turn reinforcement** (from JuliusBrussee/caveman research): prevents mid-session model drift caused by competing plugin instructions. Codex CLI currently exposes `SessionStart`, `PreToolUse`, `PostToolUse` only — the `UserPromptSubmit` hook is registered and ready to activate when support is added.
+
+---
+
+## Architecture: AGENTS vs SKILL vs Hooks
 
 | Primitive | Best for | Caveman fit |
 |-----------|----------|-------------|
-| **SKILL** | On-demand behaviour, user-invocable via `/caveman` | ✅ Best — loaded only when needed, supports lite/full/ultra variants |
-| **Hooks** | Always-on side-effects (SessionStart flag, statusline) | ⚠️ Partial — Codex hooks still experimental |
-| **AGENTS.md** | Persistent standing rules for every task | ⚠️ Too broad — bakes compression in when not wanted |
+| **Hooks (SessionStart)** | Always-on context injection | ✅ Primary — lean 139-token prompt auto-active |
+| **Hooks (UserPromptSubmit)** | Per-turn reinforcement | ✅ Registered, pending Codex support |
+| **SKILL** | On-demand overrides via `/caveman` | ✅ Manual level override when needed |
+| **AGENTS.md** | Persistent standing rules | ⚠️ Too broad for per-prompt adaptation |
 
-**Recommended pattern:** SKILL as primary interface + Hook for SessionStart flag write + AGENTS.md one-liner reference.
-
----
-
-## Caveman Compression Benchmarks
-
-Real API results — **80 calls total**, 4 models × 4 levels × 5 technical prompts.
-Run: **2026-04-16 01:12 UTC** (live, no dry-run).
-
-> **gpt-5.3-codex** 為 completion model，透過 **Responses API** (`/v1/responses`) 測試，其餘模型走 Chat Completions API。
-
-### Per-Model Results
-
-#### gpt-5.4
-
-| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
-|-------|----------------|-----------|------------------|-----------------|
-| none (baseline) | 434.8 | 283.2 | 8080 | — |
-| lite | 420.6 | 291.4 | 7708 | 3.3% |
-| full | 410.0 | 257.0 | 7541 | 5.7% |
-| ultra | 377.8 | 229.4 | 7323 | **13.1%** |
-
-#### gpt-5.4-mini
-
-| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
-|-------|----------------|-----------|------------------|-----------------|
-| none (baseline) | 403.4 | 270.8 | 2950 | — |
-| lite | 355.2 | 241.2 | 2853 | 11.9% |
-| full | 295.8 | 182.6 | 2538 | **26.7%** |
-| ultra | 196.0 | 106.4 | 2409 | **51.4%** |
-
-#### gpt-5.4-nano
-
-| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
-|-------|----------------|-----------|------------------|-----------------|
-| none (baseline) | 445.2 | 279.0 | 3670 | — |
-| lite | 357.2 | 220.4 | 2892 | 19.8% |
-| full | 392.6 | 240.4 | 3488 | 11.8% |
-| ultra | 217.2 | 120.4 | 2014 | **51.2%** |
-
-#### gpt-5.3-codex (Responses API)
-
-| Level | Avg Out-Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
-|-------|----------------|-----------|------------------|-----------------|
-| none (baseline) | 369.8 | 227.2 | 6640 | — |
-| lite | 346.2 | 211.6 | 6726 | 6.4% |
-| full | 347.0 | 203.6 | 6524 | 6.2% |
-| ultra | 296.8 | 150.4 | 6292 | **19.7%** |
-
-### Cross-Model Summary
-
-| Model | None (baseline) | lite | full | ultra | Best reduction | Latency@full |
-|-------|----------------|------|------|-------|----------------|---------------|
-| gpt-5.4 | 435 tok | 3.3% | 5.7% | 13.1% | **13.1%** | 7541ms |
-| gpt-5.4-mini | 403 tok | 11.9% | 26.7% | 51.4% | **51.4%** | 2538ms |
-| gpt-5.4-nano | 445 tok | 19.8% | 11.8% | 51.2% | **51.2%** | 3488ms |
-| gpt-5.3-codex | 370 tok | 6.4% | 6.2% | 19.7% | **19.7%** | 6524ms |
-
-**Key findings:**
-- 🏆 **gpt-5.4-mini + ultra** 最佳壓縮（51.4%）且延遲第二低（2409ms）。
-- ⚡ **gpt-5.4-nano + ultra** 壓縮相近（51.2%）且延遲最低（2014ms）——速度優先選擇。
-- 🧠 **gpt-5.4 對 caveman 較有抵抗性**，lite/full 效果有限（3–6%），ultra 才達 13%。
-- 📡 **gpt-5.3-codex** 須用 Responses API，壓縮響應弱於其他模型（ultra 才 19.7%）。
-- 💡 **成本＋壓縮最優解**：`gpt-5.4-mini + ultra` 或 `gpt-5.4-nano + ultra`。
-
-Full report: [`benchmarks/results/caveman_benchmark_report.md`](benchmarks/results/caveman_benchmark_report.md)
-Raw JSON: [`benchmarks/results/caveman_benchmark_results.json`](benchmarks/results/caveman_benchmark_results.json)
+**Current pattern:** SessionStart hook (lean) + per-prompt classifier + delta append + SKILL for manual overrides.
 
 ---
-
-## Caveman Auto-Level Selection Benchmark
-
-**80 calls** · gpt-5.4-mini · 4 strategies × 20 prompts × 5 categories
-Run: **2026-04-16 01:30 UTC**
-
-> **Auto-level** = prompt classifier 自動判斷 lite/full/ultra/off，無需用戶手動選擇。
-> 規則注入於 `.codex/hooks/session_start_note.sh` + `AGENTS.md`，Codex-native，無 Node.js 依賴。
-
-### Classifier Accuracy: 19/20 = 95.0%
-
-| 分類 | 命中 |
-|---|---|
-| simple_qa → lite | ✅ 4/4 |
-| technical_explain → full | ✅ 4/4 |
-| debug → full | ✅ 4/4 |
-| summarize_batch → ultra | ✅ 3/4 (tl;dr 修正後 4/4) |
-| security_destructive → off | ✅ 4/4 |
-
-### Overall Strategy Comparison
-
-| Strategy | Avg Out-Tokens | Token Reduction vs None | Avg Latency (ms) |
-|----------|----------------|-------------------------|-----------------|
-| none (baseline) | 300.6 | — | 2732 |
-| manual-full | 201.0 | **33.1%** | 2363 |
-| **auto-select** | **204.8** | **31.9%** | **2168** ✅ |
-| forced-ultra | 159.8 | 46.8% | 2201 |
-
-### Per-Category Auto Reduction
-
-| Category | Expected | Auto Reduction vs None |
-|----------|----------|----------------------|
-| simple_qa | lite | **43.3%** |
-| technical_explain | full | **39.0%** |
-| debug | full | **25.5%** |
-| summarize_batch | ultra | **30.6%** |
-| security_destructive | off | 4.1% (正確保留清晰度) |
-
-**Key findings:**
-- 🎯 **Auto 達到手動 full 的 96.3% 壓縮效益**（31.9% vs 33.1%），無需用戶選擇。
-- ⚡ **Auto 延遲比手動低 8.3%**（2168ms vs 2363ms），因 lite prompts 得到更輕量回應。
-- 🔒 **Security prompts** 正確切換到 off level，確保安全警告不被壓縮。
-- 🏆 **最佳場景**：混合對話（Q&A + 技術解釋 + 摘要），auto 自適應優於固定 full。
-
-Full report: [`benchmarks/results/caveman_auto_level_report.md`](benchmarks/results/caveman_auto_level_report.md)
-Raw JSON: [`benchmarks/results/caveman_auto_level_results.json`](benchmarks/results/caveman_auto_level_results.json)
-
----
-
-
 
 ## Model Configuration
 
@@ -185,19 +184,16 @@ See `.codex/config.toml` for full routing config.
 
 | Skill | Trigger | Purpose |
 |-------|---------|---------|
-| `caveman` | `/caveman [lite\|full\|ultra]` | Token compression 50–92%; intensity-selectable |
+| `caveman` | `/caveman [lite\|full\|ultra]` | Manual level override; auto-level is always-on via hook |
 | `caveman-commit` | `/caveman-commit` | Compressed conventional commits |
 | `caveman-review` | `/caveman-review` | Single-line PR feedback |
-| `caveman-compress` | `/caveman:compress <file>` | Compress memory files (AGENTS.md, todos) |
+| `caveman-compress` | `/caveman-compress <file>` | Compress memory files (AGENTS.md, todos) |
 | `karpathy-loop` | `/karpathy-loop` | Declarative validation loop, max 5 rounds / 10 min |
 | `multi-agent-collaboration` | task delegation | 3-phase: research → implement → review |
 | `deep-review` | major changes | Correctness, regression risk, security |
 | `docs-drift-check` | doc divergence | Spec vs implementation drift |
 | `session-handoff` | end of session | Structured Memory.md update |
 | `cost-tracker` | cost review | Token usage report |
-| `blog-analyzer` | doc research | Karpathy/blog → actionable changes |
-| `agent-team` | complex tasks | Orchestrated multi-agent team |
-| `frontend-design` | UI work | Design-focused agent |
 
 ---
 
@@ -220,21 +216,33 @@ Full: [`docs/karpathy-codex-principles.md`](docs/karpathy-codex-principles.md)
 ## Validation & Commands
 
 ```bash
-# ── Session bootstrap ──────────────────────────────────────────────────────
-# Standard Codex session start
-codex "請先固定讀取 AGENTS.md、Memory.md、prompts.md；再讀 .codex/config.toml；skills 按需載入。"
+# ── Test suite (55 tests) ───────────────────────────────────────────────────
+python3 -m pytest tests/ -q
 
 # ── Workspace structure ────────────────────────────────────────────────────
 python3 scripts/validate_codex_workspace.py
 
-# ── Caveman integration ────────────────────────────────────────────────────
-python3 tests/caveman/verify_repo.py              # repo layout + compress + CLI checks
-python3 -m unittest -v tests/caveman/test_hooks.py  # JS hook tests (requires Node.js)
-python3 -m unittest -v tests/test_caveman_compress.py  # Python compress unit tests
-
 # ── Core behaviour tests ───────────────────────────────────────────────────
-python3 -m unittest -v tests/test_codex_hooks_behavior.py
-python3 -m unittest -v tests/test_subagent_checks.py
+python3 -m pytest tests/test_codex_hooks_behavior.py -v
+python3 -m pytest tests/test_subagent_checks.py -v
+python3 -m pytest tests/test_caveman_dynamic_loader.py -v
+
+# ── Auto-level classifier (offline, no API key needed) ─────────────────────
+python3 scripts/caveman_auto_level.py "Summarize all PRs"     # → ultra
+python3 scripts/caveman_auto_level.py "What is TCP?"           # → lite
+python3 scripts/caveman_auto_level.py "DROP TABLE users"       # → off
+
+# ── Dynamic loader (inspect prompt sizes + decisions) ─────────────────────
+python3 scripts/caveman_dynamic_loader.py --show-prompts
+python3 scripts/caveman_dynamic_loader.py "Explain connection pooling"
+python3 scripts/caveman_dynamic_loader.py --benchmark-mode
+
+# ── Codex workspace load simulator ────────────────────────────────────────
+python3 scripts/simulate_codex_load.py
+
+# ── Full benchmark (Phase 1+3 offline; Phase 2 requires API key) ──────────
+python3 benchmarks/caveman_dynamic_load_benchmark.py --phases 1,3
+OPENAI_API_KEY=sk-... python3 benchmarks/caveman_dynamic_load_benchmark.py
 
 # ── Subagent quality & token report ───────────────────────────────────────
 python3 scripts/run_subagent_checks.py
@@ -243,23 +251,6 @@ python3 scripts/compare_subagent_trends.py
 # ── Governance smoke checks ────────────────────────────────────────────────
 rg -n "Assumption Ledger|Anti-Bloat|Generation vs Discrimination" AGENTS.md
 rg -n "^## 1[1-5]\." prompts.md
-
-# ── Caveman benchmark (real API, requires key) ─────────────────────────────
-# Key loaded automatically from .env.local (gitignored)
-python3 benchmarks/caveman_benchmark.py          # model × level benchmark
-python3 benchmarks/caveman_auto_level_benchmark.py  # auto-select strategy benchmark
-
-# ── Auto-level classifier (offline, no API key needed) ─────────────────────
-python3 scripts/caveman_auto_level.py "Summarize all PRs"     # → ultra
-python3 scripts/caveman_auto_level.py "What is TCP?"           # → lite
-python3 scripts/caveman_auto_level.py "DROP TABLE users"       # → off
-python3 -m unittest -v tests/test_caveman_auto_level.py        # 21 unit tests
-
-# ── Full one-liner validation suite ───────────────────────────────────────
-python3 scripts/validate_codex_workspace.py \
-  && python3 tests/caveman/verify_repo.py \
-  && python3 -m unittest tests/test_caveman_compress.py tests/test_codex_hooks_behavior.py \
-             tests/test_subagent_checks.py tests/test_caveman_auto_level.py
 ```
 
 ---
@@ -277,30 +268,38 @@ python3 scripts/validate_codex_workspace.py \
 
 ```
 openai-codex-workspace/
-├── AGENTS.md               ← compact rules (session start)
-├── AGENTS.full.md          ← full governance rules
-├── Memory.md               ← session handoff state
-├── prompts.md              ← prompt templates
+├── AGENTS.md                    ← compact rules (session start)
+├── AGENTS.full.md               ← full governance rules
+├── Memory.md                    ← session handoff state (~500 tokens)
+├── prompts.md                   ← prompt templates
 ├── benchmarks/
-│   ├── caveman_benchmark.py
-│   ├── prompts/en.txt
-│   └── results/
-│       ├── caveman_benchmark_results.json
-│       └── caveman_benchmark_report.md
+│   ├── caveman_benchmark.py                    ← model × level benchmark
+│   ├── caveman_dynamic_load_benchmark.py       ← 3-phase dynamic load benchmark
+│   └── results/                                ← all benchmark reports (JSON + MD)
 ├── .codex/
 │   ├── config.toml
-│   ├── agents/             ← per-agent TOML configs
+│   ├── hooks.json               ← SessionStart / PreToolUse / PostToolUse / UserPromptSubmit
+│   ├── agents/                  ← per-agent TOML configs
 │   └── hooks/
-├── .agents/skills/         ← on-demand skills (SKILL.md per skill)
-│   └── caveman-compress/
-│       └── scripts/        ← caveman memory compression toolchain
-├── hooks/caveman/          ← SessionStart + UserPromptSubmit hooks
+│       ├── session_start_note.sh           ← lean 139-token prompt
+│       ├── pre_tool_use_guard.sh           ← blocks dangerous commands
+│       ├── post_tool_use_note.sh           ← post-bash notes
+│       └── user_prompt_submit_caveman.sh   ← per-turn reinforcement (pending Codex support)
+├── .agents/skills/              ← on-demand skills (SKILL.md per skill)
 ├── docs/
 │   ├── karpathy-codex-principles.md
-│   ├── token-usage-report.md
+│   ├── reports/                 ← memory history, subagent quality reports
 │   └── ...
-├── scripts/                ← validation + subagent scripts
-└── tests/                  ← hook behaviour tests
+├── scripts/
+│   ├── caveman_auto_level.py        ← regex classifier (0.044ms, no API)
+│   ├── caveman_dynamic_loader.py    ← dynamic loading engine + prompt registry
+│   ├── simulate_codex_load.py       ← 7-phase workspace load simulator
+│   ├── validate_codex_workspace.py  ← workspace structure validator
+│   └── run_subagent_checks.py       ← subagent quality checks
+└── tests/                       ← 55 unit tests
+    ├── test_caveman_dynamic_loader.py
+    ├── test_codex_hooks_behavior.py
+    └── test_subagent_checks.py
 ```
 
 ---
@@ -311,7 +310,7 @@ openai-codex-workspace/
 |----------------|------------------|
 | `CLAUDE.md` | `AGENTS.md` |
 | `.claude/rules/*` | `AGENTS.full.md` sections |
-| `.claude/settings.json` hooks | `.codex/hooks.json` + `hooks/` scripts |
+| `.claude/settings.json` hooks | `.codex/hooks.json` + `.codex/hooks/` scripts |
 | Slash commands | `.agents/skills/*/SKILL.md` |
 | `PreCompact`/`PostCompact` | Not available in Codex |
 | `autoMemoryEnabled` | Not available; use `Memory.md` + `session-handoff` skill |
