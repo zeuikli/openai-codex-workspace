@@ -2,6 +2,18 @@
 
 > Codex 交接摘要（手動維護）
 
+## 最新狀態（2026-04-16，實際 API benchmark 完成 + README 統整）
+
+- **80 次 live API calls** 完成，4 models × 4 levels × 5 prompts，無 dry-run。
+- `gpt-5.3-codex` 改用 **Responses API**（`/v1/responses`）測試，成功。
+- 結果（full level token reduction）：gpt-5.4=5.7%、gpt-5.4-mini=26.7%、gpt-5.4-nano=11.8%、gpt-5.3-codex=6.2%。
+- ultra level 最佳：gpt-5.4-mini=51.4%（成本最優）、gpt-5.4-nano=51.2%（速度最快）。
+- API key 儲存於 `.env.local`（已 gitignore），未推送至 GitHub。
+- `benchmarks/caveman_benchmark.py` 全面改寫：自動讀 `.env.local`、模型路由分離。
+- `README.md` benchmark 表格更新為最新實測數據，Validation & Commands 統一整理。
+- 所有 12 Python unit tests pass，workspace validation OK。
+- 已推送：`origin/codex/integrate-caveman-main-20260416`。
+
 ## 最新狀態（2026-04-16，caveman 整合驗證閉環完成）
 
 - 分支：`codex/integrate-caveman-main-20260416`（基於 `claude/codex-workspace-benchmarks-EC65U`）
