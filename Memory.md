@@ -2,6 +2,53 @@
 
 > Codex 交接摘要（手動維護）
 
+## 最新狀態（2026-04-16，實際 API benchmark 完成 + README 統整）
+
+- **80 次 live API calls** 完成，4 models × 4 levels × 5 prompts，無 dry-run。
+- `gpt-5.3-codex` 改用 **Responses API**（`/v1/responses`）測試，成功。
+- 結果（full level token reduction）：gpt-5.4=5.7%、gpt-5.4-mini=26.7%、gpt-5.4-nano=11.8%、gpt-5.3-codex=6.2%。
+- ultra level 最佳：gpt-5.4-mini=51.4%（成本最優）、gpt-5.4-nano=51.2%（速度最快）。
+- API key 儲存於 `.env.local`（已 gitignore），未推送至 GitHub。
+- `benchmarks/caveman_benchmark.py` 全面改寫：自動讀 `.env.local`、模型路由分離。
+- `README.md` benchmark 表格更新為最新實測數據，Validation & Commands 統一整理。
+- 所有 12 Python unit tests pass，workspace validation OK。
+- 已推送：`origin/codex/integrate-caveman-main-20260416`。
+
+## 最新狀態（2026-04-16，caveman 整合驗證閉環完成）
+
+- 分支：`codex/integrate-caveman-main-20260416`（基於 `claude/codex-workspace-benchmarks-EC65U`）
+- upstream HEAD 確認：`c2ed24b`（`chore: sync SKILL.md copies and auto-activation rules`，2026-04-15）—無新 commits，整合資料最新。
+- 修正 `tests/caveman/verify_repo.py`：`node` 不存在時優雅 skip（JS syntax / hook flow 兩段），不再 crash。
+- 修正 `tests/caveman/test_hooks.py`：新增 `@_SKIP_NODE` 裝飾器（`unittest.skipUnless`），4 個 node 相依測試 skip→OK。
+- 新增 `tests/test_caveman_compress.py`：5 個 compress/detect/validate 純 Python 單元測試，全 OK。
+- 新增 `tests/caveman-compress/notes.md` + `notes.original.md`：caveman-compress fixture pair。
+- 已 push 到遠端：`origin/codex/integrate-caveman-main-20260416`。
+
+## 驗證狀態（本輪，2026-04-16）
+
+| 驗證項目 | 狀態 |
+|---|---|
+| `validate_codex_workspace.py` | ✅ |
+| `verify_repo.py`（caveman）| ✅（JS 段 skip：無 node） |
+| `test_hooks.py` | ✅（4 skipped, 0 errors） |
+| `test_caveman_compress.py` | ✅（5 ok） |
+| `test_codex_hooks_behavior.py` | ✅（5 ok） |
+| `test_subagent_checks.py` | ✅（2 ok） |
+| JS hook syntax（node --check）| ⏭️ 需 Node.js 環境才可驗 |
+| OpenAI live API | ⏭️ 需 OPENAI_API_KEY |
+
+## 下一步建議
+
+1. 從 `codex/integrate-caveman-main-20260416` 建立 PR → `main`。
+2. 若需驗 JS hooks，安裝 Node.js 後直接重跑 `python3 tests/caveman/verify_repo.py`。
+
+## 最新狀態（2026-04-16，latest caveman main 整合進 Codex skill 結構）
+
+- 已從 upstream `https://github.com/JuliusBrussee/caveman` 抓取最新 `main`（`c2ed24b3e5d412cd0c25197b2bc9af587621fd99`）進行對照整合。
+- 將 `caveman-compress` 從舊版缺件狀態改為真正可執行的 Codex repo skill：腳本現位於 `.agents/skills/caveman-compress/scripts/`。
+- 壓縮流程已改為 OpenAI-first：優先 `OPENAI_API_KEY` + Responses API，保留 Anthropic / `claude` CLI fallback。
+- caveman 驗證腳本已改寫為檢查目前 repo 的 Codex-native 佈局，不再依賴舊 caveman standalone 安裝面。
+
 ## 最新狀態（2026-04-15，upstream repo 比對與差異報告）
 
 - 已執行 upstream (`https://github.com/JuliusBrussee/caveman`) 與本地 workspace 的檔案完整性比對。

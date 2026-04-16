@@ -182,6 +182,19 @@ def validate_workspace(root: Path) -> list[str]:
         if not os.access(script, os.X_OK):
             errors.append(f'Hook script is not executable: {script.as_posix()}')
 
+    caveman_compress_dir = root / '.agents' / 'skills' / 'caveman-compress'
+    if caveman_compress_dir.exists():
+        required_compress_files = [
+            caveman_compress_dir / 'SKILL.md',
+            caveman_compress_dir / 'scripts' / 'cli.py',
+            caveman_compress_dir / 'scripts' / 'compress.py',
+            caveman_compress_dir / 'scripts' / 'detect.py',
+            caveman_compress_dir / 'scripts' / 'validate.py',
+        ]
+        for file_path in required_compress_files:
+            if not file_path.exists():
+                errors.append(f'Missing caveman-compress asset: {file_path.as_posix()}')
+
     migration_guide = root / 'docs' / 'codex-migration-guide.md'
     if not migration_guide.exists():
         errors.append('Missing docs/codex-migration-guide.md')
