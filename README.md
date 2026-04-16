@@ -216,7 +216,7 @@ Full: [`docs/karpathy-codex-principles.md`](docs/karpathy-codex-principles.md)
 ## Validation & Commands
 
 ```bash
-# ── Test suite (55 tests) ───────────────────────────────────────────────────
+# ── Test suite ──────────────────────────────────────────────────────────────
 python3 -m pytest tests/ -q
 
 # ── Workspace structure ────────────────────────────────────────────────────
@@ -231,6 +231,17 @@ python3 -m pytest tests/test_caveman_dynamic_loader.py -v
 python3 scripts/caveman_auto_level.py "Summarize all PRs"     # → ultra
 python3 scripts/caveman_auto_level.py "What is TCP?"           # → lite
 python3 scripts/caveman_auto_level.py "DROP TABLE users"       # → off
+python3 scripts/caveman_auto_level.py "摘要一下這個架構"       # → ultra
+python3 scripts/caveman_auto_level.py "什麼是 TCP？"           # → lite
+python3 scripts/caveman_auto_level.py "清空資料庫"             # → off
+
+# ── Traditional Chinese classifier validation (offline) ───────────────────
+python3 scripts/validate_chinese_classifier.py                 # summary
+python3 scripts/validate_chinese_classifier.py --verbose       # per-prompt
+python3 scripts/validate_chinese_classifier.py --verbose --failures-only
+python3 scripts/validate_chinese_classifier.py --verbose --show-reasons
+python3 scripts/validate_chinese_classifier.py --json          # JSON report
+python3 -m pytest tests/test_chinese_classifier.py -v          # pytest suite
 
 # ── Dynamic loader (inspect prompt sizes + decisions) ─────────────────────
 python3 scripts/caveman_dynamic_loader.py --show-prompts
