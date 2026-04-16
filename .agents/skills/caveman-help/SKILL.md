@@ -6,6 +6,16 @@ description: >
   "caveman help", "what caveman commands", "how do I use caveman".
 ---
 
+## Use when
+
+- User invokes `/caveman-help`
+- User says "caveman help", "what caveman commands", "how do I use caveman", "list caveman modes"
+
+## Do not use when
+
+- User is asking a technical question (use `caveman` skill instead)
+- User wants to activate a specific mode — invoke `caveman` directly, not the help card
+
 # Caveman Help
 
 Display this reference card when invoked. One-shot — do NOT change mode, write flag files, or persist anything. Output in caveman style.

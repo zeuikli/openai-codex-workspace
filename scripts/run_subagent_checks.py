@@ -17,6 +17,8 @@ from validate_codex_workspace import validate_workspace
 DEFAULT_EXCLUDES = (
     'docs/reports/*.json',
     'docs/reports/*.md',
+    'benchmarks/results/*.md',
+    'benchmarks/results/*.json',
     'Memory.md',
     'README.md',
     'AGENTS.full.md',

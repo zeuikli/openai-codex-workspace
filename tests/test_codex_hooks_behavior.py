@@ -23,12 +23,17 @@ class CodexHooksBehaviorTest(unittest.TestCase):
             check=False,
         )
 
-    def test_session_start_includes_karpathy_notice(self) -> None:
+    def test_session_start_includes_caveman_notice(self) -> None:
         result = self.run_hook('session_start_note.sh')
         self.assertEqual(result.returncode, 0)
         body = json.loads(result.stdout)
         message = body['hookSpecificOutput']['additionalContext']
-        self.assertIn('nine Karpathy principles', message)
+        # Lean prompt: verify caveman auto-level rules are present
+        self.assertIn('CAVEMAN AUTO-LEVEL', message)
+        self.assertIn('lite', message)
+        self.assertIn('full', message)
+        self.assertIn('ultra', message)
+        self.assertIn('off', message)
 
     def test_pre_tool_use_blocks_git_push_to_main(self) -> None:
         result = self.run_hook('pre_tool_use_guard.sh', {'tool_input': {'command': 'git push origin main'}})

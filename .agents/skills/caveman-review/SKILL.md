@@ -50,6 +50,13 @@ Write code review comments terse and actionable. One line per finding. Location,
 
 Drop terse mode for: security findings (CVE-class bugs need full explanation + reference), architectural disagreements (need rationale, not just a one-liner), and onboarding contexts where the author is new and needs the "why". In those cases write a normal paragraph, then resume terse for the rest.
 
+## Do not use when
+
+- Security findings of CVE class — these need full explanation + reference link, not a one-liner
+- Architectural disagreements requiring rationale longer than two sentences
+- Onboarding contexts where the author is new and needs the "why" explained in detail
+- User explicitly says "stop caveman-review" or "normal mode"
+
 ## Boundaries
 
 Reviews only — does not write the code fix, does not approve/request-changes, does not run linters. Output the comment(s) ready to paste into the PR. "stop caveman-review" or "normal mode": revert to verbose review style.

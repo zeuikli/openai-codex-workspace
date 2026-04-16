@@ -77,16 +77,18 @@ LITE_PATTERNS = [
     r"\bdefine\s+\w+",
     r"\bmeaning\s+of\b",
     r"\bwhat\s+does\s+\w+\s+mean",
+    r"\bwhat\s+does\s+\w+\s+stand\s+for",  # "What does REST stand for?"
     r"\bwhat's\s+\w+",
     r"^how\s+(many|much|old|long)\b",
     r"\bconfirm\b",
     r"\byes\s+or\s+no\b",
     r"\bdo\s+you\b",
+    r"\bdo\s+i\s+need\s+to\b",             # "Do I need to restart the server?"
     r"\bcan\s+you\b",
     r"\bis\s+(this|that|it)\b",
     r"\bshould\s+i\b",
-    r"^is\s+\w[\w\s]{0,40}\??\s*$",      # "Is Python interpreted?" (short is-question)
-    r"^are\s+\w[\w\s]{0,40}\??\s*$",     # "Are hooks experimental?"
+    r"^is\s+\w[\w\s]{0,40}\??\s*$",        # "Is Python interpreted?" (short is-question)
+    r"^are\s+\w[\w\s]{0,40}\??\s*$",       # "Are hooks experimental?"
 
     r"\bwhat\s+language\b",
 ]

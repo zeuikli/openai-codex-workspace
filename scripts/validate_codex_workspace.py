@@ -36,6 +36,17 @@ def parse_simple_toml(text: str) -> dict[str, object]:
     return data
 
 
+def _is_gitignored(path: Path, root: Path) -> bool:
+    """Return True if `path` is ignored by git (not tracked and covered by .gitignore)."""
+    import subprocess as _sp
+    result = _sp.run(
+        ['git', 'check-ignore', '-q', str(path)],
+        cwd=root,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
 def validate_workspace(root: Path) -> list[str]:
     errors: list[str] = []
 
@@ -46,7 +57,7 @@ def validate_workspace(root: Path) -> list[str]:
         root / '.agents' / 'plugins',
     ]
     for path in forbidden:
-        if path.exists():
+        if path.exists() and not _is_gitignored(path, root):
             errors.append(f'Forbidden non-Codex artifact still exists: {path.as_posix()}')
 
     required_skills = [

@@ -1,8 +1,8 @@
 ---
-name: compress
+name: caveman-compress
 description: >
-  Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format
-  to save input tokens. Preserves all technical substance, code, URLs, and structure.
+  Compress natural language memory files (AGENTS.md, Memory.md, todos, preferences) into caveman
+  format to save input tokens. Preserves all technical substance, code, URLs, and structure.
   Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md.
   Trigger: /caveman:compress <filepath> or "compress memory file"
 ---
@@ -12,6 +12,19 @@ description: >
 ## Purpose
 
 Compress natural language files (CLAUDE.md, todos, preferences) into caveman-speak to reduce input tokens. Compressed version overwrites original. Human-readable backup saved as `<filename>.original.md`.
+
+## Use when
+
+- User invokes `/caveman:compress <filepath>`
+- User says "compress memory file", "compress AGENTS.md", "compress Memory.md", or similar
+- Token budget is a concern and the target file is a natural language `.md` / `.txt` file
+
+## Do not use when
+
+- Target file is code (`.py`, `.js`, `.ts`, `.json`, `.yaml`, `.toml`, `.sh`, etc.)
+- Target file is already in caveman format (check for `FILE.original.md` backup)
+- User has not specified a file and context is ambiguous — ask for the filepath first
+- File contains security-sensitive content (credentials, keys, tokens)
 
 ## Trigger
 
