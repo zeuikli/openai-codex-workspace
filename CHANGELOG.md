@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-04-16（sync latest caveman main into Codex-native workspace）
+
+- 新分支 `codex/integrate-caveman-main-20260416`：以 upstream `JuliusBrussee/caveman` `main@c2ed24b` 為基準，補齊最新 caveman-compress 工具鏈。
+- `.agents/skills/caveman-compress/scripts/*` 新增 OpenAI-first 壓縮腳本，優先走 Responses API，保留 Anthropic / `claude` CLI fallback。
+- `tests/caveman/verify_repo.py`、`tests/caveman/test_hooks.py` 改寫為檢查目前 repo 的 Codex-native caveman 結構，不再依賴舊版 standalone layout。
+- 新增 `tests/test_caveman_compress.py` 與 `tests/caveman-compress/` fixture，讓壓縮 skill 有可重跑的本地驗證。
+
 ## 2026-04-14（Karpathy notes 深度落地：Codex CLI/Cloud）
 
 - `docs/karpathy-codex-principles.md` 新增「2026 文章增補：Codex-only 深度落地」，補齊 IDE+Agent 並行、Tenacity 停機條件、Anti-Bloat 衛生檢查與 CLI/Cloud 相容要求。

@@ -30,60 +30,63 @@ Based on benchmarking and analysis, **SKILL is the right primitive for caveman c
 ## Caveman Compression Benchmarks
 
 Real API results — 80 calls, 4 models × 4 levels × 5 technical prompts.
-Run: 2026-04-16 00:13 UTC. Models mapped to closest available OpenAI API equivalents.
+Run: 2026-04-16 00:31 UTC.
+
+> **Note on gpt-5.3-codex:** 所有 `-codex` 模型變體為 completion-only，不支援 `/v1/chat/completions`。
+> 最接近的 chat 相容替代為 `gpt-5.2`，以下資料使用 `gpt-5.2` 代替。
 
 ### Per-Model Results
 
-#### gpt-5.4 (→ gpt-4.1)
+#### gpt-5.4
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
 |-------|-------------------|-----------|------------------|-----------------|
-| none (baseline) | 448.8 | 287.6 | 5553 | — |
-| lite | 151.6 | 101.6 | 3057 | **66.2%** |
-| full | 156.0 | 87.0 | 2637 | **65.2%** |
-| ultra | 123.6 | 67.2 | 1871 | **72.5%** |
+| none (baseline) | 435.0 | 291.2 | 7509 | — |
+| lite | 426.8 | 293.0 | 7472 | 1.9% |
+| full | 430.6 | 265.8 | 6609 | 1.0% |
+| ultra | 366.2 | 213.2 | 6553 | **15.8%** |
 
-#### gpt-5.4-mini (→ gpt-4.1-mini)
-
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
-|-------|-------------------|-----------|------------------|-----------------|
-| none (baseline) | 409.0 | 286.4 | 6772 | — |
-| lite | 204.0 | 138.4 | 3256 | **50.1%** |
-| full | 200.2 | 130.4 | 3253 | **51.1%** |
-| ultra | 95.4 | 58.8 | 1525 | **76.7%** |
-
-#### gpt-5.4-nano (→ gpt-4.1-nano)
+#### gpt-5.4-mini
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
 |-------|-------------------|-----------|------------------|-----------------|
-| none (baseline) | 434.4 | 291.4 | 2492 | — |
-| lite | 73.8 | 57.6 | 596 | **83.0%** |
-| full | 99.4 | 64.8 | 711 | **77.1%** |
-| ultra | 35.8 | 10.8 | 416 | **91.8%** |
+| none (baseline) | 426.6 | 290.0 | 2967 | — |
+| lite | 345.8 | 233.0 | 2284 | 18.9% |
+| full | 296.6 | 179.8 | 2183 | **30.5%** |
+| ultra | 186.8 | 108.0 | 1647 | **56.2%** |
 
-#### gpt-5.3-codex (→ gpt-4o)
+#### gpt-5.4-nano
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
 |-------|-------------------|-----------|------------------|-----------------|
-| none (baseline) | 459.0 | 338.8 | 3824 | — |
-| lite | 151.6 | 102.2 | 1593 | **67.0%** |
-| full | 193.2 | 116.0 | 3179 | **57.9%** |
-| ultra | 156.6 | 81.8 | 1652 | **65.9%** |
+| none (baseline) | 439.0 | 277.2 | 3146 | — |
+| lite | 381.2 | 230.0 | 2709 | 13.2% |
+| full | 411.6 | 251.8 | 2859 | 6.2% |
+| ultra | 224.0 | 114.0 | 1787 | **49.0%** |
 
-### Cross-Model Summary (full level)
+#### gpt-5.3-codex → gpt-5.2 (chat 相容替代)
 
-| Model | Avg Output Tokens | Token Reduction | Avg Latency (ms) |
-|-------|-------------------|-----------------|------------------|
-| gpt-5.4 (→ gpt-4.1) | 156.0 | 65.2% | 2637 |
-| gpt-5.4-mini (→ gpt-4.1-mini) | 200.2 | 51.1% | 3253 |
-| gpt-5.4-nano (→ gpt-4.1-nano) | 99.4 | **77.1%** | **711** |
-| gpt-5.3-codex (→ gpt-4o) | 193.2 | 57.9% | 3179 |
+| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction |
+|-------|-------------------|-----------|------------------|-----------------|
+| none (baseline) | 468.6 | 280.2 | 7406 | — |
+| lite | 430.6 | 263.0 | 8491 | 8.1% |
+| full | 328.4 | 185.8 | 6244 | **29.9%** |
+| ultra | 254.2 | 128.6 | 4968 | **45.8%** |
+
+### Cross-Model Summary (ultra level)
+
+| Model | Baseline Tokens | Ultra Tokens | Token Reduction | Latency (ms) |
+|-------|-----------------|--------------|-----------------|--------------|
+| gpt-5.4 | 435.0 | 366.2 | 15.8% | 6553 |
+| gpt-5.4-mini | 426.6 | 186.8 | **56.2%** | **1647** |
+| gpt-5.4-nano | 439.0 | 224.0 | 49.0% | 1787 |
+| gpt-5.3-codex → gpt-5.2 | 468.6 | 254.2 | 45.8% | 4968 |
 
 **Key findings:**
-- `ultra` mode delivers the highest compression (66–92% token reduction) at lowest latency.
-- `gpt-5.4-nano` responds fastest and compresses most aggressively under all levels.
-- `gpt-5.4` (flagship) produces best quality at `full`/`ultra` while keeping technical accuracy.
-- `lite` is best when grammar must stay intact; saves 50–83% tokens vs baseline.
+- **gpt-5.4 對 caveman 有抵抗性** — lite/full 幾乎無效（1%），只有 `ultra` 有明顯效果（16%）。模型越大越難覆寫其輸出風格。
+- **gpt-5.4-mini 壓縮效果最佳** — `ultra` 達到 56% token 削減，latency 最低（1647ms）。成本敏感型工作流首選。
+- **`ultra` 是唯一對 gpt-5.4 有效的等級** — lite/full 建議用在 mini/nano。
+- **gpt-5.3-codex 為 completion model**，不能走 chat completions，需用 `gpt-5.2` 代替。
 
 Full raw data: [`benchmarks/results/caveman_benchmark_results.json`](benchmarks/results/caveman_benchmark_results.json)
 Full report: [`benchmarks/results/caveman_benchmark_report.md`](benchmarks/results/caveman_benchmark_report.md)
@@ -124,7 +127,7 @@ See `.codex/config.toml` for full routing config.
 | Doc drift check | `.agents/skills/docs-drift-check/SKILL.md` |
 | Session handoff | `.agents/skills/session-handoff/SKILL.md` |
 | Cost & token review | `.agents/skills/cost-tracker/SKILL.md` |
-| Caveman compression | `.agents/skills/caveman/SKILL.md` |
+| Caveman compression | `.agents/skills/caveman-compress/SKILL.md` |
 
 ---
 
@@ -170,6 +173,10 @@ Full: [`docs/karpathy-codex-principles.md`](docs/karpathy-codex-principles.md)
 # Workspace structure check
 python3 scripts/validate_codex_workspace.py
 
+# Caveman integration checks
+python3 tests/caveman/verify_repo.py
+python3 -m unittest -v tests/caveman/test_hooks.py tests/test_caveman_compress.py
+
 # Hooks behaviour tests
 python3 -m unittest -v tests/test_codex_hooks_behavior.py
 
@@ -214,6 +221,8 @@ openai-codex-workspace/
 │   ├── agents/             ← per-agent TOML configs
 │   └── hooks/
 ├── .agents/skills/         ← on-demand skills (SKILL.md per skill)
+│   └── caveman-compress/
+│       └── scripts/        ← caveman memory compression toolchain
 ├── hooks/caveman/          ← SessionStart + UserPromptSubmit hooks
 ├── docs/
 │   ├── karpathy-codex-principles.md

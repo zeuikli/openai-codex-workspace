@@ -26,18 +26,18 @@ except ImportError:
 # Config
 # ──────────────────────────────────────────
 MODELS = [
-    "gpt-4.1",        # closest available to "gpt-5.4" family
-    "gpt-4.1-mini",   # closest available to "gpt-5.4-mini"
-    "gpt-4.1-nano",   # closest available to "gpt-5.4-nano"
-    "gpt-4o",         # proxy for gpt-5.3-codex class
+    "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
+    "gpt-5.2",       # gpt-5.3-codex is a completion model (not chat); gpt-5.2 is nearest chat substitute
 ]
 
-# Map requested names to actual API names (for display in report)
+# Display names — note the substitution for gpt-5.3-codex
 MODEL_DISPLAY = {
-    "gpt-4.1":      "gpt-5.4 (→ gpt-4.1)",
-    "gpt-4.1-mini": "gpt-5.4-mini (→ gpt-4.1-mini)",
-    "gpt-4.1-nano": "gpt-5.4-nano (→ gpt-4.1-nano)",
-    "gpt-4o":       "gpt-5.3-codex (→ gpt-4o)",
+    "gpt-5.4":      "gpt-5.4",
+    "gpt-5.4-mini": "gpt-5.4-mini",
+    "gpt-5.4-nano": "gpt-5.4-nano",
+    "gpt-5.2":      "gpt-5.3-codex → gpt-5.2 (codex variants are completion-only models)",
 }
 
 # Caveman system prompts per compression level
@@ -91,7 +91,7 @@ def run_single(client: OpenAI, model: str, level: str, prompt: str) -> dict:
                 {"role": "system", "content": system},
                 {"role": "user",   "content": prompt},
             ],
-            max_tokens=512,
+            max_completion_tokens=512,
             temperature=0,
         )
         latency_ms = round((time.monotonic() - t0) * 1000)

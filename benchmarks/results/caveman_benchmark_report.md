@@ -1,6 +1,6 @@
 # Caveman Compression Benchmark Report
 
-**Run at:** 2026-04-16 00:13 UTC
+**Run at:** 2026-04-16 00:31 UTC
 **Prompts:** 5 standard technical questions
 **Compression levels:** none (baseline) · lite · full · ultra
 
@@ -18,115 +18,139 @@ For this OpenAI Codex Workspace, **SKILL** is the right primitive for caveman:
 
 ## Results by Model
 
-### gpt-5.4 (→ gpt-4.1)
+### gpt-5.4
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
 |-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 448.8 | 287.6 | 5553.2 | — | 0 |
-| lite | 151.6 | 101.6 | 3056.8 | 66.2% | 0 |
-| full | 156.0 | 87.0 | 2636.6 | 65.2% | 0 |
-| ultra | 123.6 | 67.2 | 1871.2 | 72.5% | 0 |
+| none | 435.0 | 291.2 | 7509.2 | — | 0 |
+| lite | 426.8 | 293.0 | 7472.0 | 1.9% | 0 |
+| full | 430.6 | 265.8 | 6608.8 | 1.0% | 0 |
+| ultra | 366.2 | 213.2 | 6553.2 | 15.8% | 0 |
 
-### gpt-5.4-mini (→ gpt-4.1-mini)
-
-| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
-|-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 409.0 | 286.4 | 6771.6 | — | 0 |
-| lite | 204.0 | 138.4 | 3256.2 | 50.1% | 0 |
-| full | 200.2 | 130.4 | 3252.6 | 51.1% | 0 |
-| ultra | 95.4 | 58.8 | 1525.2 | 76.7% | 0 |
-
-### gpt-5.4-nano (→ gpt-4.1-nano)
+### gpt-5.4-mini
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
 |-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 434.4 | 291.4 | 2492.4 | — | 0 |
-| lite | 73.8 | 57.6 | 596.2 | 83.0% | 0 |
-| full | 99.4 | 64.8 | 711.2 | 77.1% | 0 |
-| ultra | 35.8 | 10.8 | 415.8 | 91.8% | 0 |
+| none | 426.6 | 290.0 | 2967.2 | — | 0 |
+| lite | 345.8 | 233.0 | 2284.0 | 18.9% | 0 |
+| full | 296.6 | 179.8 | 2183.4 | 30.5% | 0 |
+| ultra | 186.8 | 108.0 | 1647.0 | 56.2% | 0 |
 
-### gpt-5.3-codex (→ gpt-4o)
+### gpt-5.4-nano
 
 | Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
 |-------|-------------------|-----------|------------------|-------------------------|--------|
-| none | 459.0 | 338.8 | 3823.8 | — | 0 |
-| lite | 151.6 | 102.2 | 1592.6 | 67.0% | 0 |
-| full | 193.2 | 116.0 | 3179.2 | 57.9% | 0 |
-| ultra | 156.6 | 81.8 | 1651.8 | 65.9% | 0 |
+| none | 439.0 | 277.2 | 3145.8 | — | 0 |
+| lite | 381.2 | 230.0 | 2709.2 | 13.2% | 0 |
+| full | 411.6 | 251.8 | 2859.0 | 6.2% | 0 |
+| ultra | 224.0 | 114.0 | 1787.0 | 49.0% | 0 |
+
+### gpt-5.3-codex → gpt-5.2 (codex variants are completion-only models)
+
+| Level | Avg Output Tokens | Avg Words | Avg Latency (ms) | Token Reduction vs None | Errors |
+|-------|-------------------|-----------|------------------|-------------------------|--------|
+| none | 468.6 | 280.2 | 7406.0 | — | 0 |
+| lite | 430.6 | 263.0 | 8491.2 | 8.1% | 0 |
+| full | 328.4 | 185.8 | 6244.0 | 29.9% | 0 |
+| ultra | 254.2 | 128.6 | 4967.6 | 45.8% | 0 |
 
 ## Cross-Model Summary (full compression level)
 
 | Model | Avg Output Tokens (full) | Token Reduction vs None | Avg Latency (ms) |
 |-------|--------------------------|-------------------------|------------------|
-| gpt-5.4 (→ gpt-4.1) | 156.0 | 65.2% | 2636.6 |
-| gpt-5.4-mini (→ gpt-4.1-mini) | 200.2 | 51.1% | 3252.6 |
-| gpt-5.4-nano (→ gpt-4.1-nano) | 99.4 | 77.1% | 711.2 |
-| gpt-5.3-codex (→ gpt-4o) | 193.2 | 57.9% | 3179.2 |
+| gpt-5.4 | 430.6 | 1.0% | 6608.8 |
+| gpt-5.4-mini | 296.6 | 30.5% | 2183.4 |
+| gpt-5.4-nano | 411.6 | 6.2% | 2859.0 |
+| gpt-5.3-codex → gpt-5.2 (codex variants are completion-only models) | 328.4 | 29.9% | 6244.0 |
 
 ## Sample Outputs (first prompt)
 
 **Prompt:** `Why does my React component re-render every time the parent updates?`
 
-### gpt-5.4 (→ gpt-4.1)
+### gpt-5.4
 
-**none:** When a parent React component updates (i.e., re-renders), its child components will also re-render by default. This is a fundamental part of how React's rendering model works. Here’s why this happens and what you can do about it:
+**none:** Because in React, **when a parent renders, its children render too by default**.
 
-## Why does this happen?
+That doesn’t always mean the DOM changes, but the child component function/class is usually called again unless React can **skip** it.
 
-1. **React’s Rendering Model:**  
-   When a parent component re-renders, React will also re-render all of its children, unless you explicitly p…
+## Common reasons your child re-renders
 
-**full:** Parent re-renders → child re-renders by default. React re-renders all children when parent renders, unless child is memoized.
+### 1. The parent re-rendered
+If the parent updates state or receives new props, React re-runs the parent render, and child components are re…
 
-Reasons:
-- Props change → child re-renders.
-- Parent state/props change → triggers parent render → triggers child render.
-- Functions/objects/arrays passed as props → new reference each render → child sees props as changed.
+**full:** Common cause: parent render creates new props each time.
 
-Solutions:
-- Use `React.memo` for functional com…
+React re-renders child when:
+- parent re-renders, and child not memoized
+- prop identity changes
+- state changes in child
+- context value changes
+- hook inside child triggers update
 
-**ultra:** Parent re-render → child re-render (default React).  
-Reason:  
-- New props (even if same value) → child re-render.  
-- Parent state/props change → parent re-render → child re-render.  
-- No memoization (React.memo) → always re-render.
+Big offenders in parent:
+- inline object props  
+  `style={{ color: 'red' }}`
+- inline array props  
+  `items={[1,2,3]}`
+- inline function props  
+  `onClick={…
 
-Fix:  
-- Use React.memo(child) → shallow prop compare → skip re-render if props same.  
-- Use useCallback/useMemo for stable fn/obj/array props.  
-- Minimize paren…
+**ultra:** Normal.
 
-### gpt-5.4-mini (→ gpt-4.1-mini)
+Parent render → child fn runs again.
 
-**none:** In React, a child component re-renders whenever its parent re-renders by default. This happens because React's rendering process is top-down: when a parent component updates (due to state or props changes), React will re-render that parent and all of its children to ensure the UI stays consistent.
+Why:
+- React re-evals subtree on parent update.
+- Child props same ≠ child skipped, by default.
+- Fn component call = render phase, not always DOM change.
 
-Here are the main reasons why your React component re-renders every time the parent updates:
+Common triggers:
+- New object/array literal props each parent render.
+  - `{}` `[]` `() => {}`
+- New callback identity.
+- Context value changed.
+- State changed in child.
+- Key changed/remount.
+- S…
 
-1. **P…
+### gpt-5.4-mini
 
-**full:** React re-renders child components when parent re-renders by default. Reasons:
+**none:** Because in React, a parent re-render usually causes its children to be re-rendered too.
 
-1. Parent state/props change → parent re-renders → child re-renders.
-2. Child receives new props (even if values same, new object/array reference triggers re-render).
-3. No memoization on child component.
+That does **not always mean the DOM is updated** — it just means React runs the child component function again to see if anything changed.
 
-Solutions:
+## Common reasons
 
-- Use React.memo on child to memoize output, skip re-render if props shallow equal.
-- Use useCallback/u…
+### 1. Parent re-render triggers child re-render
+If the parent updates state, React re-runs the parent, and by default its children are re-rendered as p…
 
-**ultra:** React re-renders child if parent re-renders by default. Parent update → new props/context → child re-render.
+**full:** Because parent render usually means child render too.
 
-Reasons:
-- Parent state/props change → parent re-render → child re-render.
-- Child props shallow compare fail (new object/array inline).
-- Context value change.
-- No React.memo/useMemo/useCallback to memoize child/props/fns.
+In React, when parent component updates, React re-runs parent function. That creates new child element tree. Child component gets rendered again unless React can skip it.
 
-Fix:
-- Use React.memo(child) → skip if props same.
-- Memoize pro…
+Common reasons:
+
+- Parent state/props changed
+- Child receives new prop reference each render:
+  - inline object: `{}`  
+  - inline array: `[]`
+  - inline function: `() => {…
+
+**ultra:** Because parent update → child fn runs again → React re-renders child by default.
+
+Common causes:
+- Parent state/props change
+- New prop refs each render (`{}`, `[]`, `() => {}`) → shallow compare fails
+- Context value changes
+- Child not memoized
+
+Fixes:
+- `React.memo(Child)`
+- `useMemo` / `useCallback` for stable refs
+- Lift state less / split components
+- Avoid passing inline objs/fns
+
+Note: re-…
 
 ---
-*Generated by `benchmarks/caveman_benchmark.py` · 2026-04-16 00:13 UTC*
+*Generated by `benchmarks/caveman_benchmark.py` · 2026-04-16 00:31 UTC*
