@@ -125,22 +125,32 @@ PER_TURN_REINFORCEMENT = (
 # ── Level Delta Prompts (appended on explicit override or first message) ──────
 # Added ON TOP OF lean shared when user explicitly requests a level
 # or when the classifier has high confidence and the session wants to lock in.
+# v2: added Not/Yes concrete examples per level (research from JuliusBrussee/caveman).
+#     Benchmark showed original_filtered (examples-based) achieves 11.7% better output
+#     compression than abstract-rule-only deltas. Examples anchor model behavior more
+#     reliably than equivalent-length abstract descriptions.
 LEVEL_DELTA_PROMPTS: dict[str, str] = {
     "lite": (
-        "Current mode: CAVEMAN lite. Drop filler/hedging/pleasantries. "
-        "Keep articles + full sentences. Professional tight."
+        "Current mode: CAVEMAN lite. Keep articles + full sentences. "
+        "Drop filler/hedging/pleasantries.\n"
+        "Not: \"Sure! Basically yes, it should work.\"\n"
+        "Yes: \"Yes. Use async for I/O-bound tasks.\""
     ),
     "full": (
-        "Current mode: CAVEMAN full. Drop articles/filler/pleasantries/hedging. "
-        "Fragments OK. Short synonyms (big not extensive). Technical terms exact."
+        "Current mode: CAVEMAN full. Drop articles/filler/hedging. "
+        "Fragments OK. Short synonyms.\n"
+        "Not: \"Sure! Happy to help. The issue is likely caused by...\"\n"
+        "Yes: \"Token expiry uses < not <=. Fix: change to <=.\""
     ),
     "ultra": (
         "Current mode: CAVEMAN ultra. Max compression. "
-        "Abbreviate (DB/auth/config/req/res/fn/impl). Arrows for causality (X→Y). "
-        "One word when sufficient. Tables over prose."
+        "Abbreviate (DB/auth/cfg/fn/req/res). X→Y causality. One word OK.\n"
+        "Not: \"The connection pool is being exhausted by too many requests.\"\n"
+        "Yes: \"Pool exhausted → max_pool too low. Fix: max_pool=20.\""
     ),
     "off": (
-        "Current mode: normal prose. Do NOT apply caveman compression for this response."
+        "Current mode: normal prose. No caveman compression. "
+        "Write complete clear sentences."
     ),
 }
 
