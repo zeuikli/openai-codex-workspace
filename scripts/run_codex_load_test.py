@@ -12,8 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "benchmarks" / "results"
 
 CHECKS = [
+    # Full pytest suite (33 passed, 4 skipped by design)
+    ["python3", "-m", "pytest", "tests/", "-v", "--tb=short"],
+    # Codex workspace structure validator
+    ["python3", "scripts/validate_codex_workspace.py"],
+    # verify_repo sanity check
     ["python3", "tests/caveman/verify_repo.py"],
-    ["python3", "-m", "unittest", "-v", "tests/caveman/test_hooks"],
 ]
 
 

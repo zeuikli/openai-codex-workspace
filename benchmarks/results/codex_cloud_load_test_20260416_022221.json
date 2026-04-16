@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-04-16T02:22:21.285365+00:00",
+  "status": "fail",
+  "checks": [
+    {
+      "command": "python3 tests/caveman/verify_repo.py",
+      "args": [
+        "python3",
+        "tests/caveman/verify_repo.py"
+      ],
+      "returncode": 0,
+      "stdout_tail": "== Repo Layout ==\nCodex-native caveman assets present\n\n== Manifest And Syntax ==\n[SKIP] node not found — JS syntax checks skipped (install Node.js to enable)\nShell syntax OK\n\n== Compress Fixtures ==\nValidated 1 caveman-compress fixture pairs\n\n== Compress CLI ==\nCompress CLI skip/error paths OK\n\n== Hook Flow ==\n[SKIP] node not found — hook flow checks skipped (install Node.js to enable)\n\nAll caveman checks passed.",
+      "stderr_tail": ""
+    },
+    {
+      "command": "python3 -m unittest -v tests/caveman/test_hooks",
+      "args": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "tests/caveman/test_hooks"
+      ],
+      "returncode": 1,
+      "stdout_tail": "",
+      "stderr_tail": "tests/caveman/test_hooks (unittest.loader._FailedTest) ... ERROR\n\n======================================================================\nERROR: tests/caveman/test_hooks (unittest.loader._FailedTest)\n----------------------------------------------------------------------\nImportError: Failed to import test module: tests/caveman/test_hooks\nTraceback (most recent call last):\n  File \"/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/loader.py\", line 154, in loadTestsFromName\n    module = __import__(module_name)\nModuleNotFoundError: No module named 'tests/caveman/test_hooks'\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nFAILED (errors=1)"
+    }
+  ]
+}
