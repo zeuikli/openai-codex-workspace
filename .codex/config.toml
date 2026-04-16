@@ -11,7 +11,6 @@ multi_agent = true
 # Hooks 仍屬 under development；本 workspace 已提供 hooks.json 與腳本，故啟用。
 codex_hooks = true
 
-project_doc_fallback_filenames = [".agents.md"]
 
 [agents]
 max_threads = 6
