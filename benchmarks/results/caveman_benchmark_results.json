@@ -1,0 +1,1011 @@
+{
+  "run_at": "2026-04-16 00:13 UTC",
+  "models": [
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "gpt-4o"
+  ],
+  "results": {
+    "gpt-4.1": {
+      "none": [
+        {
+          "ok": true,
+          "latency_ms": 7090,
+          "input_tokens": 36,
+          "output_tokens": 512,
+          "total_tokens": 548,
+          "output_words": 352,
+          "output_chars": 2368,
+          "content": "When a parent React component updates (i.e., re-renders), its child components will also re-render by default. This is a fundamental part of how React's rendering model works. Here\u2019s why this happens and what you can do about it:\n\n## Why does this happen?\n\n1. **React\u2019s Rendering Model:**  \n   When a parent component re-renders, React will also re-render all of its children, unless you explicitly prevent it. This ensures that the UI stays in sync with the state and props.\n\n2. **Props May Change:**  \n   Even if the props passed to the child component haven\u2019t changed, React will still re-render the child unless you optimize it. If the parent\u2019s state or props change, React assumes the children might need to update as well.\n\n3. **New Props References:**  \n   If you pass objects, arrays, or functions as props, and those are re-created on every render, their references change, causing the child to re-render even if the content is the same.\n\n## How to Prevent Unnecessary Re-renders\n\nIf you want to prevent unnecessary re-renders of your child component, you can use one of the following techniques:\n\n### 1. `React.memo` (for functional components)\nWrap your child component with `React.memo`. This will make React only re-render the child if its props have actually changed (using a shallow comparison).\n\n```jsx\nconst MyChild = React.memo(function MyChild(props) {\n  // ...\n});\n```\n\n### 2. `shouldComponentUpdate` (for class components)\nImplement the `shouldComponentUpdate` lifecycle method to control when the component should re-render.\n\n```jsx\nclass MyChild extends React.Component {\n  shouldComponentUpdate(nextProps) {\n    // return true to re-render, false to skip\n  }\n  // ...\n}\n```\n\n### 3. Memoize Props\nIf you pass objects, arrays, or functions as props, memoize them using `useMemo` or `useCallback` in the parent to avoid creating new references on every render.\n\n```jsx\nconst memoizedValue = useMemo(() => ({ a: 1 }), []);\nconst memoizedCallback = useCallback(() => { /* ... */ }, []);\n```\n\n### 4. Avoid Unnecessary Parent Re-renders\nSometimes, the parent is re-rendering more often than needed. Check if you can optimize the parent component to avoid unnecessary updates.\n\n---\n\n## Summary Table\n\n| Cause of Re-render                | Solution                                  |\n|-----------------------------------|--------------------------------",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 4605,
+          "input_tokens": 28,
+          "output_tokens": 379,
+          "total_tokens": 407,
+          "output_words": 281,
+          "output_chars": 1937,
+          "content": "**Database connection pooling** is a technique used to manage and optimize the use of database connections in applications, especially those that require frequent access to a database (such as web applications).\n\n### What is it?\n\n- **Connection pooling** maintains a pool (collection) of open database connections.\n- When an application needs to interact with the database, it borrows a connection from the pool instead of opening a new one.\n- After the operation, the connection is returned to the pool for reuse, rather than being closed.\n\n### Why is it needed?\n\n- **Opening and closing database connections is resource-intensive and time-consuming.**\n- Without pooling, each database request would require a new connection, leading to performance bottlenecks and increased load on the database server.\n\n### How does it work?\n\n1. **Initialization:** At startup, a pool of database connections is created and kept open.\n2. **Borrowing:** When the application needs a connection, it requests one from the pool.\n3. **Using:** The application uses the connection to perform database operations.\n4. **Returning:** Once done, the connection is returned to the pool for future use.\n5. **Limits:** The pool has a maximum and minimum number of connections to control resource usage.\n\n### Benefits\n\n- **Improved performance:** Reduces the overhead of establishing new connections.\n- **Resource management:** Limits the number of simultaneous connections to the database.\n- **Scalability:** Supports more users and requests efficiently.\n\n### Example\n\nIn Java, frameworks like **HikariCP**, **C3P0**, or **Apache DBCP** provide connection pooling. In Python, libraries like **SQLAlchemy** or **Django ORM** have built-in pooling mechanisms.\n\n**In summary:**  \nDatabase connection pooling is a method to efficiently manage database connections by reusing a set of established connections, improving application performance and resource utilization.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 4210,
+          "input_tokens": 31,
+          "output_tokens": 404,
+          "total_tokens": 435,
+          "output_words": 263,
+          "output_chars": 2034,
+          "content": "**TCP (Transmission Control Protocol)** and **UDP (User Datagram Protocol)** are both transport layer protocols used for sending data over the Internet, but they have key differences:\n\n### TCP (Transmission Control Protocol)\n- **Connection-oriented:** Establishes a connection before data transfer (handshake process).\n- **Reliable:** Guarantees delivery of data, retransmits lost packets, and ensures data arrives in order.\n- **Error checking:** Performs error checking and correction.\n- **Flow control:** Manages data flow to prevent overwhelming the receiver.\n- **Slower:** Due to overhead from connection setup, acknowledgments, and error correction.\n- **Use cases:** Web browsing (HTTP/HTTPS), email (SMTP), file transfers (FTP), etc.\n\n### UDP (User Datagram Protocol)\n- **Connectionless:** No connection setup; data is sent without prior communication.\n- **Unreliable:** No guarantee of delivery, order, or error correction. Lost packets are not retransmitted.\n- **Minimal error checking:** Only basic checksum for data integrity.\n- **No flow control:** Sender can overwhelm the receiver.\n- **Faster:** Lower overhead, suitable for real-time applications.\n- **Use cases:** Streaming (audio/video), online gaming, VoIP, DNS queries, etc.\n\n### Summary Table\n\n| Feature         | TCP                          | UDP                        |\n|-----------------|-----------------------------|----------------------------|\n| Connection      | Connection-oriented          | Connectionless             |\n| Reliability     | Reliable (guaranteed)        | Unreliable (best effort)   |\n| Ordering        | Guaranteed                   | Not guaranteed             |\n| Speed           | Slower (more overhead)       | Faster (less overhead)     |\n| Use cases       | Web, email, file transfer    | Streaming, gaming, DNS     |\n\n**In short:**  \nTCP is reliable and ensures data arrives correctly and in order, but is slower. UDP is faster and simpler, but does not guarantee delivery or order. The choice depends on the application's needs.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 6513,
+          "input_tokens": 38,
+          "output_tokens": 512,
+          "total_tokens": 550,
+          "output_words": 245,
+          "output_chars": 1981,
+          "content": "Fixing a memory leak in a long-running Node.js process involves several steps: **identifying**, **diagnosing**, and **resolving** the leak. Here\u2019s a structured approach:\n\n---\n\n## 1. **Identify the Memory Leak**\n\n### **Symptoms**\n- Increasing memory usage over time (as seen in `top`, `htop`, or monitoring tools).\n- Process crashes with \"out of memory\" errors.\n\n### **Monitor Memory Usage**\n- Use built-in tools:\n  ```js\n  setInterval(() => {\n    const used = process.memoryUsage();\n    console.log(`Heap Used: ${Math.round(used.heapUsed / 1024 / 1024)} MB`);\n  }, 60000);\n  ```\n- Use external monitoring (e.g., PM2, New Relic, Datadog).\n\n---\n\n## 2. **Diagnose the Leak**\n\n### **A. Heap Snapshots**\n- Use Chrome DevTools:\n  1. Start Node.js with `--inspect` or `--inspect-brk`:\n     ```\n     node --inspect index.js\n     ```\n  2. Open `chrome://inspect` in Chrome.\n  3. Take heap snapshots at intervals and compare them.\n\n### **B. Memory Profiling Tools**\n- [heapdump](https://www.npmjs.com/package/heapdump): Generate heap snapshots programmatically.\n  ```js\n  const heapdump = require('heapdump');\n  // Trigger a dump on demand\n  heapdump.writeSnapshot('/path/to/snapshot.heapsnapshot');\n  ```\n- [clinic.js](https://clinicjs.org/): `clinic doctor -- node index.js`\n\n### **C. Leak Detection Libraries**\n- [memwatch-next](https://www.npmjs.com/package/memwatch-next): Detects leaks and heap growth.\n\n---\n\n## 3. **Find the Cause**\n\nCommon causes include:\n- **Global variables**: Accidentally storing data globally.\n- **Event listeners**: Not removing listeners (`EventEmitter`) causing references to persist.\n- **Closures**: Functions holding references to large objects.\n- **Caches**: Unbounded in-memory caches (e.g., objects, arrays).\n- **Timers**: Unstopped intervals/timeouts.\n\n---\n\n## 4. **Fix the Leak**\n\n- **Remove unnecessary global references.**\n- **Properly clean up event listeners:**\n  ```js\n  emitter.removeListener('event', handler);\n  ```\n- **Limit cache size** (use",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 5348,
+          "input_tokens": 34,
+          "output_tokens": 437,
+          "total_tokens": 471,
+          "output_words": 297,
+          "output_chars": 1947,
+          "content": "The SQL `EXPLAIN` command provides detailed information about how a SQL query will be executed by the database engine. It is a diagnostic tool used to analyze and optimize queries.\n\n**What `EXPLAIN` tells you:**\n\n- **Query Execution Plan:** It shows the steps the database will take to execute your query, including the order of operations (such as table scans, index scans, joins, sorts, etc.).\n- **Access Methods:** It indicates whether the database will use indexes, perform full table scans, or use other access paths.\n- **Join Types:** For queries involving multiple tables, it shows how tables will be joined (e.g., nested loop, hash join, merge join).\n- **Estimated Costs:** Many databases provide estimated costs for each step, which help identify expensive operations.\n- **Row Estimates:** It often shows the estimated number of rows processed at each step.\n- **Other Details:** Depending on the database, it may show filter conditions, used indexes, and other relevant information.\n\n**Why use `EXPLAIN`?**\n\n- **Performance Tuning:** Identify slow parts of your query and optimize them (e.g., by adding indexes or rewriting the query).\n- **Debugging:** Understand why a query is not using an index or is slower than expected.\n- **Learning:** Gain insight into how the database processes queries.\n\n**Example (PostgreSQL):**\n```sql\nEXPLAIN SELECT * FROM users WHERE email = 'test@example.com';\n```\nSample output:\n```\nIndex Scan using users_email_idx on users  (cost=0.29..8.30 rows=1 width=100)\n  Index Cond: (email = 'test@example.com')\n```\nThis tells you the query will use an index scan on `users_email_idx` to find the row.\n\n**Note:** The exact output and features of `EXPLAIN` vary between database systems (MySQL, PostgreSQL, Oracle, SQL Server, etc.), but the general purpose is the same.\n\n**Summary:**  \n`EXPLAIN` helps you understand and optimize how your SQL queries are executed by showing the execution plan and related details.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "lite": [
+        {
+          "ok": true,
+          "latency_ms": 2707,
+          "input_tokens": 54,
+          "output_tokens": 157,
+          "total_tokens": 211,
+          "output_words": 110,
+          "output_chars": 762,
+          "content": "React component re-renders when parent updates because React\u2019s default behavior is to re-render all children when a parent re-renders. This happens even if props to the child haven\u2019t changed.\n\nMain reasons:\n- Parent passes new props (even if values are the same, but new references for objects/arrays/functions).\n- No memoization: Functional components re-render unless wrapped in `React.memo`.\n- Context or state changes in parent trigger re-render of all descendants.\n\nTo prevent unnecessary re-renders:\n- Use `React.memo` for functional components.\n- Memoize props (objects, arrays, functions) with `useMemo` or `useCallback`.\n- Avoid unnecessary state or context changes in parent.\n\nCheck React DevTools to see what props or state changes trigger re-renders.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2680,
+          "input_tokens": 46,
+          "output_tokens": 126,
+          "total_tokens": 172,
+          "output_words": 108,
+          "output_chars": 718,
+          "content": "Database connection pooling is a technique for managing and reusing a set of database connections in an application. Instead of opening and closing a new connection for every database request, a pool of connections is created and maintained. When an application needs to interact with the database, it borrows a connection from the pool. After the operation, the connection is returned to the pool for reuse.\n\nBenefits:\n- Reduces overhead of establishing connections.\n- Improves performance and resource utilization.\n- Limits the number of simultaneous connections to the database.\n\nCommon in web servers and enterprise applications. Managed by libraries or frameworks. Pool size and timeout settings are configurable.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 1285,
+          "input_tokens": 49,
+          "output_tokens": 96,
+          "total_tokens": 145,
+          "output_words": 64,
+          "output_chars": 494,
+          "content": "TCP (Transmission Control Protocol) is connection-oriented, reliable, and ensures data arrives in order. It uses handshakes, acknowledgments, and retransmissions for error correction. Common for web browsing, email, and file transfers.\n\nUDP (User Datagram Protocol) is connectionless, unreliable, and does not guarantee order or delivery. No handshakes or retransmissions. Faster, lower overhead. Used for streaming, gaming, and real-time applications where speed matters more than reliability.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 5619,
+          "input_tokens": 56,
+          "output_tokens": 316,
+          "total_tokens": 372,
+          "output_words": 178,
+          "output_chars": 1335,
+          "content": "1. **Identify the Leak**  \n   - Use `process.memoryUsage()` to monitor memory over time.\n   - Run with `--inspect` or `--inspect-brk` and use Chrome DevTools for heap snapshots.\n   - Use tools like `heapdump`, `memwatch-next`, or `clinic.js`.\n\n2. **Analyze Heap Snapshots**  \n   - Take snapshots at intervals.\n   - Compare snapshots to find objects that keep growing.\n   - Look for detached DOM trees, event listeners, or large arrays/maps.\n\n3. **Common Causes**  \n   - Unreleased event listeners (`EventEmitter` leaks).\n   - Global variables holding references.\n   - Closures capturing large objects.\n   - Caching without limits (e.g., LRU cache with no size cap).\n   - Forgotten timers or intervals.\n\n4. **Fix the Leak**  \n   - Remove or limit caches.\n   - Unregister event listeners (`emitter.removeListener` or `emitter.off`).\n   - Clear timers/intervals (`clearTimeout`, `clearInterval`).\n   - Avoid unnecessary global variables.\n   - Break circular references.\n\n5. **Test**  \n   - Rerun with monitoring.\n   - Confirm memory stabilizes over time.\n\n6. **Automate**  \n   - Add monitoring/alerts for memory usage in production.\n   - Consider process restarts with tools like PM2 or Kubernetes as a fallback.\n\n**Summary:**  \nFind what\u2019s growing, remove references, clean up listeners/timers, and monitor. Use heap snapshots for proof.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2993,
+          "input_tokens": 52,
+          "output_tokens": 63,
+          "total_tokens": 115,
+          "output_words": 48,
+          "output_chars": 296,
+          "content": "The SQL `EXPLAIN` command shows how the database will execute a query. It provides details like:\n\n- Order of table access\n- Indexes used\n- Join methods\n- Estimated rows processed\n- Cost estimates\n\nPurpose: Analyze and optimize query performance. Output format and details vary by database system.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "full": [
+        {
+          "ok": true,
+          "latency_ms": 2926,
+          "input_tokens": 75,
+          "output_tokens": 162,
+          "total_tokens": 237,
+          "output_words": 98,
+          "output_chars": 722,
+          "content": "Parent re-renders \u2192 child re-renders by default. React re-renders all children when parent renders, unless child is memoized.\n\nReasons:\n- Props change \u2192 child re-renders.\n- Parent state/props change \u2192 triggers parent render \u2192 triggers child render.\n- Functions/objects/arrays passed as props \u2192 new reference each render \u2192 child sees props as changed.\n\nSolutions:\n- Use `React.memo` for functional components to prevent unnecessary re-renders.\n- Memoize props (functions/objects/arrays) with `useCallback`/`useMemo`.\n- Use `shouldComponentUpdate` for class components.\n\nExample:\n```js\nconst Child = React.memo(function Child(props) { ... });\n```\n\nSummary: No memoization \u2192 child re-renders with parent. Memoize to optimize.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1917,
+          "input_tokens": 67,
+          "output_tokens": 102,
+          "total_tokens": 169,
+          "output_words": 62,
+          "output_chars": 516,
+          "content": "Database connection pooling: technique. Manages pool of reusable database connections. Avoids overhead of creating/destroying connection per request. Pool holds open connections. Application borrows connection, uses it, returns to pool. Reduces latency, improves performance, controls resource usage. Common in web servers, enterprise apps. Managed by libraries (HikariCP, c3p0, DBCP) or frameworks. Pool size configurable. Handles connection leaks, timeouts, validation. Essential for high-concurrency environments.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 2283,
+          "input_tokens": 70,
+          "output_tokens": 109,
+          "total_tokens": 179,
+          "output_words": 55,
+          "output_chars": 433,
+          "content": "TCP:  \n- Connection-oriented  \n- Reliable (guarantees delivery, order, no duplicates)  \n- Flow control, congestion control  \n- Slower (overhead from checks, handshakes)  \n- Use: web (HTTP/HTTPS), email (SMTP), file transfer (FTP)\n\nUDP:  \n- Connectionless  \n- Unreliable (no delivery/order guarantee, possible duplicates)  \n- No flow/congestion control  \n- Faster (minimal overhead)  \n- Use: streaming (video/audio), DNS, gaming, VoIP",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 4519,
+          "input_tokens": 77,
+          "output_tokens": 323,
+          "total_tokens": 400,
+          "output_words": 166,
+          "output_chars": 1270,
+          "content": "1. **Identify leak**  \nUse tools:  \n- `process.memoryUsage()`  \n- Chrome DevTools (inspect with `node --inspect`)  \n- Heap snapshots (`heapdump` module)  \n- Leak detection modules (`memwatch-next`, `leakage`)\n\n2. **Analyze heap**  \n- Take heap snapshots at intervals  \n- Compare: look for growing objects  \n- Focus on closures, global variables, event listeners, caches\n\n3. **Common causes**  \n- Forgotten timers/intervals (`setInterval`, `setTimeout`)  \n- Unremoved event listeners (`emitter.on` without `off`)  \n- Growing arrays/objects (caches, queues)  \n- Closures holding references  \n- Global variables\n\n4. **Fix**  \n- Remove unused listeners: `emitter.removeListener` or `emitter.off`  \n- Clear timers: `clearInterval`, `clearTimeout`  \n- Limit cache size (LRU, TTL)  \n- Avoid global variables  \n- Break reference cycles\n\n5. **Monitor**  \n- Use process monitors (`pm2`, `forever`)  \n- Alert on high memory usage  \n- Restart process if needed\n\n**Example: Remove event listener**\n```js\nfunction handler() { /* ... */ }\nemitter.on('event', handler);\n// Later\nemitter.off('event', handler);\n```\n\n**Example: Limit cache**\n```js\nconst cache = new Map();\nif (cache.size > 1000) cache.clear();\n```\n\n**Summary:**  \nFind leak, analyze heap, fix references, monitor process.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1538,
+          "input_tokens": 73,
+          "output_tokens": 84,
+          "total_tokens": 157,
+          "output_words": 54,
+          "output_chars": 371,
+          "content": "EXPLAIN shows SQL query execution plan. Reveals:\n\n- Table access order\n- Index usage\n- Join methods (nested loop, hash join, etc.)\n- Row estimates per step\n- Cost estimates (DB-dependent)\n- Filter/predicate application points\n\nUsed for query optimization, performance tuning. Output format varies by database (MySQL, PostgreSQL, Oracle, etc.). No data returned\u2014plan only.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "ultra": [
+        {
+          "ok": true,
+          "latency_ms": 1914,
+          "input_tokens": 74,
+          "output_tokens": 105,
+          "total_tokens": 179,
+          "output_words": 60,
+          "output_chars": 413,
+          "content": "Parent re-render \u2192 child re-render (default React).  \nReason:  \n- New props (even if same value) \u2192 child re-render.  \n- Parent state/props change \u2192 parent re-render \u2192 child re-render.  \n- No memoization (React.memo) \u2192 always re-render.\n\nFix:  \n- Use React.memo(child) \u2192 shallow prop compare \u2192 skip re-render if props same.  \n- Use useCallback/useMemo for stable fn/obj/array props.  \n- Minimize parent re-renders.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1646,
+          "input_tokens": 66,
+          "output_tokens": 80,
+          "total_tokens": 146,
+          "output_words": 53,
+          "output_chars": 279,
+          "content": "DB conn pool:  \n- Pre-make N DB conns (pool)  \n- App req conn \u2192 get from pool  \n- Done \u2192 return conn to pool  \n- No wait for new conn each time (slow)  \n- Pool size config (min/max)  \n- Pool manages idle/active conns  \n- Prevents conn flood (DB crash)  \n- Faster, efficient, safe",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 1060,
+          "input_tokens": 69,
+          "output_tokens": 83,
+          "total_tokens": 152,
+          "output_words": 43,
+          "output_chars": 262,
+          "content": "TCP:  \n- Conn. oriented  \n- Reliable (ACK, retransmit)  \n- Ordered  \n- Slower  \n- Heavy (handshake, overhead)  \n- Use: web, email, file xfer\n\nUDP:  \n- Conn. less  \n- Unreliable (no ACK)  \n- Unordered  \n- Fast  \n- Light (no handshake)  \n- Use: video, voice, games",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 3469,
+          "input_tokens": 76,
+          "output_tokens": 282,
+          "total_tokens": 358,
+          "output_words": 145,
+          "output_chars": 995,
+          "content": "1. **Detect**:  \n- Use `top`, `htop`, `ps` \u2192 check RAM.  \n- `process.memoryUsage()` \u2192 log heap.  \n- `heapdump`, `memwatch-next`, `clinic.js` \u2192 snapshots.\n\n2. **Analyze**:  \n- Chrome DevTools \u2192 `node --inspect` \u2192 heap snapshot \u2192 find leaks (growing objects, detached DOM, listeners).\n- Look for:  \n  - Global vars  \n  - Closures holding refs  \n  - EventEmitter leaks (`emitter.setMaxListeners()`, `emitter.listenerCount()`)  \n  - Caches never cleared  \n  - Timers/intervals not cleared\n\n3. **Fix**:  \n- Remove unused refs (`obj = null`)  \n- Unregister listeners (`emitter.off()`)  \n- Clear timers (`clearTimeout`, `clearInterval`)  \n- Limit cache size (LRU, TTL)  \n- Avoid global vars  \n- Use weak refs (`WeakMap`, `WeakSet`) for ephemeral data\n\n4. **Test**:  \n- Run process \u2192 monitor RAM  \n- Run load test \u2192 check for growth\n\n5. **Deploy**:  \n- Monitor in prod (Prometheus, Grafana, etc.)\n\n**Summary**:  \nLeak = object ref never released \u2192 RAM \u2191.  \nFind \u2192 Analyze \u2192 Remove refs \u2192 Test \u2192 Monitor.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1267,
+          "input_tokens": 72,
+          "output_tokens": 68,
+          "total_tokens": 140,
+          "output_words": 35,
+          "output_chars": 220,
+          "content": "EXPLAIN\u2192SQL query plan.  \nShows:  \n- Table scan/index use  \n- Join type/order  \n- Row est.  \n- Cost est.  \n- Step-by-step ops  \nUse:  \n- Perf debug  \n- Bottleneck spot  \n- Index need?  \nUltra:  \nEXPLAIN\u2192How DB run query.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ]
+    },
+    "gpt-4.1-mini": {
+      "none": [
+        {
+          "ok": true,
+          "latency_ms": 10571,
+          "input_tokens": 36,
+          "output_tokens": 512,
+          "total_tokens": 548,
+          "output_words": 329,
+          "output_chars": 2321,
+          "content": "In React, a child component re-renders whenever its parent re-renders by default. This happens because React's rendering process is top-down: when a parent component updates (due to state or props changes), React will re-render that parent and all of its children to ensure the UI stays consistent.\n\nHere are the main reasons why your React component re-renders every time the parent updates:\n\n1. **Parent Re-render triggers child re-render**  \n   When a parent component re-renders, React will also re-render all its children by default, even if the child's props haven't changed. This is because React needs to reconcile the virtual DOM tree and determine what actually changed.\n\n2. **Props are new references on every render**  \n   If the parent passes down objects, arrays, or functions as props, and these are recreated on every render, the child will see new prop references and re-render. For example:\n   ```jsx\n   <ChildComponent data={{ a: 1 }} />\n   ```\n   Here, `{ a: 1 }` is a new object every time, so the child receives new props and re-renders.\n\n3. **No memoization or PureComponent**  \n   By default, functional components re-render whenever their parent renders. Class components re-render unless you use `PureComponent` or implement `shouldComponentUpdate`. Functional components can be wrapped with `React.memo` to avoid unnecessary re-renders.\n\n---\n\n### How to prevent unnecessary re-renders?\n\n- **Use `React.memo` for functional components**  \n  Wrap your child component with `React.memo` to memoize it and prevent re-renders if props haven't changed:\n  ```jsx\n  const ChildComponent = React.memo(function Child(props) {\n    // component code\n  });\n  ```\n\n- **Avoid creating new objects or functions inline**  \n  Use `useMemo` or `useCallback` hooks in the parent to memoize objects or functions passed as props:\n  ```jsx\n  const memoizedData = useMemo(() => ({ a: 1 }), []);\n  <ChildComponent data={memoizedData} />\n  ```\n\n- **Use keys properly**  \n  Ensure keys are stable and unique to avoid unnecessary remounts.\n\n- **Use `PureComponent` or `shouldComponentUpdate` in class components**  \n  For class components, extending `React.PureComponent` or implementing `shouldComponentUpdate` can help avoid re-renders when props/state haven't changed.\n\n---\n\n### Summary\n\nYour React component re-renders",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 6290,
+          "input_tokens": 28,
+          "output_tokens": 345,
+          "total_tokens": 373,
+          "output_words": 276,
+          "output_chars": 1950,
+          "content": "Database connection pooling is a technique used to manage and reuse database connections efficiently in applications. Instead of opening and closing a new database connection every time an application needs to interact with the database\u2014which is a time-consuming and resource-intensive process\u2014connection pooling maintains a pool (a cache) of open database connections that can be reused.\n\n### How It Works:\n1. **Initialization:** When the application starts, the connection pool creates a set of database connections and keeps them open.\n2. **Request for Connection:** When the application needs to execute a query, it requests a connection from the pool.\n3. **Reuse:** If there is an available connection in the pool, it is handed over to the application immediately.\n4. **Return:** After the application finishes using the connection, it returns it to the pool instead of closing it.\n5. **Management:** The pool manages the lifecycle of connections, including creating new ones if needed, closing idle or stale connections, and limiting the maximum number of connections to avoid overloading the database.\n\n### Benefits:\n- **Performance Improvement:** Reduces the overhead of establishing a new connection each time, leading to faster database operations.\n- **Resource Management:** Limits the number of simultaneous connections to the database, preventing resource exhaustion.\n- **Scalability:** Helps applications handle a large number of database requests efficiently.\n- **Better Control:** Allows configuration of parameters like maximum pool size, connection timeout, and idle time.\n\n### Common Use Cases:\n- Web applications with many concurrent users.\n- Enterprise applications requiring high throughput.\n- Any system where database connection overhead is a bottleneck.\n\n### Summary:\nDatabase connection pooling optimizes database access by reusing existing connections, improving application performance, and managing resources effectively.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 6617,
+          "input_tokens": 31,
+          "output_tokens": 461,
+          "total_tokens": 492,
+          "output_words": 314,
+          "output_chars": 2453,
+          "content": "The main differences between TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are related to how they handle data transmission over a network:\n\n1. **Connection Type:**\n   - **TCP:** Connection-oriented protocol. It establishes a connection between the sender and receiver before data transfer begins.\n   - **UDP:** Connectionless protocol. It sends data without establishing a dedicated end-to-end connection.\n\n2. **Reliability:**\n   - **TCP:** Provides reliable data transfer. It ensures that all data packets arrive in order and retransmits lost packets.\n   - **UDP:** Does not guarantee delivery, order, or error checking beyond basic checksums. Packets may be lost or arrive out of order.\n\n3. **Data Flow Control and Congestion Control:**\n   - **TCP:** Implements flow control and congestion control mechanisms to avoid overwhelming the network or receiver.\n   - **UDP:** Does not provide flow control or congestion control.\n\n4. **Speed:**\n   - **TCP:** Generally slower due to overhead from connection setup, error checking, and retransmission.\n   - **UDP:** Faster and more efficient for applications that can tolerate some data loss.\n\n5. **Use Cases:**\n   - **TCP:** Suitable for applications requiring reliable communication, such as web browsing (HTTP/HTTPS), email (SMTP), and file transfers (FTP).\n   - **UDP:** Used in applications where speed is critical and some data loss is acceptable, such as live video/audio streaming, online gaming, and DNS queries.\n\n**Summary Table:**\n\n| Feature               | TCP                          | UDP                          |\n|-----------------------|------------------------------|------------------------------|\n| Connection            | Connection-oriented           | Connectionless               |\n| Reliability           | Reliable, guarantees delivery | Unreliable, no guarantee     |\n| Ordering              | Ensures ordered delivery      | No ordering guarantee        |\n| Flow Control          | Yes                          | No                           |\n| Congestion Control    | Yes                          | No                           |\n| Speed                 | Slower due to overhead        | Faster, low overhead          |\n| Typical Use Cases     | Web, email, file transfer     | Streaming, gaming, DNS       |\n\nIn summary, TCP is used when reliability is important, while UDP is preferred for speed and efficiency when occasional data loss is acceptable.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 7206,
+          "input_tokens": 38,
+          "output_tokens": 512,
+          "total_tokens": 550,
+          "output_words": 352,
+          "output_chars": 2353,
+          "content": "Fixing a memory leak in a long-running Node.js process involves identifying the source of the leak and then modifying your code or environment to prevent it. Here\u2019s a step-by-step approach to diagnose and fix memory leaks:\n\n### 1. Understand What a Memory Leak Is\nA memory leak occurs when your application holds onto memory that it no longer needs, causing the memory usage to grow over time and potentially crash the process.\n\n### 2. Monitor Memory Usage\n- Use tools like `process.memoryUsage()` in your code to log memory usage periodically.\n- Use external monitoring tools like **PM2**, **New Relic**, or **Datadog** to track memory over time.\n- Run your Node.js process with the `--inspect` flag to enable debugging and profiling.\n\n### 3. Use Profiling Tools to Identify Leaks\n- **Chrome DevTools**: Connect to your Node.js process using `node --inspect` and open Chrome DevTools to take heap snapshots.\n- **heapdump**: Use the `heapdump` module to take heap snapshots programmatically.\n- **clinic.js**: Use Clinic.js\u2019s `clinic doctor` and `clinic heapprofile` to analyze memory usage.\n- **Valgrind / Memwatch-next**: For native memory leaks or more detailed analysis.\n\n### 4. Analyze Heap Snapshots\n- Take multiple heap snapshots at different times.\n- Compare snapshots to see which objects are growing and not being garbage collected.\n- Look for large arrays, caches, or closures holding references.\n\n### 5. Common Causes and Fixes\n- **Global variables or caches**: Avoid storing large data indefinitely in global variables or caches without eviction policies.\n- **Event listeners**: Remove event listeners when they are no longer needed (`emitter.removeListener` or `off`).\n- **Closures**: Be careful with closures that capture large objects or variables.\n- **Timers and intervals**: Clear intervals and timeouts when done (`clearInterval`, `clearTimeout`).\n- **Unclosed resources**: Close database connections, file handles, or streams properly.\n- **Large data structures**: Avoid accumulating large arrays or objects without limits.\n\n### 6. Code Example: Fixing a Common Leak\n```js\n// Potential leak: adding event listeners repeatedly without removing\nconst EventEmitter = require('events');\nconst emitter = new EventEmitter();\n\nfunction start() {\n  emitter.on('data', () => {\n    // handle data\n  });\n}\n\n// Fix: remove listener when no longer",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 3174,
+          "input_tokens": 34,
+          "output_tokens": 215,
+          "total_tokens": 249,
+          "output_words": 161,
+          "output_chars": 987,
+          "content": "The SQL `EXPLAIN` command provides information about how the database query optimizer plans to execute a given SQL query. It helps you understand the query execution plan, including details such as:\n\n- The order in which tables are accessed\n- The types of joins used\n- Which indexes (if any) are utilized\n- Estimated number of rows processed at each step\n- The cost or estimated resource usage of each operation\n- Whether a full table scan or index scan is performed\n\nBy analyzing the output of `EXPLAIN`, you can identify performance bottlenecks and optimize your queries for better efficiency.\n\n**Example usage:**\n\n```sql\nEXPLAIN SELECT * FROM orders WHERE customer_id = 123;\n```\n\nThis will show how the database plans to retrieve the rows matching `customer_id = 123`.\n\n**Note:** The exact format and details of the `EXPLAIN` output vary between database systems (e.g., MySQL, PostgreSQL, Oracle, SQL Server), but the core purpose remains the same: to reveal the query execution plan.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "lite": [
+        {
+          "ok": true,
+          "latency_ms": 3672,
+          "input_tokens": 54,
+          "output_tokens": 265,
+          "total_tokens": 319,
+          "output_words": 176,
+          "output_chars": 1238,
+          "content": "Your React component re-renders every time the parent updates because React's default behavior is to re-render child components whenever the parent re-renders. This happens even if the child's props haven't changed.\n\nKey reasons:\n\n1. **Props reference changes:** If the parent passes new object/array/function props, their references change, causing child to re-render.\n2. **No memoization:** Without `React.memo` or `PureComponent`, React does not optimize child re-renders.\n3. **State or context changes:** If the child consumes context or state that updates, it re-renders.\n4. **Parent re-renders:** React re-renders the entire subtree by default.\n\nHow to prevent unnecessary re-renders:\n\n- Use `React.memo` to memoize functional components.\n- Use `PureComponent` for class components.\n- Memoize functions and objects passed as props with `useCallback` and `useMemo`.\n- Avoid anonymous functions or inline objects in JSX props.\n- Lift state appropriately to minimize updates.\n\nExample:\n\n```jsx\nconst Child = React.memo(({ data }) => {\n  // renders only if data changes by shallow comparison\n  return <div>{data.value}</div>;\n});\n```\n\nIf you still see re-renders, check if props references change or if context/state updates trigger it.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2105,
+          "input_tokens": 46,
+          "output_tokens": 127,
+          "total_tokens": 173,
+          "output_words": 107,
+          "output_chars": 747,
+          "content": "Database connection pooling is a technique to manage database connections efficiently. Instead of opening and closing a new connection for every database request, a pool of connections is created and maintained. When an application needs a connection, it borrows one from the pool. After use, the connection is returned to the pool for reuse.\n\nBenefits:\n- Reduces overhead of establishing connections repeatedly.\n- Improves application performance and scalability.\n- Manages limited database resources effectively.\n\nConnection pools typically handle:\n- Maximum and minimum pool size.\n- Connection timeout.\n- Validation of connections before use.\n\nThis approach is common in web applications and enterprise systems to optimize database interaction.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 3095,
+          "input_tokens": 49,
+          "output_tokens": 222,
+          "total_tokens": 271,
+          "output_words": 140,
+          "output_chars": 1016,
+          "content": "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) differ primarily in connection type, reliability, and use cases:\n\n1. **Connection**:  \n   - TCP is connection-oriented. It establishes a connection before data transfer.  \n   - UDP is connectionless. It sends data without establishing a connection.\n\n2. **Reliability**:  \n   - TCP guarantees delivery, order, and error-checking. It retransmits lost packets.  \n   - UDP does not guarantee delivery, order, or error correction. Packets may be lost or arrive out of order.\n\n3. **Speed**:  \n   - TCP is slower due to overhead from connection management and error handling.  \n   - UDP is faster with minimal overhead.\n\n4. **Use Cases**:  \n   - TCP suits applications needing reliable communication (e.g., web browsing, email, file transfer).  \n   - UDP suits applications needing speed and can tolerate some loss (e.g., video streaming, online gaming, VoIP).\n\nSummary: TCP is reliable, connection-based, slower. UDP is fast, connectionless, unreliable.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 5958,
+          "input_tokens": 56,
+          "output_tokens": 323,
+          "total_tokens": 379,
+          "output_words": 207,
+          "output_chars": 1441,
+          "content": "To fix a memory leak in a long-running Node.js process:\n\n1. **Identify the leak:**\n   - Use tools like Chrome DevTools (`--inspect` flag), `node --inspect`, or `clinic.js` to profile memory.\n   - Take heap snapshots at intervals to compare memory usage.\n   - Use `process.memoryUsage()` to monitor memory stats programmatically.\n\n2. **Analyze heap snapshots:**\n   - Look for objects that grow over time and are not released.\n   - Identify retained objects and their references.\n\n3. **Common causes:**\n   - Global variables or caches that grow indefinitely.\n   - Event listeners not removed (`.on` without `.off`).\n   - Closures holding references longer than needed.\n   - Large data structures (arrays, maps) never cleared.\n   - Timers or intervals not cleared.\n\n4. **Fix the leak:**\n   - Remove unused event listeners.\n   - Clear or limit cache sizes.\n   - Nullify references when no longer needed.\n   - Use weak references (`WeakMap`, `WeakSet`) where appropriate.\n   - Avoid global variables or large persistent objects.\n   - Properly clear intervals and timeouts.\n\n5. **Test and monitor:**\n   - After fixes, run the app under load and monitor memory.\n   - Use automated tests to detect regressions.\n\n6. **Additional tools:**\n   - `heapdump` module to generate heap snapshots on demand.\n   - `memwatch-next` for leak detection events.\n\nSummary: Profile memory, find retained objects, fix code holding references, and monitor continuously.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1451,
+          "input_tokens": 52,
+          "output_tokens": 83,
+          "total_tokens": 135,
+          "output_words": 62,
+          "output_chars": 393,
+          "content": "The SQL EXPLAIN command shows the query execution plan. It details how the database engine will execute a query, including:\n\n- The order of table access\n- Join methods used (e.g., nested loop, hash join)\n- Indexes utilized\n- Estimated cost and row counts\n- Access paths (sequential scan, index scan)\n\nThis helps optimize queries by revealing performance bottlenecks and inefficient operations.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "full": [
+        {
+          "ok": true,
+          "latency_ms": 4262,
+          "input_tokens": 75,
+          "output_tokens": 260,
+          "total_tokens": 335,
+          "output_words": 154,
+          "output_chars": 1091,
+          "content": "React re-renders child components when parent re-renders by default. Reasons:\n\n1. Parent state/props change \u2192 parent re-renders \u2192 child re-renders.\n2. Child receives new props (even if values same, new object/array reference triggers re-render).\n3. No memoization on child component.\n\nSolutions:\n\n- Use React.memo on child to memoize output, skip re-render if props shallow equal.\n- Use useCallback/useMemo in parent to keep stable function/objects passed as props.\n- Avoid anonymous functions/objects inline in JSX props.\n- Lift state down or use context to reduce prop drilling.\n\nExample:\n\n```jsx\nconst Child = React.memo(({ data }) => {\n  console.log('Child render');\n  return <div>{data.value}</div>;\n});\n\nfunction Parent() {\n  const [count, setCount] = React.useState(0);\n  const data = React.useMemo(() => ({ value: 'hello' }), []);\n  return (\n    <>\n      <button onClick={() => setCount(c => c + 1)}>Increment</button>\n      <Child data={data} />\n    </>\n  );\n}\n```\n\nWithout memo and useMemo, Child re-renders every Parent update. With them, Child skips re-render if props unchanged.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2389,
+          "input_tokens": 67,
+          "output_tokens": 168,
+          "total_tokens": 235,
+          "output_words": 122,
+          "output_chars": 814,
+          "content": "Database connection pooling: technique to manage DB connections efficiently. Instead of opening/closing connection for each request, pool keeps set of open connections ready. When app needs DB access, it borrows connection from pool, uses it, then returns it. Reduces overhead of connection setup/teardown, improves performance, resource use.\n\nKey points:\n- Pool size: max number of connections kept open.\n- Idle connections: connections not in use but open.\n- Borrow/return: app borrows connection, returns after use.\n- Timeout: max wait time if no connection available.\n- Connection validation: check if connection alive before use.\n\nBenefits:\n- Faster DB access.\n- Limits DB server load.\n- Manages concurrent requests better.\n\nUsed in web servers, app servers, middleware. Common in JDBC, .NET, Node.js DB libs.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 1429,
+          "input_tokens": 70,
+          "output_tokens": 94,
+          "total_tokens": 164,
+          "output_words": 56,
+          "output_chars": 354,
+          "content": "TCP vs UDP:\n\nTCP:\n- Connection-oriented\n- Reliable (ack, retransmit)\n- Ordered data delivery\n- Flow control, congestion control\n- Slower, more overhead\n- Use: web, email, file transfer\n\nUDP:\n- Connectionless\n- Unreliable (no ack, no retransmit)\n- No order guarantee\n- No flow/congestion control\n- Faster, less overhead\n- Use: streaming, gaming, DNS, VoIP",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 6542,
+          "input_tokens": 77,
+          "output_tokens": 369,
+          "total_tokens": 446,
+          "output_words": 246,
+          "output_chars": 1641,
+          "content": "Fix memory leak Node.js long-running process:\n\n1. Identify leak:\n- Use Chrome DevTools or `--inspect` flag.\n- Use `heapdump` module to take heap snapshots.\n- Use `clinic.js` (clinic doctor, clinic flame) for profiling.\n- Use `node --inspect` + Chrome DevTools Memory tab.\n- Use `memwatch-next` or `leakage` modules.\n\n2. Analyze heap snapshots:\n- Look for detached DOM nodes, closures holding references.\n- Look for growing arrays, caches, event listeners not removed.\n- Look for global variables or module-level caches growing.\n\n3. Common causes:\n- Unremoved event listeners.\n- Large caches without eviction.\n- Closures holding references to large objects.\n- Timers or intervals not cleared.\n- Global variables or singletons accumulating data.\n- Streams or sockets not closed.\n\n4. Fix:\n- Remove event listeners when no longer needed.\n- Use weak references or limit cache size.\n- Clear timers/intervals on completion.\n- Nullify references to large objects after use.\n- Avoid global mutable state.\n- Use tools like `weak` module to detect retained objects.\n\n5. Test:\n- Run process with memory profiling.\n- Confirm heap size stabilizes over time.\n- Use load testing to simulate long run.\n\n6. Optional:\n- Use `--max-old-space-size` to limit memory.\n- Restart process periodically if leak unavoidable (e.g. PM2 restart).\n\nExample: Remove event listener leak\n\n```js\nconst emitter = new EventEmitter();\n\nfunction onData(data) {\n  // process data\n}\n\nemitter.on('data', onData);\n\n// Later, when no longer needed:\nemitter.removeListener('data', onData);\n```\n\nSummary: Profile memory, find retained objects, fix code holding references, test stability.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1641,
+          "input_tokens": 73,
+          "output_tokens": 110,
+          "total_tokens": 183,
+          "output_words": 74,
+          "output_chars": 486,
+          "content": "EXPLAIN shows query execution plan. How database plans to run SQL statement. Details include:\n\n- Order tables accessed\n- Join types (nested loop, hash join, etc.)\n- Indexes used or not\n- Estimated rows per step\n- Cost estimates (CPU, I/O)\n- Scan types (sequential, index scan)\n- Filter conditions applied\n\nHelps optimize queries by revealing bottlenecks, inefficient scans, missing indexes. Different DBMS have variations (MySQL, PostgreSQL, Oracle). Output usually text or tree format.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "ultra": [
+        {
+          "ok": true,
+          "latency_ms": 2170,
+          "input_tokens": 74,
+          "output_tokens": 145,
+          "total_tokens": 219,
+          "output_words": 90,
+          "output_chars": 623,
+          "content": "React re-renders child if parent re-renders by default. Parent update \u2192 new props/context \u2192 child re-render.\n\nReasons:\n- Parent state/props change \u2192 parent re-render \u2192 child re-render.\n- Child props shallow compare fail (new object/array inline).\n- Context value change.\n- No React.memo/useMemo/useCallback to memoize child/props/fns.\n\nFix:\n- Use React.memo(child) \u2192 skip if props same.\n- Memoize props (useMemo/useCallback) \u2192 stable refs.\n- Lift state down or optimize parent to reduce re-renders.\n- Avoid inline objects/arrays/fns in JSX props.\n\nSummary: Parent re-render \u2192 child re-render unless memoized + stable props.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1030,
+          "input_tokens": 66,
+          "output_tokens": 58,
+          "total_tokens": 124,
+          "output_words": 42,
+          "output_chars": 247,
+          "content": "DB connection pooling: pre-create DB conns \u2192 reuse on req \u2192 reduce conn overhead (latency/cpu). Pool manages max conns, idle timeout, conn health. App asks pool \u2192 pool gives ready conn \u2192 app uses \u2192 returns conn to pool. Improves perf, scalability.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 1387,
+          "input_tokens": 69,
+          "output_tokens": 79,
+          "total_tokens": 148,
+          "output_words": 39,
+          "output_chars": 317,
+          "content": "TCP vs UDP:\n\nTCP: Conn-oriented, reliable, ordered, error-check, flow/cong control, slower, handshake (3-way), use: web/email/file transfer.\n\nUDP: Connless, unreliable, unordered, no error-check, no flow control, faster, no handshake, use: streaming/gaming/DNS.\n\nSummary: TCP = reliable, slow; UDP = fast, unreliable.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2308,
+          "input_tokens": 76,
+          "output_tokens": 158,
+          "total_tokens": 234,
+          "output_words": 99,
+          "output_chars": 646,
+          "content": "Fix memory leak Node.js long-run:\n\n1. Identify leak:\n- Use Chrome DevTools (node --inspect)\n- Heap snapshots (compare over time)\n- Tools: heapdump, memwatch-next\n\n2. Common causes:\n- Unreleased timers/intervals\n- Large caches w/o eviction\n- Event listeners not removed\n- Closures holding refs\n- Global vars\n\n3. Fix:\n- Clear timers/intervals when done\n- Implement cache eviction (LRU)\n- Remove event listeners after use\n- Avoid global vars, nullify refs\n- Optimize data structures\n\n4. Monitor:\n- Use process.memoryUsage()\n- Restart process if needed (PM2, forever)\n\nSummary: Profile \u2192 find leak source \u2192 fix refs/timers/listeners \u2192 monitor memory.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 731,
+          "input_tokens": 72,
+          "output_tokens": 37,
+          "total_tokens": 109,
+          "output_words": 24,
+          "output_chars": 175,
+          "content": "EXPLAIN shows SQL query plan: how DB engine executes query. Details: table scan/index use, join order/method, cost estimates, rows processed. Helps optimize query performance.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ]
+    },
+    "gpt-4.1-nano": {
+      "none": [
+        {
+          "ok": true,
+          "latency_ms": 3102,
+          "input_tokens": 36,
+          "output_tokens": 512,
+          "total_tokens": 548,
+          "output_words": 304,
+          "output_chars": 2309,
+          "content": "When a parent component updates in React, its child components typically re-render as well. This behavior is by design, ensuring that the UI stays in sync with the latest state and props. However, if you want to understand *why* your specific child component re-renders and how to control or optimize it, here are some common reasons and solutions:\n\n### Common Reasons for Child Re-renders\n\n1. **Props Change**:  \n   If the parent passes new props (even if they are deeply equal but not referentially equal), the child will re-render.\n\n2. **Parent State Changes**:  \n   When the parent updates its state, it triggers a re-render, which cascades down to children.\n\n3. **New Function or Object References**:  \n   If you pass inline functions or objects as props, they are recreated on each render, causing the child to re-render.\n\n4. **Unoptimized Components**:  \n   Functional components re-render whenever their parent does unless optimized with `React.memo()` or similar techniques.\n\n---\n\n### How to Prevent Unnecessary Re-renders\n\n1. **Use `React.memo()`**  \n   Wrap your child component with `React.memo()` to memoize it. It will only re-render if its props change (by shallow comparison).\n\n   ```jsx\n   const ChildComponent = React.memo(function Child(props) {\n     // component code\n   });\n   ```\n\n2. **Ensure Stable Prop References**  \n   - Avoid inline functions or objects in parent render:\n     ```jsx\n     // Instead of:\n     <ChildComponent onClick={() => handleClick()} />\n\n     // Use:\n     const handleClickMemoized = useCallback(() => handleClick(), [dependencies]);\n     <ChildComponent onClick={handleClickMemoized} />\n     ```\n   - Use `useCallback()` for functions and `useMemo()` for objects to keep references stable across renders.\n\n3. **Implement `shouldComponentUpdate()` or `PureComponent`** (Class Components)  \n   For class components, extend `React.PureComponent` or implement `shouldComponentUpdate()` to prevent unnecessary re-renders.\n\n4. **Avoid Changing Parent State Unnecessarily**  \n   Minimize state updates in parent components that don't affect the child.\n\n---\n\n### Example\n\n```jsx\nimport React, { useState, useCallback } from 'react';\n\nconst Child = React.memo(({ onClick }) => {\n  console.log('Child re-rendered');\n  return <button onClick={onClick}>Click me</button>;\n",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2187,
+          "input_tokens": 28,
+          "output_tokens": 396,
+          "total_tokens": 424,
+          "output_words": 300,
+          "output_chars": 2175,
+          "content": "Database connection pooling is a technique used to manage and optimize the use of database connections in an application. Instead of opening and closing a new database connection for each individual request, connection pooling maintains a cache (or pool) of active database connections that can be reused by multiple clients or requests.\n\n**Key Concepts of Database Connection Pooling:**\n\n1. **Pooling of Connections:**  \n   A pool of pre-established database connections is created and maintained. When an application needs to interact with the database, it requests a connection from the pool rather than creating a new one.\n\n2. **Reusing Connections:**  \n   Once the application finishes using a connection, it returns it to the pool instead of closing it. This allows the connection to be reused for subsequent requests, reducing the overhead of establishing new connections.\n\n3. **Configuration Parameters:**  \n   Connection pools are typically configurable with parameters such as:\n   - **Maximum pool size:** The maximum number of connections that can be open simultaneously.\n   - **Minimum pool size:** The minimum number of connections maintained in the pool.\n   - **Connection timeout:** How long to wait for a connection to become available.\n   - **Idle timeout:** How long an unused connection can remain in the pool before being closed.\n\n4. **Benefits of Connection Pooling:**\n   - **Improved Performance:** Reduces the latency associated with establishing new database connections.\n   - **Resource Management:** Limits the number of active connections, preventing resource exhaustion.\n   - **Scalability:** Supports higher concurrency by efficiently managing database connections.\n\n5. **Implementation:**  \n   Many application frameworks and database drivers provide built-in support for connection pooling. For example, Java's JDBC has connection pool implementations like HikariCP, Apache DBCP, and C3P0.\n\n**In summary:**  \nDatabase connection pooling is a technique that maintains a pool of open database connections to improve application performance and resource utilization by reusing existing connections rather than creating and closing them repeatedly.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 3062,
+          "input_tokens": 31,
+          "output_tokens": 451,
+          "total_tokens": 482,
+          "output_words": 313,
+          "output_chars": 2599,
+          "content": "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are both core protocols of the Internet Protocol Suite used for transmitting data over networks. However, they differ significantly in how they handle data transmission, reliability, and use cases:\n\n**1. Connection Orientation:**\n- **TCP:** Connection-oriented protocol. It establishes a connection between sender and receiver before transmitting data, ensuring a reliable communication channel.\n- **UDP:** Connectionless protocol. It sends data without establishing a dedicated connection, making it faster but less reliable.\n\n**2. Reliability:**\n- **TCP:** Ensures data delivery through acknowledgments, retransmissions, and error checking. It guarantees that data arrives in order and without errors.\n- **UDP:** Does not guarantee delivery, order, or error checking. It sends packets called datagrams without confirming receipt.\n\n**3. Speed and Overhead:**\n- **TCP:** Slower due to connection setup, error checking, and acknowledgment processes. It has higher overhead.\n- **UDP:** Faster with lower overhead because it skips connection setup and error correction.\n\n**4. Use Cases:**\n- **TCP:** Suitable for applications where reliability is critical, such as web browsing (HTTP/HTTPS), email (SMTP), file transfer (FTP), and remote login (SSH).\n- **UDP:** Ideal for applications where speed is more important than reliability, such as live video or audio streaming, online gaming, and DNS queries.\n\n**5. Data Transmission:**\n- **TCP:** Data is transmitted as a stream of bytes.\n- **UDP:** Data is sent in discrete packets called datagrams.\n\n**Summary Table:**\n\n| Feature                | TCP                                | UDP                                |\n|------------------------|------------------------------------|-----------------------------------|\n| Connection             | Yes                                | No                                |\n| Reliability            | Yes                                | No                                |\n| Ordering               | Yes                                | No                                |\n| Speed                  | Slower                             | Faster                            |\n| Overhead               | Higher                             | Lower                             |\n| Use Cases              | Web, email, file transfer, SSH   | Streaming, gaming, DNS          |\n\nIn summary, choose TCP when reliability and data integrity are essential, and choose UDP when speed and efficiency are more important, and some data loss is acceptable.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2646,
+          "input_tokens": 38,
+          "output_tokens": 512,
+          "total_tokens": 550,
+          "output_words": 334,
+          "output_chars": 2265,
+          "content": "Fixing a memory leak in a long-running Node.js process involves several steps to identify, diagnose, and resolve the issue. Here's a comprehensive approach:\n\n### 1. **Identify the Memory Leak**\n\n- **Monitor Memory Usage:** Use tools like `top`, `htop`, or Node.js built-in `process.memoryUsage()` to observe memory consumption over time.\n- **Use Profiling Tools:** Leverage Node.js profiling tools such as:\n  - **Chrome DevTools:** Connect via `node --inspect` and use the Chrome DevTools profiler.\n  - **`node --inspect` + Chrome DevTools:** For real-time inspection.\n  - **`clinic.js` (by NearForm):** Includes `clinic heap-snapshot` and `clinic flame` for detailed analysis.\n  - **`heapdump` module:** To take heap snapshots at different intervals.\n\n### 2. **Capture Heap Snapshots**\n\n- Use Chrome DevTools or `heapdump` to take snapshots of the heap at different times.\n- Compare snapshots to identify objects that are not being garbage collected and are growing over time.\n\n### 3. **Analyze the Heap Snapshots**\n\n- Look for:\n  - Unexpectedly retained objects.\n  - Closures holding onto large data.\n  - Event listeners or timers that are not cleaned up.\n  - Global variables or caches that grow indefinitely.\n\n### 4. **Common Causes and Fixes**\n\n- **Unreleased Event Listeners:**\n  - Remove listeners with `.removeListener()` or `.off()` when no longer needed.\n- **Global Variables or Caches:**\n  - Limit cache size or clear caches periodically.\n- **Timers and Intervals:**\n  - Clear timers with `clearTimeout()` or `clearInterval()` when done.\n- **Closures:**\n  - Avoid capturing large objects in closures that persist longer than necessary.\n- **Memory Leaks in Native Modules:**\n  - Update or replace native modules if they are known to leak.\n\n### 5. **Code Review and Refactoring**\n\n- Review your code for patterns that can cause leaks:\n  - Long-lived references.\n  - Circular references that prevent garbage collection.\n- Use tools like **ESLint** with plugins to detect common issues.\n\n### 6. **Implement Best Practices**\n\n- Use **weak references** if appropriate (`WeakMap`, `WeakSet`) to prevent holding onto objects unnecessarily.\n- Limit the size of in-memory caches.\n- Regularly restart the process if leaks are hard to fix immediately, or implement a",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1465,
+          "input_tokens": 34,
+          "output_tokens": 301,
+          "total_tokens": 335,
+          "output_words": 206,
+          "output_chars": 1404,
+          "content": "The SQL `EXPLAIN` command provides information about how the database engine plans to execute a given SQL query. It helps you understand the query's execution plan, including details such as:\n\n- **Order of operations:** The sequence in which tables are accessed and joined.\n- **Index usage:** Whether indexes are used to optimize data retrieval.\n- **Join methods:** How tables are joined (e.g., nested loop, hash join).\n- **Estimated costs:** The estimated resource consumption (like I/O, CPU) for each step.\n- **Row estimates:** The number of rows the engine expects to process at each stage.\n\nBy analyzing this information, you can identify potential performance bottlenecks, optimize queries, and make informed decisions about indexing and query restructuring.\n\n**Note:** The exact output and details of `EXPLAIN` vary depending on the database system (e.g., MySQL, PostgreSQL, Oracle, SQL Server). Some systems also offer extended or more detailed explain plans with additional options.\n\n**Example (MySQL):**\n```sql\nEXPLAIN SELECT * FROM employees WHERE department_id = 10;\n```\n\nThis will show a table with columns like `id`, `select_type`, `table`, `type`, `possible_keys`, `key`, `rows`, and `Extra`, describing how MySQL plans to execute the query.\n\n**Summary:**  \n`EXPLAIN` is a diagnostic tool that reveals the query execution plan, helping you optimize and troubleshoot SQL queries effectively.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "lite": [
+        {
+          "ok": true,
+          "latency_ms": 483,
+          "input_tokens": 54,
+          "output_tokens": 61,
+          "total_tokens": 115,
+          "output_words": 44,
+          "output_chars": 317,
+          "content": "React component re-renders on parent update because React's default behavior is to re-render child components when parent state or props change. This ensures UI consistency. To prevent unnecessary re-renders, optimize with React.memo, useCallback, or useMemo. Also, ensure props passed to child are stable references.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 823,
+          "input_tokens": 46,
+          "output_tokens": 103,
+          "total_tokens": 149,
+          "output_words": 87,
+          "output_chars": 599,
+          "content": "Database connection pooling maintains a cache of database connections. Applications reuse these connections instead of creating new ones for each request. This reduces connection overhead, improves performance, and manages resources efficiently. Connection pools are configured with parameters such as maximum pool size, minimum pool size, and timeout settings. When an application needs a database connection, it requests one from the pool. If available, a connection is provided; if not, the request waits or fails based on configuration. After use, connections are returned to the pool for reuse.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 596,
+          "input_tokens": 49,
+          "output_tokens": 81,
+          "total_tokens": 130,
+          "output_words": 61,
+          "output_chars": 462,
+          "content": "TCP (Transmission Control Protocol) is connection-oriented, ensures reliable data transfer, guarantees delivery, orders packets, and manages flow control. UDP (User Datagram Protocol) is connectionless, does not guarantee delivery, does not order packets, and has minimal overhead. TCP is suitable for applications requiring reliability, such as web browsing and email. UDP fits real-time applications like streaming and gaming where speed outweighs reliability.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 535,
+          "input_tokens": 56,
+          "output_tokens": 79,
+          "total_tokens": 135,
+          "output_words": 61,
+          "output_chars": 450,
+          "content": "Identify leak source using profiling tools like Chrome DevTools, Node.js --inspect, or heapdump. Analyze heap snapshots to locate objects not garbage collected. Use tools such as memwatch-next or leakage to monitor memory growth. Fix leaks by removing event listeners, closing database connections, clearing caches, and avoiding global variables. Implement periodic memory cleanup or restart process if necessary. Test thoroughly after modifications.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 544,
+          "input_tokens": 52,
+          "output_tokens": 45,
+          "total_tokens": 97,
+          "output_words": 35,
+          "output_chars": 229,
+          "content": "The SQL EXPLAIN command shows the execution plan for a query. It details how the database engine retrieves data, including index usage, join methods, and scan types. It helps identify performance bottlenecks and optimize queries.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "full": [
+        {
+          "ok": true,
+          "latency_ms": 1065,
+          "input_tokens": 75,
+          "output_tokens": 193,
+          "total_tokens": 268,
+          "output_words": 127,
+          "output_chars": 890,
+          "content": "Component re-renders on parent update because React re-renders child components by default when parent state or props change. \n\nPossible causes:\n- Props change: parent passes new props.\n- State change: parent updates state, triggers re-render.\n- Inline functions/objects: recreated each render, causing child to re-render if passed as props.\n- No memoization: component not wrapped with React.memo or useMemo.\n\nSolutions:\n- Wrap child with React.memo to prevent re-render if props unchanged.\n- Memoize functions/objects with useCallback/useMemo before passing.\n- Avoid inline functions/objects in JSX.\n- Use shouldComponentUpdate or React.PureComponent in class components.\n\nExample:\n```jsx\nconst Child = React.memo(({ data }) => {\n  // child component\n});\n```\n\n```jsx\nconst Parent = () => {\n  const data = useMemo(() => computeData(), [dependencies]);\n  return <Child data={data} />;\n}\n```",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 773,
+          "input_tokens": 67,
+          "output_tokens": 76,
+          "total_tokens": 143,
+          "output_words": 44,
+          "output_chars": 380,
+          "content": "Database connection pooling. Pre-establishes set of database connections. Reuses connections for multiple requests. Reduces overhead of opening/closing connections. Improves performance, scalability. Pool size configurable. Connections checked out, returned to pool. Manages connection lifecycle. Common in web servers, application servers. Libraries: HikariCP, Apache DBCP, c3p0.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 586,
+          "input_tokens": 70,
+          "output_tokens": 79,
+          "total_tokens": 149,
+          "output_words": 46,
+          "output_chars": 390,
+          "content": "TCP: connection-oriented, reliable, ordered data transfer, uses three-way handshake, retransmits lost packets, flow control, congestion control.\n\nUDP: connectionless, unreliable, no guarantee order, no retransmission, faster, minimal overhead, used for real-time apps.\n\n```plaintext\nTCP: reliable, connection, flow control, congestion control.\nUDP: fast, no guarantee, minimal overhead.\n```",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 770,
+          "input_tokens": 77,
+          "output_tokens": 123,
+          "total_tokens": 200,
+          "output_words": 88,
+          "output_chars": 641,
+          "content": "Identify leak. Use profiling tools: Chrome DevTools, Node.js --inspect, or Visual Studio Code debugger. Attach profiler, monitor heap. Look for increasing memory over time. Use heap snapshots to find objects not garbage collected. Check for global variables, event listeners, timers, open database connections. Remove unused references. Use weak references if needed. Optimize code: avoid large in-memory data, stream data instead of loading fully. Use `--max-old-space-size` flag to limit memory. Restart process periodically if leak persists. Fix code causing leak: close connections, remove event listeners, clear caches. Test thoroughly.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 362,
+          "input_tokens": 73,
+          "output_tokens": 26,
+          "total_tokens": 99,
+          "output_words": 19,
+          "output_chars": 139,
+          "content": "Shows execution plan. How database runs query. Includes steps, index usage, join methods, cost estimates. Helps optimize query performance.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "ultra": [
+        {
+          "ok": true,
+          "latency_ms": 453,
+          "input_tokens": 74,
+          "output_tokens": 48,
+          "total_tokens": 122,
+          "output_words": 15,
+          "output_chars": 195,
+          "content": "Parent\u2192props\u2192child re-render.  \nState/props change\u2192child re-render.  \nPureComponent/memo\u2192prevent re-render if no change.  \nUse React.memo, shouldComponentUpdate, React.useCallback, React.useMemo.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 439,
+          "input_tokens": 66,
+          "output_tokens": 44,
+          "total_tokens": 110,
+          "output_words": 10,
+          "output_chars": 154,
+          "content": "DB\u2192Pool. Maintains\u2192Connections. Reuses\u2192Connections. Reduces\u2192Overhead. Improves\u2192Performance. Manages\u2192Concurrency. Config\u2192Size, Timeout. Req\u2192Client. Res\u2192DB.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 387,
+          "input_tokens": 69,
+          "output_tokens": 25,
+          "total_tokens": 94,
+          "output_words": 11,
+          "output_chars": 95,
+          "content": "TCP\u2192Reliable, connection, ordered, flow control. UDP\u2192Unreliable, no connection, no order, fast.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 497,
+          "input_tokens": 76,
+          "output_tokens": 47,
+          "total_tokens": 123,
+          "output_words": 10,
+          "output_chars": 146,
+          "content": "Identify\u2192Leak.  \nUse\u2192Profilers (Node.js, Chrome DevTools).  \nAnalyze\u2192Heap.  \nFind\u2192Leaking\u2192Objects.  \nFix\u2192Code\u2192Leaks.  \nTest\u2192Fix.  \nMonitor\u2192Memory.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 303,
+          "input_tokens": 72,
+          "output_tokens": 15,
+          "total_tokens": 87,
+          "output_words": 8,
+          "output_chars": 53,
+          "content": "DB\u2192Query plan, cost, steps, index use, row estimates.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ]
+    },
+    "gpt-4o": {
+      "none": [
+        {
+          "ok": true,
+          "latency_ms": 4111,
+          "input_tokens": 36,
+          "output_tokens": 512,
+          "total_tokens": 548,
+          "output_words": 377,
+          "output_chars": 2403,
+          "content": "In React, components re-render when their state or props change. If your React component is re-rendering every time the parent updates, it could be due to several reasons:\n\n1. **Props Change**: If the parent component passes new props to the child component on every update, the child will re-render. This can happen if the parent component is generating new objects or arrays as props, even if their contents are the same. JavaScript objects and arrays are reference types, so even if their contents are identical, they are considered different if their references change.\n\n   - **Solution**: Use `useMemo` or `useCallback` in the parent component to memoize objects, arrays, or functions that are passed as props to prevent unnecessary re-renders.\n\n2. **State Change in Parent**: If the parent component's state changes, it will re-render, and by default, all of its children will also re-render. This is the default behavior in React.\n\n   - **Solution**: Ensure that the state changes in the parent are necessary and that they are not causing unnecessary re-renders. You can also use `React.memo` to prevent a child component from re-rendering if its props have not changed.\n\n3. **Context Updates**: If your component is consuming a context that updates, it will re-render whenever the context value changes.\n\n   - **Solution**: Make sure that the context value is only updated when necessary. You can also split the context into smaller contexts to minimize the number of components that need to re-render.\n\n4. **Parent Component Re-renders**: If the parent component re-renders due to its own state or prop changes, it will cause all of its children to re-render unless they are optimized.\n\n   - **Solution**: Use `React.memo` for functional components or `shouldComponentUpdate` for class components to prevent unnecessary re-renders of child components.\n\n5. **Key Prop Changes**: If you are using the `key` prop on your component and it changes, React will treat it as a new component and re-render it.\n\n   - **Solution**: Ensure that the `key` prop is stable and only changes when necessary.\n\n6. **Use of Inline Functions or Objects**: If you are passing inline functions or objects as props, they will be recreated on every render, causing the child component to re-render.\n\n   - **Solution**: Use `useCallback` for functions and `useMemo` for objects to memoize them and prevent unnecessary re",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 3532,
+          "input_tokens": 28,
+          "output_tokens": 396,
+          "total_tokens": 424,
+          "output_words": 316,
+          "output_chars": 2309,
+          "content": "Database connection pooling is a technique used to manage and optimize the use of database connections in applications. It involves maintaining a pool of reusable database connections that can be shared among multiple clients or requests, rather than opening and closing a new connection for each individual request. This approach offers several benefits:\n\n1. **Performance Improvement**: Establishing a new database connection can be resource-intensive and time-consuming. By reusing existing connections from the pool, applications can significantly reduce the overhead associated with connection creation and teardown, leading to faster response times.\n\n2. **Resource Management**: Connection pooling helps manage the limited resources of a database server more efficiently. By controlling the number of active connections, it prevents the server from being overwhelmed by too many simultaneous connection requests.\n\n3. **Scalability**: Applications can handle more concurrent users or requests by efficiently managing connections. Connection pooling allows for better scalability by reusing connections and reducing the load on the database server.\n\n4. **Configuration Flexibility**: Connection pools can be configured with parameters such as the minimum and maximum number of connections, connection timeout settings, and idle connection limits. This allows for fine-tuning based on the specific needs and workload of the application.\n\n5. **Connection Reuse**: Connections in the pool are reused for multiple requests, which can help maintain session state or transaction context if needed, depending on the application requirements.\n\n6. **Error Handling and Recovery**: Connection pools often include mechanisms for detecting and handling broken or stale connections, automatically removing them from the pool and replacing them with new ones.\n\nIn practice, connection pooling is typically implemented by a middleware layer or a database driver that manages the pool. Popular frameworks and libraries, such as Java's JDBC, .NET's ADO.NET, and various ORM (Object-Relational Mapping) tools, often provide built-in support for connection pooling.\n\nOverall, database connection pooling is a critical component in building efficient, high-performance, and scalable applications that interact with databases.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 3231,
+          "input_tokens": 31,
+          "output_tokens": 407,
+          "total_tokens": 438,
+          "output_words": 293,
+          "output_chars": 2013,
+          "content": "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are both transport layer protocols used for transmitting data over the internet, but they have key differences in how they operate:\n\n1. **Connection-Oriented vs. Connectionless:**\n   - **TCP** is connection-oriented, meaning it establishes a connection between the sender and receiver before data is transmitted. This ensures that data is delivered reliably and in order.\n   - **UDP** is connectionless, meaning it sends data without establishing a dedicated end-to-end connection. This makes it faster but less reliable.\n\n2. **Reliability:**\n   - **TCP** provides reliable data transfer. It uses acknowledgments to confirm receipt of data, retransmits lost packets, and ensures data is received in the correct order.\n   - **UDP** does not guarantee delivery, order, or error checking. It sends packets without waiting for acknowledgments, which can result in lost or out-of-order packets.\n\n3. **Overhead:**\n   - **TCP** has higher overhead due to its error-checking, acknowledgment, and connection management features. This can result in slower performance compared to UDP.\n   - **UDP** has lower overhead, making it faster and more efficient for applications that can tolerate some data loss.\n\n4. **Use Cases:**\n   - **TCP** is suitable for applications where reliability is crucial, such as web browsing (HTTP/HTTPS), email (SMTP), and file transfers (FTP).\n   - **UDP** is ideal for applications where speed is more important than reliability, such as live video or audio streaming, online gaming, and DNS queries.\n\n5. **Flow Control and Congestion Control:**\n   - **TCP** includes flow control and congestion control mechanisms to manage data flow and prevent network congestion.\n   - **UDP** lacks these mechanisms, which can lead to network congestion if not managed by the application layer.\n\nIn summary, TCP is used when reliability and order are important, while UDP is used when speed and efficiency are prioritized over reliability.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 3897,
+          "input_tokens": 38,
+          "output_tokens": 512,
+          "total_tokens": 550,
+          "output_words": 354,
+          "output_chars": 2393,
+          "content": "Fixing a memory leak in a long-running Node.js process involves several steps to identify, diagnose, and resolve the issue. Here\u2019s a structured approach to tackle memory leaks:\n\n### 1. **Identify the Memory Leak**\n\n- **Monitor Memory Usage**: Use tools like `top`, `htop`, or `pm2` to monitor the memory usage of your Node.js process over time. Look for a consistent increase in memory usage that does not stabilize.\n\n- **Logging**: Implement logging to track memory usage at regular intervals. You can use `process.memoryUsage()` to log memory statistics.\n\n### 2. **Diagnose the Memory Leak**\n\n- **Heap Snapshots**: Use Chrome DevTools or Node.js built-in inspector to take heap snapshots. You can start your Node.js application with the `--inspect` flag and connect to it using Chrome DevTools.\n\n- **Analyze Snapshots**: Compare heap snapshots over time to identify objects that are growing unexpectedly. Look for detached DOM trees, closures, or objects that are not being garbage collected.\n\n- **Node.js Profiling Tools**: Use tools like `clinic.js`, `node-heapdump`, or `memwatch-next` to help identify memory leaks.\n\n### 3. **Common Causes and Fixes**\n\n- **Unintentional Global Variables**: Ensure that you are not accidentally creating global variables. Use `'use strict';` to catch such issues.\n\n- **Event Listeners**: Check for event listeners that are not being removed. Use `removeListener` or `off` to clean up listeners when they are no longer needed.\n\n- **Closures**: Be cautious with closures that capture large objects or variables. Ensure that closures do not unintentionally hold references to objects that should be garbage collected.\n\n- **Caching**: If you are using caching, ensure that cache size is managed properly and that old entries are purged when no longer needed.\n\n- **Third-party Modules**: Review third-party modules for known memory leaks. Ensure they are up-to-date and check their issue trackers for any reported leaks.\n\n### 4. **Implement Fixes**\n\n- **Refactor Code**: Based on your findings, refactor the code to eliminate unnecessary references, properly manage event listeners, and optimize data structures.\n\n- **Garbage Collection**: While Node.js handles garbage collection automatically, you can manually trigger it using `global.gc()` if you start your application with the `--expose-gc` flag. This is generally not recommended for production but can",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 4348,
+          "input_tokens": 34,
+          "output_tokens": 468,
+          "total_tokens": 502,
+          "output_words": 354,
+          "output_chars": 2320,
+          "content": "The SQL `EXPLAIN` command is a powerful tool used to understand how a database management system (DBMS) executes a query. It provides detailed information about the execution plan that the database engine uses to retrieve the requested data. This information can be invaluable for optimizing queries and improving database performance. Here's what `EXPLAIN` typically tells you:\n\n1. **Execution Plan**: It shows the steps the database will take to execute the query, often in a tree-like structure. This includes the order of operations, such as which tables are accessed first and how they are joined.\n\n2. **Access Methods**: It indicates how the database accesses the data, such as whether it uses a full table scan, an index scan, or an index seek. This helps in understanding the efficiency of data retrieval.\n\n3. **Join Methods**: For queries involving multiple tables, `EXPLAIN` shows how tables are joined, such as using nested loops, hash joins, or merge joins.\n\n4. **Cost Estimates**: Many databases provide cost estimates for each step in the execution plan. These estimates give an idea of the relative expense of different operations, helping to identify potential bottlenecks.\n\n5. **Row Estimates**: It often includes estimates of the number of rows processed at each step, which can help in understanding the scale of operations and identifying inefficiencies.\n\n6. **Filter Conditions**: It shows any filter conditions applied at each step, which can help in understanding how the database narrows down the result set.\n\n7. **Indexes Used**: It indicates which indexes, if any, are used in the query execution. This can help in determining whether existing indexes are effective or if new indexes might be needed.\n\n8. **Sort Operations**: If the query involves sorting, `EXPLAIN` will show where and how sorting is performed, which can be useful for optimizing order-by operations.\n\nDifferent database systems may provide additional details or have variations in how `EXPLAIN` works. For example, MySQL, PostgreSQL, and Oracle each have their own specific implementations and output formats for `EXPLAIN`. Some systems also offer extended versions, like `EXPLAIN ANALYZE` in PostgreSQL, which actually executes the query and provides runtime statistics, offering even deeper insights into query performance.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "lite": [
+        {
+          "ok": true,
+          "latency_ms": 1724,
+          "input_tokens": 54,
+          "output_tokens": 142,
+          "total_tokens": 196,
+          "output_words": 92,
+          "output_chars": 627,
+          "content": "React components re-render when their props or state change. If a parent component updates, it may pass new props to its child components, causing them to re-render. Key reasons for re-rendering:\n\n1. **Props Change**: Child component receives new props from parent.\n2. **State Change**: Component's own state changes.\n3. **Context Change**: Context values used by component change.\n4. **Parent Re-render**: Parent re-renders, causing child to re-render if props are passed.\n\nTo optimize, use `React.memo` to prevent unnecessary re-renders if props remain the same. Use `useMemo` or `useCallback` to memoize values or functions.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1417,
+          "input_tokens": 46,
+          "output_tokens": 97,
+          "total_tokens": 143,
+          "output_words": 85,
+          "output_chars": 577,
+          "content": "Database connection pooling is a technique to manage database connections efficiently. It maintains a pool of connections that can be reused, reducing the overhead of establishing a new connection each time a database operation is needed. When an application needs a connection, it borrows one from the pool. After use, the connection is returned to the pool for future use. This improves performance and resource utilization, especially in high-load environments. Connection pooling also helps manage database connection limits by controlling the number of active connections.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 999,
+          "input_tokens": 49,
+          "output_tokens": 136,
+          "total_tokens": 185,
+          "output_words": 93,
+          "output_chars": 648,
+          "content": "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are core protocols for data transmission over the internet.\n\nTCP:\n- Connection-oriented: Establishes a connection before data transfer.\n- Reliable: Ensures data delivery with error checking and acknowledgment.\n- Ordered: Maintains data order.\n- Slower: Overhead from connection setup and error handling.\n- Use cases: Web browsing, email, file transfers.\n\nUDP:\n- Connectionless: No connection setup.\n- Unreliable: No guarantee of delivery, order, or error checking.\n- Faster: Minimal overhead.\n- Use cases: Streaming, gaming, VoIP.\n\nChoose based on need for reliability vs. speed.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2634,
+          "input_tokens": 56,
+          "output_tokens": 330,
+          "total_tokens": 386,
+          "output_words": 201,
+          "output_chars": 1438,
+          "content": "1. **Identify Leak**: Use tools like Chrome DevTools, Node.js built-in `--inspect` flag, or `node --inspect-brk` to attach a debugger. Analyze heap snapshots to find objects that grow over time.\n\n2. **Monitor Memory**: Use `process.memoryUsage()` to monitor memory usage. Log this data to identify patterns or spikes.\n\n3. **Use Profilers**: Tools like `clinic.js`, `0x`, or `node-heapdump` can help profile memory usage and identify leaks.\n\n4. **Check Code**: Look for common culprits:\n   - Unclosed event listeners.\n   - Global variables holding references.\n   - Caches that grow indefinitely.\n   - Unreleased timers or intervals.\n\n5. **Optimize Code**: Refactor code to:\n   - Remove unnecessary global variables.\n   - Properly close event listeners.\n   - Use weak references where appropriate.\n   - Limit cache size or use LRU (Least Recently Used) strategies.\n\n6. **Garbage Collection**: Force garbage collection in development with `global.gc()` (requires `--expose-gc` flag) to test if memory is freed.\n\n7. **Update Dependencies**: Ensure all dependencies are up-to-date. Memory leaks can be caused by bugs in third-party libraries.\n\n8. **Test**: After changes, test under similar conditions to ensure the leak is resolved.\n\n9. **Continuous Monitoring**: Implement monitoring in production to catch future leaks early. Use tools like `pm2` or `New Relic`.\n\n10. **Documentation**: Document findings and solutions for future reference.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1189,
+          "input_tokens": 52,
+          "output_tokens": 53,
+          "total_tokens": 105,
+          "output_words": 40,
+          "output_chars": 265,
+          "content": "The SQL `EXPLAIN` command provides details on how a database executes a query. It shows the query execution plan, including the order of operations, use of indexes, join methods, and estimated costs. This helps identify performance bottlenecks and optimize queries.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "full": [
+        {
+          "ok": true,
+          "latency_ms": 5231,
+          "input_tokens": 75,
+          "output_tokens": 138,
+          "total_tokens": 213,
+          "output_words": 83,
+          "output_chars": 623,
+          "content": "React component re-renders when parent updates because:\n\n1. **Props Change**: If parent passes new props, child re-renders to reflect changes.\n2. **State Change**: Parent state change triggers re-render, affecting children.\n3. **Context Change**: If component uses React Context, context value change causes re-render.\n4. **Parent Re-render**: Even without prop/state change, parent re-render can trigger child re-render.\n\nTo optimize:\n\n- Use `React.memo` to prevent re-renders if props/state unchanged.\n- Use `useMemo` or `useCallback` to memoize values/functions.\n- Ensure props/state changes are necessary for re-render.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2226,
+          "input_tokens": 67,
+          "output_tokens": 207,
+          "total_tokens": 274,
+          "output_words": 139,
+          "output_chars": 999,
+          "content": "Database connection pooling: technique to manage database connections efficiently. \n\n- **Purpose**: Reduce overhead of opening/closing connections repeatedly. Improve performance, resource utilization.\n- **How it works**: \n  - Pool maintains set of open connections.\n  - When application needs connection, pool provides one from pool.\n  - After use, connection returned to pool, not closed.\n  - New connections created only if pool has none available and max size not reached.\n- **Benefits**:\n  - Faster connection acquisition.\n  - Reduced database load.\n  - Better resource management.\n- **Configuration**:\n  - Initial pool size: number of connections created at start.\n  - Max pool size: max number of connections pool can hold.\n  - Idle timeout: time connection can remain idle before being closed.\n  - Validation: check if connection still valid before use.\n\nCommon in web applications, enterprise systems. Libraries/frameworks often provide built-in support (e.g., HikariCP, Apache DBCP, C3P0).",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 4435,
+          "input_tokens": 70,
+          "output_tokens": 261,
+          "total_tokens": 331,
+          "output_words": 146,
+          "output_chars": 1100,
+          "content": "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) both transport layer protocols, but key differences:\n\n1. **Connection**:\n   - TCP: Connection-oriented. Establishes connection before data transfer. Ensures reliable communication.\n   - UDP: Connectionless. Sends data without establishing connection. No guarantee of delivery.\n\n2. **Reliability**:\n   - TCP: Reliable. Error-checking, acknowledgment, retransmission of lost packets.\n   - UDP: Unreliable. No error-checking, no acknowledgment, no retransmission.\n\n3. **Speed**:\n   - TCP: Slower due to overhead of connection setup, error-checking, flow control.\n   - UDP: Faster. Minimal overhead, no connection setup.\n\n4. **Use Cases**:\n   - TCP: Web browsing (HTTP/HTTPS), email (SMTP), file transfer (FTP).\n   - UDP: Streaming (video/audio), online gaming, VoIP.\n\n5. **Data Flow**:\n   - TCP: Ordered. Data arrives in sequence.\n   - UDP: Unordered. Data may arrive out of sequence.\n\n6. **Header Size**:\n   - TCP: Larger header (20 bytes minimum).\n   - UDP: Smaller header (8 bytes).\n\nChoose based on need for reliability vs. speed.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 3173,
+          "input_tokens": 77,
+          "output_tokens": 307,
+          "total_tokens": 384,
+          "output_words": 173,
+          "output_chars": 1278,
+          "content": "1. **Identify Leak**: Use tools like Chrome DevTools, Node.js built-in `--inspect` flag, or `node --inspect-brk` for debugging. Attach debugger, take heap snapshots, analyze memory usage.\n\n2. **Monitor Memory**: Use `process.memoryUsage()` to log memory stats. Track over time to spot trends.\n\n3. **Use Profilers**: Tools like `clinic.js`, `heapdump`, or `memwatch-next` can help identify leaks.\n\n4. **Check Code**: Look for:\n   - Unreleased event listeners.\n   - Global variables holding references.\n   - Caches growing indefinitely.\n   - Long-lived timers or intervals.\n\n5. **Garbage Collection**: Force GC with `global.gc()` if `--expose-gc` flag enabled. Use sparingly for testing.\n\n6. **Optimize Code**: Refactor to release resources:\n   - Remove unused listeners with `removeListener`.\n   - Use weak references for caches (`WeakMap`, `WeakSet`).\n   - Clear intervals/timers when done.\n\n7. **Update Dependencies**: Ensure all packages up-to-date. Known leaks might be fixed in newer versions.\n\n8. **Test**: After changes, run process under load. Monitor memory to confirm leak fixed.\n\n9. **Automate Monitoring**: Use tools like `pm2` or `forever` to restart process if memory exceeds threshold.\n\n10. **Documentation**: Keep notes on findings and fixes for future reference.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 831,
+          "input_tokens": 73,
+          "output_tokens": 53,
+          "total_tokens": 126,
+          "output_words": 39,
+          "output_chars": 265,
+          "content": "SQL `EXPLAIN` command provides execution plan for query. Shows how database engine executes query, including:\n\n- Order of operations\n- Index usage\n- Join methods\n- Estimated cost\n- Row estimates\n\nHelps optimize query performance by understanding execution strategy.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ],
+      "ultra": [
+        {
+          "ok": true,
+          "latency_ms": 1292,
+          "input_tokens": 74,
+          "output_tokens": 157,
+          "total_tokens": 231,
+          "output_words": 85,
+          "output_chars": 667,
+          "content": "React component re-render when parent updates because:\n\n1. **Props Change**: Parent passes new props \u2192 Child re-renders.\n2. **State Change**: Parent state change \u2192 Child re-renders if props depend on state.\n3. **Context Change**: Context value change \u2192 All consumers re-render.\n4. **Parent Re-render**: Parent re-renders \u2192 Child re-renders by default.\n\n**Solutions**:\n- **Memoization**: Use `React.memo` to prevent re-render if props same.\n- **useMemo/useCallback**: Memoize functions/values to avoid unnecessary re-renders.\n- **PureComponent**: Use `PureComponent` for shallow prop/state comparison.\n- **shouldComponentUpdate**: Implement to control re-render logic.",
+          "error": null,
+          "prompt": "Why does my React component re-render every time the parent updates?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 1874,
+          "input_tokens": 66,
+          "output_tokens": 124,
+          "total_tokens": 190,
+          "output_words": 73,
+          "output_chars": 641,
+          "content": "DB connection pooling: technique manage DB connections efficiently. Pool: cache of DB connections. App requests connection\u2192pool provides. Connection done\u2192returned to pool, not closed. Benefits: \n\n1. **Performance**: Reduce overhead. Creating/destroying connections costly. Pool reuses connections.\n2. **Resource Management**: Limit max connections. Prevent DB overload.\n3. **Scalability**: Handle more requests. Pool manages connections efficiently.\n4. **Latency Reduction**: Faster connection retrieval. Pre-established connections.\n\nPool config: min/max connections, idle timeout, validation. Proper config crucial for optimal performance.",
+          "error": null,
+          "prompt": "Explain database connection pooling."
+        },
+        {
+          "ok": true,
+          "latency_ms": 2207,
+          "input_tokens": 69,
+          "output_tokens": 250,
+          "total_tokens": 319,
+          "output_words": 124,
+          "output_chars": 896,
+          "content": "TCP vs UDP:\n\n1. **Connection**:\n   - TCP: Connection-oriented. Handshake (SYN, SYN-ACK, ACK).\n   - UDP: Connectionless. No handshake.\n\n2. **Reliability**:\n   - TCP: Reliable. Error-checking, retransmission.\n   - UDP: Unreliable. No error-checking, no retransmission.\n\n3. **Order**:\n   - TCP: Ordered. Data arrives in sequence.\n   - UDP: Unordered. Data may arrive out of order.\n\n4. **Speed**:\n   - TCP: Slower. Overhead from reliability features.\n   - UDP: Faster. Minimal overhead.\n\n5. **Use Cases**:\n   - TCP: Web (HTTP/HTTPS), email (SMTP), file transfer (FTP).\n   - UDP: Streaming (video/audio), gaming, VoIP.\n\n6. **Header Size**:\n   - TCP: Larger header (20 bytes min).\n   - UDP: Smaller header (8 bytes).\n\n7. **Flow Control**:\n   - TCP: Flow control (congestion control).\n   - UDP: No flow control.\n\nSummary: TCP reliable, ordered, slower. UDP fast, simple, unordered. Choose based on need.",
+          "error": null,
+          "prompt": "What's the difference between TCP and UDP?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 2209,
+          "input_tokens": 76,
+          "output_tokens": 221,
+          "total_tokens": 297,
+          "output_words": 105,
+          "output_chars": 816,
+          "content": "1. **Identify Leak**: Use tools. `node --inspect` or `node --inspect-brk` for Chrome DevTools. `node --prof` for V8 profiler. `heapdump` for snapshots.\n\n2. **Analyze Heap**: Load snapshot in DevTools. Look for detached DOM trees, closures, or large arrays/objects.\n\n3. **Check Code**: Review for:\n   - Unreleased event listeners.\n   - Global variables.\n   - Unclosed database connections.\n   - Caches growing indefinitely.\n\n4. **Use Tools**: \n   - `clinic.js` for profiling.\n   - `memwatch-next` for leak detection.\n   - `v8-profiler-node8` for CPU/heap profiling.\n\n5. **Optimize**: \n   - Release resources (e.g., `db.close()`).\n   - Use weak references (`WeakMap`, `WeakSet`).\n   - Limit cache size.\n\n6. **Test**: Run under load. Monitor memory usage (`process.memoryUsage()`).\n\n7. **Repeat**: Iterate until stable.",
+          "error": null,
+          "prompt": "How do I fix a memory leak in a long-running Node.js process?"
+        },
+        {
+          "ok": true,
+          "latency_ms": 677,
+          "input_tokens": 72,
+          "output_tokens": 31,
+          "total_tokens": 103,
+          "output_words": 22,
+          "output_chars": 144,
+          "content": "SQL EXPLAIN \u2192 query execution plan. Shows how DB engine executes query. Reveals index use, join methods, scan types. Helps optimize performance.",
+          "error": null,
+          "prompt": "What does the SQL EXPLAIN command tell me?"
+        }
+      ]
+    }
+  }
+}
