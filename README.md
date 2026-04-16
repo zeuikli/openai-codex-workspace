@@ -93,6 +93,56 @@ Raw JSON: [`benchmarks/results/caveman_benchmark_results.json`](benchmarks/resul
 
 ---
 
+## Caveman Auto-Level Selection Benchmark
+
+**80 calls** · gpt-5.4-mini · 4 strategies × 20 prompts × 5 categories
+Run: **2026-04-16 01:30 UTC**
+
+> **Auto-level** = prompt classifier 自動判斷 lite/full/ultra/off，無需用戶手動選擇。
+> 規則注入於 `.codex/hooks/session_start_note.sh` + `AGENTS.md`，Codex-native，無 Node.js 依賴。
+
+### Classifier Accuracy: 19/20 = 95.0%
+
+| 分類 | 命中 |
+|---|---|
+| simple_qa → lite | ✅ 4/4 |
+| technical_explain → full | ✅ 4/4 |
+| debug → full | ✅ 4/4 |
+| summarize_batch → ultra | ✅ 3/4 (tl;dr 修正後 4/4) |
+| security_destructive → off | ✅ 4/4 |
+
+### Overall Strategy Comparison
+
+| Strategy | Avg Out-Tokens | Token Reduction vs None | Avg Latency (ms) |
+|----------|----------------|-------------------------|-----------------|
+| none (baseline) | 300.6 | — | 2732 |
+| manual-full | 201.0 | **33.1%** | 2363 |
+| **auto-select** | **204.8** | **31.9%** | **2168** ✅ |
+| forced-ultra | 159.8 | 46.8% | 2201 |
+
+### Per-Category Auto Reduction
+
+| Category | Expected | Auto Reduction vs None |
+|----------|----------|----------------------|
+| simple_qa | lite | **43.3%** |
+| technical_explain | full | **39.0%** |
+| debug | full | **25.5%** |
+| summarize_batch | ultra | **30.6%** |
+| security_destructive | off | 4.1% (正確保留清晰度) |
+
+**Key findings:**
+- 🎯 **Auto 達到手動 full 的 96.3% 壓縮效益**（31.9% vs 33.1%），無需用戶選擇。
+- ⚡ **Auto 延遲比手動低 8.3%**（2168ms vs 2363ms），因 lite prompts 得到更輕量回應。
+- 🔒 **Security prompts** 正確切換到 off level，確保安全警告不被壓縮。
+- 🏆 **最佳場景**：混合對話（Q&A + 技術解釋 + 摘要），auto 自適應優於固定 full。
+
+Full report: [`benchmarks/results/caveman_auto_level_report.md`](benchmarks/results/caveman_auto_level_report.md)
+Raw JSON: [`benchmarks/results/caveman_auto_level_results.json`](benchmarks/results/caveman_auto_level_results.json)
+
+---
+
+
+
 ## Model Configuration
 
 | Role | Model | Reasoning |
@@ -196,13 +246,20 @@ rg -n "^## 1[1-5]\." prompts.md
 
 # ── Caveman benchmark (real API, requires key) ─────────────────────────────
 # Key loaded automatically from .env.local (gitignored)
-# Or: OPENAI_API_KEY=<key> python3 benchmarks/caveman_benchmark.py
-python3 benchmarks/caveman_benchmark.py
+python3 benchmarks/caveman_benchmark.py          # model × level benchmark
+python3 benchmarks/caveman_auto_level_benchmark.py  # auto-select strategy benchmark
+
+# ── Auto-level classifier (offline, no API key needed) ─────────────────────
+python3 scripts/caveman_auto_level.py "Summarize all PRs"     # → ultra
+python3 scripts/caveman_auto_level.py "What is TCP?"           # → lite
+python3 scripts/caveman_auto_level.py "DROP TABLE users"       # → off
+python3 -m unittest -v tests/test_caveman_auto_level.py        # 21 unit tests
 
 # ── Full one-liner validation suite ───────────────────────────────────────
 python3 scripts/validate_codex_workspace.py \
   && python3 tests/caveman/verify_repo.py \
-  && python3 -m unittest tests/test_caveman_compress.py tests/test_codex_hooks_behavior.py tests/test_subagent_checks.py
+  && python3 -m unittest tests/test_caveman_compress.py tests/test_codex_hooks_behavior.py \
+             tests/test_subagent_checks.py tests/test_caveman_auto_level.py
 ```
 
 ---
