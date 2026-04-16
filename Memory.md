@@ -2,6 +2,87 @@
 
 > Codex 交接摘要（手動維護）
 
+## 最新狀態（2026-04-15，upstream repo 比對與差異報告）
+
+- 已執行 upstream (`https://github.com/JuliusBrussee/caveman`) 與本地 workspace 的檔案完整性比對。
+- 比對結論：
+  - `missing_from_workspace_count = 0`（upstream 所有檔案都存在於本 workspace）。
+  - `extra_in_workspace_count = 3`（workspace 追加 benchmark/load test/report 檔）。
+  - `content_differences_count = 4`（`.gitignore`、`README.md`、2 個 hooks 檔為預期差異）。
+- 新增報告檔：
+  - `caveman/docs/repo-parity-report.md`
+  - `caveman/docs/repo-parity-report.json`
+- `caveman/README.md` 已新增 parity 摘要與報告連結。
+
+## 最新狀態（2026-04-15，修正載入測試失敗：caveman banner / mode tracker）
+
+- 修正 `caveman/hooks/caveman-activate.js`：
+  - 啟用訊息改回含 `CAVEMAN MODE ACTIVE.` 前綴，與 `tests/verify_repo.py` 期望一致。
+- 修正 `caveman/hooks/caveman-mode-tracker.js`：
+  - 預設恢復 silent 模式，避免 `verify_repo.py` 的 `mode tracker should stay silent` 失敗。
+  - 新增可選行為：僅在 `CAVEMAN_REINFORCE=1` 時才輸出 per-turn reinforcement。
+- 驗證結果：
+  - `python3 caveman/tests/verify_repo.py` ✅
+  - `python3 caveman/scripts/run_codex_cloud_load_test.py` ✅ (`status=pass`)
+  - `python3 -m unittest -v caveman/tests/test_hooks.py` ✅
+
+## 最新狀態（2026-04-15，Caveman README 整併 + 最新測試數據）
+
+- 依使用者要求整併 `caveman/README.md` 中重複的 workspace 說明段落，統一為單一 `Workspace Integration (Unified)` 區塊。
+- 以 `python3 caveman/benchmarks/openai_workspace_benchmark.py` 重跑 matrix（`gpt-5.4 / gpt-5.4-mini / gpt-5.4-nano / gpt-5.3-codex` × `lite/full/ultra`）：
+  - 本輪為 `dry_run`（未使用對話中貼出的 key）。
+  - 最新最佳組合：`gpt-5.4-nano + ultra`（median output tokens = 12）。
+- 以 `python3 caveman/scripts/run_codex_cloud_load_test.py` 重跑 Codex Cloud 載入測試：
+  - 結果 `FAIL`，主因 `tests/verify_repo.py` 回報 `activation output missing caveman banner`。
+- 新報告產物：
+  - `caveman/benchmarks/results/openai_workspace_benchmark_20260415_234413.json`
+  - `caveman/benchmarks/results/openai_workspace_benchmark_20260415_234413.md`
+  - `caveman/benchmarks/results/codex_cloud_load_test_20260415_234413.json`
+  - `caveman/benchmarks/results/codex_cloud_load_test_20260415_234413.md`
+
+## 最新狀態（2026-04-15，Caveman benchmark 修補 + 安全性調整）
+
+- 修補 `caveman/benchmarks/openai_workspace_benchmark.py`：
+  - 新增 `.env.local` 自動載入（不覆蓋既有環境變數）。
+  - 新增 `--models/--levels` 參數合法性檢查，避免錯字造成靜默錯誤。
+- 修補 `caveman/scripts/run_codex_cloud_load_test.py`：
+  - 報告加入原始 `args` 欄位。
+  - 任一檢查失敗時腳本改為非零退出碼，讓 CI 可正確 fail fast。
+- 文件與產物調整：
+  - `caveman/README.md` 新增安全 key 載入方式（`.env.local`）與 load test 退出碼說明。
+  - `caveman/.gitignore` 新增忽略 `benchmarks/results/*.md`。
+  - 移除已追蹤的時間戳記報告檔（避免產物檔進版控造成噪音）。
+
+## 最新狀態（2026-04-15，Caveman Workspace 適配 + OpenAI Dry Run + Cloud 載入測試）
+
+- 依使用者要求，針對 `caveman` 子目錄新增 OpenAI 模型×壓縮等級效能腳本：
+  - `caveman/benchmarks/openai_workspace_benchmark.py`
+  - 支援 `gpt-5.4 / gpt-5.4-mini / gpt-5.4-nano / gpt-5.3-codex` × `lite/full/ultra`。
+  - 若缺 `OPENAI_API_KEY` 會自動切換 Python dry run（仍輸出完整 JSON/Markdown 報告）。
+- 新增 Codex Cloud 載入測試整合腳本：
+  - `caveman/scripts/run_codex_cloud_load_test.py`
+  - 固定執行 `tests/verify_repo.py` 與 `tests/test_hooks.py`，並輸出 JSON 報告。
+- 實測輸出（本輪）：
+  - `caveman/benchmarks/results/openai_workspace_benchmark_20260415_232230.json`
+  - `caveman/benchmarks/results/openai_workspace_benchmark_20260415_232230.md`
+  - `caveman/benchmarks/results/codex_cloud_load_test_20260415_232230.json`
+  - `caveman/benchmarks/results/codex_cloud_load_test_20260415_232230.md`
+- `caveman/README.md` 已新增：
+  - `Workspace Fit (AGENTS vs SKILL vs HOOKS)` 決策建議
+  - `OpenAI Model × lite/full/ultra Benchmark` 統一操作
+  - `Codex Cloud Load Test` 統一操作
+
+## 驗證狀態（本輪）
+
+- 已驗證：
+  - `python3 caveman/benchmarks/openai_workspace_benchmark.py`（dry run）
+  - `python3 caveman/scripts/run_codex_cloud_load_test.py`
+  - `python3 caveman/tests/verify_repo.py`
+  - `python3 -m unittest -v caveman/tests/test_hooks.py`
+- 未驗證：
+  - OpenAI live API 回應（環境無 `OPENAI_API_KEY`）
+  - 遠端 GitHub push（尚未在本輪完成）
+
 ## 最新狀態（2026-04-15，Codex Cloud 再驗證 + docs 整理）
 
 - 已新增 `docs/README.md`，建立 docs 有效性總覽：

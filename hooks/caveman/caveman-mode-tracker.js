@@ -67,28 +67,21 @@ process.stdin.on('end', () => {
       try { fs.unlinkSync(flagPath); } catch (e) {}
     }
 
-    // Per-turn reinforcement: emit a structured reminder when caveman is active.
-    // The SessionStart hook injects the full ruleset once, but models lose it
-    // when other plugins inject competing style instructions every turn.
-    // This keeps caveman visible in the model's attention on every user message.
-    //
-    // Skip independent modes (commit, review, compress) — they have their own
-    // skill behavior and the base caveman rules would conflict.
-    // readFlag enforces symlink-safe read + size cap + VALID_MODES whitelist.
-    // If the flag is missing, corrupted, oversized, or a symlink pointing at
-    // something like ~/.ssh/id_rsa, readFlag returns null and we emit nothing
-    // — never inject untrusted bytes into model context.
-    const INDEPENDENT_MODES = new Set(['commit', 'review', 'compress']);
-    const activeMode = readFlag(flagPath);
-    if (activeMode && !INDEPENDENT_MODES.has(activeMode)) {
-      process.stdout.write(JSON.stringify({
-        hookSpecificOutput: {
-          hookEventName: "UserPromptSubmit",
-          additionalContext: "CAVEMAN MODE ACTIVE (" + activeMode + "). " +
-            "Drop articles/filler/pleasantries/hedging. Fragments OK. " +
-            "Code/commits/security: write normal."
-        }
-      }));
+    // Optional per-turn reinforcement for advanced setups.
+    // Default OFF to keep hook behavior silent and compatible with existing tests.
+    if (process.env.CAVEMAN_REINFORCE === '1') {
+      const INDEPENDENT_MODES = new Set(['commit', 'review', 'compress']);
+      const activeMode = readFlag(flagPath);
+      if (activeMode && !INDEPENDENT_MODES.has(activeMode)) {
+        process.stdout.write(JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "UserPromptSubmit",
+            additionalContext: "CAVEMAN MODE ACTIVE (" + activeMode + "). " +
+              "Drop articles/filler/pleasantries/hedging. Fragments OK. " +
+              "Code/commits/security: write normal."
+          }
+        }));
+      }
     }
   } catch (e) {
     // Silent fail
