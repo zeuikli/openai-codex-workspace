@@ -7,6 +7,7 @@
 - 預設模型改為 `gpt-5.4`：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`README.md` 已同步。
 - 三層 Agent 分派改依先前測試結果：探索/文件用 `gpt-5.4-mini`，主 Agent 用 `gpt-5.4`，工程/測試/review/security 用 `gpt-5.3-codex`。
 - `.codex/agents/*.toml` 已同步：`architecture_explorer` / `docs_researcher` → `gpt-5.4-mini`；`implementer` / `test_writer` / `reviewer` / `security_reviewer` → `gpt-5.3-codex`。
+- `benchmarks/results` 舊碎片報告整併為 `benchmark_results.json` / `benchmark_results.md`，保留 19 JSON + 19 Markdown 來源內容。
 
 ## 最新狀態（2026-04-16，load simulator + workspace 優化）
 
