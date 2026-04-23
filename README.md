@@ -81,7 +81,9 @@ Run: **2026-04-16 03:47 UTC** — Phase 1 (offline) + Phase 2 (API) + Phase 3 (h
 
 Static caveman (+54.6% total cost) injects 392 tokens of system prompt but only saves ~197 output tokens per call — input overhead outweighs output savings. Dynamic auto-level costs only +12.7% above baseline while compressing output by 50.8%.
 
-Full reports: [`benchmarks/results/`](benchmarks/results/)
+Full reports: [`benchmarks/results/benchmark_results.md`](benchmarks/results/benchmark_results.md)
+
+Machine-readable aggregate: [`benchmarks/results/benchmark_results.json`](benchmarks/results/benchmark_results.json)
 
 ---
 
@@ -109,7 +111,7 @@ Run: **2026-04-16 01:12 UTC**
 | gpt-5.4-nano | 445 tok | 19.8% | 11.8% | **51.2%** | 51.2% |
 | gpt-5.3-codex | 370 tok | 6.4% | 6.2% | **19.7%** | 19.7% |
 
-Full report: [`benchmarks/results/caveman_benchmark_report.md`](benchmarks/results/caveman_benchmark_report.md)
+Full report: [`benchmarks/results/benchmark_results.md`](benchmarks/results/benchmark_results.md)
 
 ---
 
