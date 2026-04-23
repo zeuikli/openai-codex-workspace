@@ -73,14 +73,14 @@
 - 預設用 `gpt-5.4`。
 - 讀多寫少、快速探索與摘要優先用 `gpt-5.4-mini`。
 - 文檔查證預設使用 `docs_researcher`（`gpt-5.4-mini`）；僅在規格衝突、證據不足或高風險決策時升級 `gpt-5.4`。
-- 複雜工程或深度審查可用 `gpt-5.3-codex`。
+- 複雜工程、測試補強、深度審查與安全審查優先用 `gpt-5.3-codex`。
 - 只有在明確要求或任務可平行拆分時才啟用 subagents。
 
 ### 建議配置
 
-- 日常任務：主 Agent 用 `gpt-5.4` + `medium` reasoning，兼顧品質與成本。
+- 日常任務：主 Agent 用 `gpt-5.4` + `medium` reasoning。
 - 全面審查、跨檔案治理、整體優化：主 Agent 用 `gpt-5.4` + `high` reasoning。
-- 最終驗收、高風險決策、安全或規範衝突收斂：主 Agent 用 `gpt-5.4` + `xhigh` reasoning。
+- 最終驗收、高風險決策、安全或規範衝突收斂：主 Agent 用 `gpt-5.4` + `xhigh` reasoning；工程細節可交 `gpt-5.3-codex` 複核。
 - 架構盤點、文件查證、成本分析、handoff：優先用 `gpt-5.4-mini` + `medium` reasoning。
 - 純實作與測試補強：優先用 `gpt-5.3-codex` + `medium` reasoning。
 - 深度 review 與 security review：優先用 `gpt-5.3-codex` + `high` reasoning。
@@ -89,7 +89,8 @@
 
 - 跨模組決策與最後收斂交給 `gpt-5.4`。
 - 高頻讀取、盤點、整理與子任務交給 `gpt-5.4-mini`。
-- coding 密集的實作、測試與審查交給 `gpt-5.3-codex`。
+- 主線工程實作、測試補強、深度 review 與 security review 交給 `gpt-5.3-codex`。
+- `gpt-5.4-nano`、`gpt-5.1-codex`、`gpt-5.1-codex-mini`、`gpt-5.1-codex-max`、`gpt-5.2-codex` 不納入目前預設主路由。
 - 若成本壓力高，先優化上下文載入與摘要節奏，再降低模型或 reasoning。
 
 ## 結構邊界

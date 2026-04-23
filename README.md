@@ -146,12 +146,14 @@ Full report: [`benchmarks/results/caveman_benchmark_report.md`](benchmarks/resul
 
 | Role | Model | Reasoning |
 |------|-------|-----------|
-| Workspace default | `gpt-5.4` | Cross-module decisions, final convergence |
-| Light exploration / docs | `gpt-5.4-mini` | High-frequency reads, cost-efficient |
-| Fast nano tasks | `gpt-5.4-nano` | Lowest latency, best compression ratio |
-| Implementation / code | `gpt-5.3-codex` | Dense coding work, review, security |
+| Layer 1: Light exploration / docs | `gpt-5.4-mini` | High-frequency reads, low-cost scouting |
+| Layer 2: Workspace default / orchestration | `gpt-5.4` | Mainline delivery, planning, and final convergence |
+| Layer 3: Engineering / review / security | `gpt-5.3-codex` | Implementation, tests, review, and security checks |
 
 See `.codex/config.toml` for full routing config.
+
+Models removed from default routing after benchmark review: `gpt-5.4-nano`, `gpt-5.1-codex`, `gpt-5.1-codex-mini`, `gpt-5.1-codex-max`, `gpt-5.2-codex`.
+Active default routing now prioritizes `gpt-5.4`, `gpt-5.4-mini`, and `gpt-5.3-codex`.
 
 ---
 

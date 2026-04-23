@@ -76,17 +76,19 @@
 
 ## 模型與分工
 
+- 三層分派：
+  `Layer 1` 輕量高頻/讀多寫少：`gpt-5.4-mini`
+  `Layer 2` 主線交付/一般實作：`gpt-5.4`
+  `Layer 3` 複雜工程/測試/審查/安全收斂：`gpt-5.3-codex`
 - 預設：`gpt-5.4`
-- 輕量探索/摘要：`gpt-5.4-mini`
-- 複雜工程/深度審查：`gpt-5.3-codex`
-- 文檔查證預設：`gpt-5.4-mini`，僅在必要時升級 `gpt-5.4`。
+- 文檔查證預設：`gpt-5.4-mini`，僅在多文件衝突、規格不一致或高風險決策時升級 `gpt-5.4`。
 - subagents 只在明確要求或可平行拆分時使用。
-- 全面審查與整體優化：主 Agent 用 `gpt-5.4` 搭配 `high` reasoning。
-- 最終驗收或高風險收斂：主 Agent 用 `gpt-5.4` 搭配 `xhigh` reasoning。
 - 日常高頻任務：主 Agent 用 `gpt-5.4` 搭配 `medium` reasoning。
-- 架構盤點與文件查證：`gpt-5.4-mini` 搭配 `medium` reasoning。
-- 純實作/測試：`gpt-5.3-codex` 搭配 `medium` reasoning。
-- 深度 code review / security review：`gpt-5.3-codex` 搭配 `high` reasoning。
+- 架構盤點、文件查證、成本分析、handoff：優先用 `gpt-5.4-mini` 搭配 `medium` reasoning。
+- 純實作、測試補強、code review、安全審查：優先用 `gpt-5.3-codex`。
+- 全面審查與整體優化：主 Agent 用 `gpt-5.4` 搭配 `high` reasoning。
+- 最終驗收或高風險決策：主 Agent 用 `gpt-5.4` 搭配 `xhigh` reasoning；工程細節交 `gpt-5.3-codex` 複核。
+- 非預設且不建議納入主路由：`gpt-5.4-nano`、`gpt-5.1-codex`、`gpt-5.1-codex-mini`、`gpt-5.1-codex-max`、`gpt-5.2-codex`
 
 ## 驗證閉環（必做）
 

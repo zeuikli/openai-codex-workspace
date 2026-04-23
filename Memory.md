@@ -2,6 +2,12 @@
 
 > Codex 交接摘要（手動維護）。歷史記錄：`docs/reports/memory-history.md`（按需載入）。
 
+## 最新狀態（2026-04-23，模型路由更新）
+
+- 預設模型改為 `gpt-5.4`：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`README.md` 已同步。
+- 三層 Agent 分派改依先前測試結果：探索/文件用 `gpt-5.4-mini`，主 Agent 用 `gpt-5.4`，工程/測試/review/security 用 `gpt-5.3-codex`。
+- `.codex/agents/*.toml` 已同步：`architecture_explorer` / `docs_researcher` → `gpt-5.4-mini`；`implementer` / `test_writer` / `reviewer` / `security_reviewer` → `gpt-5.3-codex`。
+
 ## 最新狀態（2026-04-16，load simulator + workspace 優化）
 
 - 新增 `scripts/simulate_codex_load.py`：7 階段本地 Codex 載入模擬，含計時、hook 執行測試、token 估算、優化建議，輸出 JSON + Markdown 報告至 `benchmarks/results/`。
