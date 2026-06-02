@@ -144,6 +144,10 @@ def validate_workspace(root: Path) -> list[str]:
             errors.append('Missing top-level web_search in .codex/config.toml')
         if 'model_reasoning_effort' not in config:
             errors.append('Missing top-level model_reasoning_effort in .codex/config.toml')
+        if config.get('model') != '"gpt-5.5"':
+            errors.append('Default model must be gpt-5.5 in .codex/config.toml')
+        if config.get('model_reasoning_effort') != '"medium"':
+            errors.append('Default model_reasoning_effort must be medium in .codex/config.toml')
 
         for role in [
             'architecture_explorer',

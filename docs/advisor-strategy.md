@@ -1,6 +1,6 @@
 # Codex Subagent Advisor Strategy（實務版）
 
-> 更新日期：2026-04-14  
+> 更新日期：2026-06-02
 > 依據：OpenAI Codex 官方 `subagents`、`config-reference`，並吸收 `advisor-strategy` 的分工精神。
 
 ## 1) 必守官方規範
@@ -24,7 +24,7 @@
 
 | 角色 | 建議模型 | Sandbox | 用途 |
 |---|---|---|---|
-| Lead / 主 Agent | `gpt-5.4` | `workspace-write` | 任務拆解、主線交付、一般裁決 |
+| Lead / 主 Agent | `gpt-5.5` + `medium` | `workspace-write` | 任務拆解、主線交付、一般裁決 |
 | Explorer / Docs Researcher | `gpt-5.4-mini` | `read-only` | 快速讀取、規範查證、證據整理 |
 | Implementer / Test Writer | `gpt-5.3-codex` | `workspace-write` | 實作、補測試、執行驗證 |
 | Reviewer / Security Reviewer | `gpt-5.3-codex` | `read-only` | 高風險收斂、回歸風險、漏洞、品質把關 |
@@ -87,3 +87,4 @@
 - `.codex/config.toml` 維持 `max_depth = 1`，避免遞迴派工風險。
 - `.codex/agents/*.toml` 使用窄職責、明確輸出格式與可讀暱稱。
 - 預設先讀後寫，先證據後結論，先驗證後交付。
+- `xhigh` reasoning 僅用於跨專案、跨 repo、最終驗收或高風險收斂。
