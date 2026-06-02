@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import os
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 import sys
 
@@ -89,6 +92,62 @@ class CavemanCompressTests(unittest.TestCase):
         plain = "# Title\n\nBody"
         self.assertEqual(compress.strip_llm_wrapper(wrapped), plain)
         self.assertEqual(compress.strip_llm_wrapper(plain), plain)
+
+    def test_model_defaults_to_gpt54_mini_medium(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(compress.resolve_model(), "gpt-5.4-mini")
+            self.assertEqual(compress.DEFAULT_REASONING_EFFORT, "medium")
+
+    def test_openai_call_requires_api_key(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "OPENAI_API_KEY"):
+                compress.call_openai("compress this")
+
+    def test_openai_call_uses_gpt54_mini_medium_payload(self) -> None:
+        captured: dict[str, object] = {}
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self) -> bytes:
+                return json.dumps({"output_text": "ok"}).encode("utf-8")
+
+        def fake_urlopen(request, timeout):
+            captured["url"] = request.full_url
+            captured["timeout"] = timeout
+            captured["body"] = json.loads(request.data.decode("utf-8"))
+            return FakeResponse()
+
+        with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}, clear=True):
+            with mock.patch.object(compress.urllib.request, "urlopen", side_effect=fake_urlopen):
+                self.assertEqual(compress.call_openai("compress this"), "ok")
+
+        self.assertEqual(captured["url"], "https://api.openai.com/v1/responses")
+        self.assertEqual(captured["timeout"], 120)
+        self.assertEqual(captured["body"]["model"], "gpt-5.4-mini")
+        self.assertEqual(captured["body"]["reasoning"]["effort"], "medium")
+        self.assertEqual(captured["body"]["input"], "compress this")
+
+    def test_extract_response_text_supports_responses_shapes(self) -> None:
+        self.assertEqual(
+            compress.extract_response_text({"output_text": "```markdown\n# Title\n```"}),
+            "# Title",
+        )
+        payload = {
+            "output": [
+                {
+                    "content": [
+                        {"type": "output_text", "text": "# Title"},
+                        {"type": "output_text", "text": "Body"},
+                    ]
+                }
+            ]
+        }
+        self.assertEqual(compress.extract_response_text(payload), "# Title\nBody")
 
     def test_build_prompts_preserve_fixing_contract(self) -> None:
         compress_prompt = compress.build_compress_prompt("# Notes\nKeep `code`\n")

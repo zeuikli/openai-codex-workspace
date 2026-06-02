@@ -18,13 +18,14 @@
 ### 標準分派
 
 - `gpt-5.5` + `medium`：主 Agent 起手與一般整合決策。
-- `gpt-5.4-mini`：輕量任務、探索型子任務、subagent 掃描與摘要。
-- `gpt-5.3-codex`：複雜軟體工程實作、重構、測試修復與 cloud-friendly coding。
+- `gpt-5.4-mini` + `medium`：輕量任務、探索型子任務、subagent 掃描與摘要。
+- `gpt-5.4` + `medium`：一般軟體工程實作、重構、測試修復與 cloud-friendly coding。
+- `gpt-5.5` + `high`：深度 review、安全審查與高風險品質把關。
 
 ### 觀測重點
 
 - 若主 Agent 長期承接大量讀檔與摘要，代表分派失衡。
-- 若 `gpt-5.3-codex` 長期被用於 trivial triage，代表成本與吞吐未優化。
+- 若 `gpt-5.5` 長期處理整份 repo 原文而非摘要，代表應下放到 `gpt-5.4-mini` 或先摘要。
 - 若 subagents 回傳原始雜訊而非摘要，代表上下文管線失效。
 
 ## 3) Skills：把高頻流程從對話變成資產
@@ -115,6 +116,7 @@ Automations 在 Codex app 背景執行，適合週期性巡檢與追蹤任務。
 
 - 用 `gpt-5.5` + `medium` 做主線決策。
 - 只有跨專案、跨 repo、最終驗收或高風險收斂才升級到 `xhigh`。
-- 用 `gpt-5.4-mini` 吃下大量輕量與平行探索。
-- 用 `gpt-5.3-codex` 扛複雜工程落地。
+- 用 `gpt-5.4-mini` + `medium` 吃下大量輕量與平行探索。
+- 用 `gpt-5.4` + `medium` 扛一般工程落地。
+- 用 `gpt-5.5` + `high` 扛困難審查與安全收斂。
 - 用 skills 建立可重用流程，用 automations 承接背景週期任務，對 hooks 保持實驗性心態與防呆設計。

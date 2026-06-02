@@ -1,7 +1,7 @@
 name = "reviewer"
 description = "深度審查 agent，聚焦正確性、回歸風險與測試缺口。"
 nickname_candidates = ["Sentinel", "Aegis", "Proof"]
-model = "gpt-5.3-codex"
+model = "gpt-5.5"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """

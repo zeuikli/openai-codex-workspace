@@ -160,20 +160,23 @@ def research_worker(root: Path) -> WorkerResult:
             details=errors,
         )
 
-    expected_models = {
-        'docs_researcher.toml': 'gpt-5.4-mini',
-        'architecture_explorer.toml': 'gpt-5.4-mini',
-        'implementer.toml': 'gpt-5.3-codex',
-        'reviewer.toml': 'gpt-5.3-codex',
-        'security_reviewer.toml': 'gpt-5.3-codex',
-        'test_writer.toml': 'gpt-5.3-codex',
+    expected_agent_config = {
+        'docs_researcher.toml': ('gpt-5.4-mini', 'medium'),
+        'architecture_explorer.toml': ('gpt-5.4-mini', 'medium'),
+        'implementer.toml': ('gpt-5.4', 'medium'),
+        'test_writer.toml': ('gpt-5.4', 'medium'),
+        'reviewer.toml': ('gpt-5.5', 'high'),
+        'security_reviewer.toml': ('gpt-5.5', 'high'),
     }
     mismatches: list[str] = []
-    for filename, expected in expected_models.items():
+    for filename, (expected_model, expected_effort) in expected_agent_config.items():
         content = (root / '.codex' / 'agents' / filename).read_text(encoding='utf-8')
-        marker = f'model = "{expected}"'
-        if marker not in content:
-            mismatches.append(f'{filename} expected {expected}')
+        model_marker = f'model = "{expected_model}"'
+        effort_marker = f'model_reasoning_effort = "{expected_effort}"'
+        if model_marker not in content:
+            mismatches.append(f'{filename} expected model {expected_model}')
+        if effort_marker not in content:
+            mismatches.append(f'{filename} expected reasoning {expected_effort}')
 
     if mismatches:
         return WorkerResult(
@@ -363,8 +366,9 @@ def optimization_actions(metrics: dict[str, Any]) -> list[str]:
     first_three = [item['path'] for item in hotspots[:3]]
     actions = [
         '保持 skills 按需載入，避免在每個任務預讀全部 SKILL.md。',
-        '將高讀取低修改的研究任務優先分派給 gpt-5.4-mini。',
-        '將實作與測試集中到 gpt-5.3-codex，降低主模型上下文負擔。',
+        '讀多寫少與文件查證交給 gpt-5.4-mini + medium，降低高頻輸入成本。',
+        '一般實作與測試交給 gpt-5.4 + medium；review/security 交給 gpt-5.5 + high。',
+        '跨專案、跨 repo、最終驗收或高風險收斂時，才升級 gpt-5.5 reasoning 到 xhigh。',
     ]
     if first_three:
         actions.append('優先摘要高 token 檔案後再進入最終回覆：' + ', '.join(first_three))

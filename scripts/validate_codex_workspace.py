@@ -110,6 +110,14 @@ def validate_workspace(root: Path) -> list[str]:
         'security_reviewer.toml',
         'test_writer.toml',
     ]
+    expected_agent_config = {
+        'architecture_explorer.toml': ('gpt-5.4-mini', 'medium'),
+        'docs_researcher.toml': ('gpt-5.4-mini', 'medium'),
+        'implementer.toml': ('gpt-5.4', 'medium'),
+        'reviewer.toml': ('gpt-5.5', 'high'),
+        'security_reviewer.toml': ('gpt-5.5', 'high'),
+        'test_writer.toml': ('gpt-5.4', 'medium'),
+    }
     for filename in required_agents:
         agent_file = root / '.codex' / 'agents' / filename
         if not agent_file.exists():
@@ -123,6 +131,13 @@ def validate_workspace(root: Path) -> list[str]:
         for key in ['name', 'description', 'developer_instructions', 'model']:
             if key not in data:
                 errors.append(f'Agent missing required field "{key}": {agent_file.as_posix()}')
+        expected_model, expected_effort = expected_agent_config[filename]
+        if data.get('model') != f'"{expected_model}"':
+            errors.append(f'Agent model must be {expected_model}: {agent_file.as_posix()}')
+        if data.get('model_reasoning_effort') != f'"{expected_effort}"':
+            errors.append(
+                f'Agent model_reasoning_effort must be {expected_effort}: {agent_file.as_posix()}'
+            )
 
     config_file = root / '.codex' / 'config.toml'
     if not config_file.exists():

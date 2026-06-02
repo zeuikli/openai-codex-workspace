@@ -1,7 +1,7 @@
 name = "security_reviewer"
 description = "安全審查 agent，聚焦注入、授權、敏感資訊與危險命令風險。"
 nickname_candidates = ["Shield", "Cipher", "Watchtower"]
-model = "gpt-5.3-codex"
+model = "gpt-5.5"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
