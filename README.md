@@ -149,13 +149,16 @@ Full report: [`benchmarks/results/benchmark_results.md`](benchmarks/results/benc
 | Role | Model | Reasoning |
 |------|-------|-----------|
 | Layer 1: Light exploration / docs | `gpt-5.4-mini` | High-frequency reads, low-cost scouting |
-| Layer 2: Workspace default / orchestration | `gpt-5.4` | Mainline delivery, planning, and final convergence |
+| Layer 2: Workspace default / orchestration | `gpt-5.5` | `medium` reasoning for routine mainline delivery, planning, and final convergence |
 | Layer 3: Engineering / review / security | `gpt-5.3-codex` | Implementation, tests, review, and security checks |
 
 See `.codex/config.toml` for full routing config.
 
-Models removed from default routing after benchmark review: `gpt-5.4-nano`, `gpt-5.1-codex`, `gpt-5.1-codex-mini`, `gpt-5.1-codex-max`, `gpt-5.2-codex`.
-Active default routing now prioritizes `gpt-5.4`, `gpt-5.4-mini`, and `gpt-5.3-codex`.
+Models not in current default routing: `gpt-5.4-nano`, `gpt-5.1-codex`, `gpt-5.1-codex-mini`, `gpt-5.1-codex-max`, `gpt-5.2-codex`.
+Active default routing now prioritizes `gpt-5.5`, `gpt-5.4-mini`, and `gpt-5.3-codex`.
+
+Official alignment checked against the OpenAI GPT-5.5 latest model guide and Codex config reference on 2026-06-02.
+Use `xhigh` reasoning only for cross-project, cross-repo, final validation, or high-risk convergence work.
 
 ---
 

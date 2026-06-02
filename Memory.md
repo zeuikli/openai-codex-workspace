@@ -2,6 +2,12 @@
 
 > Codex 交接摘要（手動維護）。歷史記錄：`docs/reports/memory-history.md`（按需載入）。
 
+## 最新狀態（2026-06-02，workspace 預設模型改為 gpt-5.5）
+
+- 預設模型已改為 `gpt-5.5` + `medium` reasoning：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`prompts.md`、`README.md` 與現行治理文件已同步。
+- 已依 2026-06-02 OpenAI 官方 GPT-5.5 latest model guide 與 Codex config reference 複核：`gpt-5.5` 可用，`model_reasoning_effort = "medium"` / `"xhigh"` 皆為支援的 Codex 設定。
+- 三層 Agent 分派維持不變：探索/文件用 `gpt-5.4-mini`，主 Agent 預設用 `gpt-5.5` + `medium`，僅跨專案/跨 repo/最終驗收/高風險收斂升 `xhigh`，工程/測試/review/security 用 `gpt-5.3-codex`。
+
 ## 最新狀態（2026-04-23，模型路由更新）
 
 - 預設模型改為 `gpt-5.4`：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`README.md` 已同步。
