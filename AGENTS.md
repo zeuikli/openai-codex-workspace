@@ -33,7 +33,7 @@
 1. 啟動固定先讀：`AGENTS.md`、`Memory.md`、`prompts.md`。
 2. 再讀與任務直接相關的程式與設定檔。
 3. `SKILL.md` 採按需載入：只讀與當前任務直接相關的 skill，禁止全量預讀。
-4. 文檔查證預設優先交由 `docs_researcher`（`gpt-5.4-mini`）；只有在多文件衝突、規格不一致或高風險決策時才升級 `gpt-5.5`。
+4. 文檔查證預設交由 `docs_researcher`（`gpt-5.4-mini` + `medium`）；只有在多文件衝突、規格不一致或高風險決策時才升級到 `gpt-5.5`。
 5. 若任務涉及 Codex 規範、Claude → Codex 遷移、hooks、skills、subagents 或官方能力判讀，優先查 `docs/codex-migration-guide.md` 與 OpenAI 官方文件。
 6. 長任務每完成一個里程碑要做一次上下文摘要，避免重複回灌舊上下文。
 7. 複雜任務先規劃，再實作。
@@ -77,18 +77,19 @@
 ## 模型與分工
 
 - 三層分派：
-  `Layer 1` 輕量高頻/讀多寫少：`gpt-5.4-mini`
-  `Layer 2` 主線交付/一般實作：`gpt-5.5`
-  `Layer 3` 複雜工程/測試/審查/安全收斂：`gpt-5.3-codex`
+  `Layer 1` 輕量高頻/讀多寫少：`gpt-5.4-mini` + `medium`
+  `Layer 2` 一般實作/測試：`gpt-5.4` + `medium`
+  `Layer 3` 主線交付/困難審查/安全收斂：`gpt-5.5` + `medium/high`
 - 預設：`gpt-5.5` + `medium` reasoning。
-- 文檔查證預設：`gpt-5.4-mini`，僅在多文件衝突、規格不一致或高風險決策時升級 `gpt-5.5`。
+- 文檔查證預設：`gpt-5.4-mini` + `medium`，僅在多文件衝突、規格不一致或高風險決策時升級 `gpt-5.5`。
 - subagents 只在明確要求或可平行拆分時使用。
 - 日常高頻任務：主 Agent 用 `gpt-5.5` 搭配 `medium` reasoning。
-- 架構盤點、文件查證、成本分析、handoff：優先用 `gpt-5.4-mini` 搭配 `medium` reasoning。
-- 純實作、測試補強、code review、安全審查：優先用 `gpt-5.3-codex`。
+- 架構盤點、文件查證、成本分析、handoff：用 `gpt-5.4-mini` 搭配 `medium` reasoning。
+- 純實作、測試補強：用 `gpt-5.4` 搭配 `medium` reasoning。
+- code review、安全審查：用 `gpt-5.5` 搭配 `high` reasoning。
 - 全面審查與整體優化：主 Agent 預設用 `gpt-5.5` 搭配 `medium` reasoning。
-- 跨專案、跨 repo、最終驗收或高風險決策：主 Agent 才升級為 `gpt-5.5` 搭配 `xhigh` reasoning；工程細節交 `gpt-5.3-codex` 複核。
-- 非預設且不建議納入主路由：`gpt-5.4-nano`、`gpt-5.1-codex`、`gpt-5.1-codex-mini`、`gpt-5.1-codex-max`、`gpt-5.2-codex`
+- 跨專案、跨 repo、最終驗收或高風險決策：主 Agent 才升級為 `gpt-5.5` 搭配 `xhigh` reasoning；工程細節可用 `gpt-5.4` 分段修補，再由 `gpt-5.5` 複核。
+- `gpt-5.3-codex` 已從主路由退休；非預設且不建議納入主路由：`gpt-5.4-nano`、`gpt-5.1-codex`、`gpt-5.1-codex-mini`、`gpt-5.1-codex-max`、`gpt-5.2-codex`
 
 ## 驗證閉環（必做）
 

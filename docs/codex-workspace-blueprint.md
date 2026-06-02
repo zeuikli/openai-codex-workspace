@@ -8,8 +8,10 @@
 
 - 以 `gpt-5.5` + `medium` reasoning 作為預設起手模型。
 - 僅跨專案、跨 repo、最終驗收或高風險收斂時升級到 `xhigh` reasoning。
-- 以 `gpt-5.4-mini` 承接輕量與可平行子任務。
-- 以 `gpt-5.3-codex` 承接複雜軟體工程與 cloud-friendly coding。
+- 以 `gpt-5.4-mini` + `medium` 承接輕量與可平行子任務。
+- 以 `gpt-5.4` + `medium` 承接一般軟體工程與 cloud-friendly coding。
+- 以 `gpt-5.5` + `high/xhigh` 承接困難審查、安全與高風險收斂。
+- `gpt-5.3-codex` 已從主路由退休。
 - subagents 僅在「明確要求」或「高度可平行」時啟用。
 - automations 視為 Codex app 背景排程能力，不等同本地 cron 腳本。
 - hooks 視為 experimental，且目前 `PreToolUse` / `PostToolUse` 只攔 Bash。
@@ -45,7 +47,7 @@
 - 每週：更新模型分派建議與常見失敗案例。
 - 每雙週：檢查 skills 觸發描述是否仍準確。
 - 每月：審查 hooks 與 automations 是否仍符合最新安全邊界。
-- 每次大改版：重新驗證 `gpt-5.5` / `gpt-5.4-mini` / `gpt-5.3-codex` 任務對照。
+- 每次大改版：重新驗證 `gpt-5.4-mini` / `gpt-5.4` / `gpt-5.5` 任務對照。
 
 ## D. 發布前檢查清單（Go / No-Go）
 

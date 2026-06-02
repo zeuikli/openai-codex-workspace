@@ -40,11 +40,16 @@ cd <directory_containing_this_SKILL.md> && python3 -m scripts <absolute_filepath
 
 3. The CLI will:
 - detect file type (no tokens)
-- call Claude to compress
+- call OpenAI Responses API with `gpt-5.4-mini` + `medium` by default
 - validate output (no tokens)
-- if errors: cherry-pick fix with Claude (targeted fixes only, no recompression)
+- if errors: cherry-pick fix with OpenAI Responses API (targeted fixes only, no recompression)
 - retry up to 2 times
 - if still failing after 2 retries: report error to user, leave original file untouched
+
+Environment:
+- `OPENAI_API_KEY` required.
+- `CAVEMAN_MODEL` optional, defaults to `gpt-5.4-mini`; set `gpt-5.5` only for unusually difficult compression/rewrite-preservation jobs.
+- `CAVEMAN_REASONING_EFFORT` optional, defaults to `medium`.
 
 4. Return result to user
 

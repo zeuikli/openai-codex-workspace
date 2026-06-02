@@ -25,9 +25,9 @@
 | 角色 | 建議模型 | Sandbox | 用途 |
 |---|---|---|---|
 | Lead / 主 Agent | `gpt-5.5` + `medium` | `workspace-write` | 任務拆解、主線交付、一般裁決 |
-| Explorer / Docs Researcher | `gpt-5.4-mini` | `read-only` | 快速讀取、規範查證、證據整理 |
-| Implementer / Test Writer | `gpt-5.3-codex` | `workspace-write` | 實作、補測試、執行驗證 |
-| Reviewer / Security Reviewer | `gpt-5.3-codex` | `read-only` | 高風險收斂、回歸風險、漏洞、品質把關 |
+| Explorer / Docs Researcher | `gpt-5.4-mini` + `medium` | `read-only` | 快速讀取、規範查證、證據整理 |
+| Implementer / Test Writer | `gpt-5.4` + `medium` | `workspace-write` | 實作、補測試、執行驗證 |
+| Reviewer / Security Reviewer | `gpt-5.5` + `high` | `read-only` | 高風險收斂、回歸風險、漏洞、品質把關 |
 
 ## 4) 啟動與禁止條件
 

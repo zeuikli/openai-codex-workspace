@@ -54,7 +54,7 @@
 ```text
 請用 docs-drift-check 檢查目前 repo 與官方文件的一致性，
 優先比對：Codex Prompting Guide、Modernizing your Codebase with Codex。
-文檔查證請優先使用 gpt-5.4-mini，只有在規格衝突或高風險決策時才升級到 gpt-5.5。
+文檔查證請使用 gpt-5.4-mini + medium reasoning；只有在跨專案、跨 repo、規格衝突或高風險決策時才升級到 gpt-5.5。
 輸出：Drift Summary、Proposed Fix、Verification Plan。
 ```
 
@@ -93,8 +93,9 @@
 請用全面審查模式執行：
 - 主 Agent 預設視為 gpt-5.5 + medium reasoning
 - 若進入跨專案、跨 repo、最終驗收或高風險收斂，才升級為 gpt-5.5 + xhigh reasoning
-- 架構盤點、文件查證、成本分析優先派給 gpt-5.4-mini + medium reasoning
-- 純實作、測試、code review、安全審查優先派給 gpt-5.3-codex
+- 架構盤點、文件查證、成本分析使用 gpt-5.4-mini + medium reasoning
+- 純實作、測試使用 gpt-5.4 + medium reasoning
+- code review、安全審查使用 gpt-5.5 + high reasoning
 輸出：審查結論、最高風險問題、優化順序、驗證計畫。
 ```
 
@@ -154,9 +155,9 @@
 ```text
 請用省成本模式執行：
 - 主 Agent 用 gpt-5.5 + medium reasoning
-- 讀多寫少任務優先交給 gpt-5.4-mini + medium reasoning
-- 純實作與測試交給 gpt-5.3-codex + medium reasoning
-- 深度 review / security review 才升到 gpt-5.3-codex + high reasoning
+- 讀多寫少任務使用 gpt-5.4-mini + medium reasoning，靠按需讀取與摘要節奏省成本
+- 純實作與測試交給 gpt-5.4 + medium reasoning
+- 深度 review / security review 預設 gpt-5.5 + high reasoning，跨專案或高風險收斂才升 xhigh
 - 先優化上下文與摘要，不要一開始就提高 reasoning
 輸出：本次分流策略、預期節省點、風險與驗證方式。
 ```

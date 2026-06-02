@@ -9,7 +9,7 @@
 
 - 已從 upstream `https://github.com/JuliusBrussee/caveman` 抓取最新 `main`（`c2ed24b3e5d412cd0c25197b2bc9af587621fd99`）進行對照整合。
 - 將 `caveman-compress` 從舊版缺件狀態改為真正可執行的 Codex repo skill：腳本現位於 `.agents/skills/caveman-compress/scripts/`。
-- 壓縮流程已改為 OpenAI-first：優先 `OPENAI_API_KEY` + Responses API，保留 Anthropic / `claude` CLI fallback。
+- 壓縮流程已改為 OpenAI Responses API：使用 `OPENAI_API_KEY`，預設 `CAVEMAN_MODEL=gpt-5.4-mini` 與 `CAVEMAN_REASONING_EFFORT=medium`，不保留 Anthropic / `claude` CLI fallback。
 - caveman 驗證腳本已改寫為檢查目前 repo 的 Codex-native 佈局，不再依賴舊 caveman standalone 安裝面。
 
 ## 最新狀態（2026-04-15，upstream repo 比對與差異報告）

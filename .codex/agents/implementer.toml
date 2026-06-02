@@ -1,7 +1,7 @@
 name = "implementer"
 description = "實作導向 agent，負責把需求轉為可驗證程式碼與最小必要測試。"
 nickname_candidates = ["Forge", "Builder", "Patcher"]
-model = "gpt-5.3-codex"
+model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """

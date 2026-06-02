@@ -148,16 +148,19 @@ Full report: [`benchmarks/results/benchmark_results.md`](benchmarks/results/benc
 
 | Role | Model | Reasoning |
 |------|-------|-----------|
-| Layer 1: Light exploration / docs | `gpt-5.4-mini` | High-frequency reads, low-cost scouting |
-| Layer 2: Workspace default / orchestration | `gpt-5.5` | `medium` reasoning for routine mainline delivery, planning, and final convergence |
-| Layer 3: Engineering / review / security | `gpt-5.3-codex` | Implementation, tests, review, and security checks |
+| Layer 1: Light exploration / docs | `gpt-5.4-mini` | `medium` reasoning for cheap high-volume reads, docs checks, summaries, and subagents |
+| Layer 2: Implementation / tests | `gpt-5.4` | `medium` reasoning for cost-aware coding and verification |
+| Layer 3: Workspace default / orchestration | `gpt-5.5` | `medium` reasoning for planning, mainline delivery, and final convergence |
+| Layer 4: Review / security / high risk | `gpt-5.5` | `high` by default; `xhigh` only for cross-project, cross-repo, final validation, or high-risk convergence |
 
 See `.codex/config.toml` for full routing config.
 
+Retired from current routing: `gpt-5.3-codex`.
 Models not in current default routing: `gpt-5.4-nano`, `gpt-5.1-codex`, `gpt-5.1-codex-mini`, `gpt-5.1-codex-max`, `gpt-5.2-codex`.
-Active default routing now prioritizes `gpt-5.5`, `gpt-5.4-mini`, and `gpt-5.3-codex`.
+Active default routing uses `gpt-5.5` for the main agent, `gpt-5.4-mini` for read-heavy research, `gpt-5.4` for implementation/tests, and `gpt-5.5` high reasoning for review/security.
 
 Official alignment checked against the OpenAI GPT-5.5 latest model guide and Codex config reference on 2026-06-02.
+Sources: [GPT-5.5 guide](https://developers.openai.com/api/docs/guides/latest-model), [GPT-5.4 model](https://developers.openai.com/api/docs/models/gpt-5.4), [GPT-5.4 mini model](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Codex config reference](https://developers.openai.com/codex/config-reference).
 Use `xhigh` reasoning only for cross-project, cross-repo, final validation, or high-risk convergence work.
 
 ---

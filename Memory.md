@@ -2,20 +2,21 @@
 
 > Codex 交接摘要（手動維護）。歷史記錄：`docs/reports/memory-history.md`（按需載入）。
 
-## 最新狀態（2026-06-02，workspace 預設模型改為 gpt-5.5）
+## 最新狀態（2026-06-02，workspace 模型分派改為 gpt-5.5 / gpt-5.4 scoped routing）
 
-- 預設模型已改為 `gpt-5.5` + `medium` reasoning：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`prompts.md`、`README.md` 與現行治理文件已同步。
-- 已依 2026-06-02 OpenAI 官方 GPT-5.5 latest model guide 與 Codex config reference 複核：`gpt-5.5` 可用，`model_reasoning_effort = "medium"` / `"xhigh"` 皆為支援的 Codex 設定。
-- 三層 Agent 分派維持不變：探索/文件用 `gpt-5.4-mini`，主 Agent 預設用 `gpt-5.5` + `medium`，僅跨專案/跨 repo/最終驗收/高風險收斂升 `xhigh`，工程/測試/review/security 用 `gpt-5.3-codex`。
+- 預設主 Agent 維持 `gpt-5.5` + `medium` reasoning；依官方文件，`medium` 是 GPT-5.5 的平衡起點，`high/xhigh` 只在評估顯示有品質收益時使用。
+- Scoped routing：探索/文件/成本分析/handoff 用 `gpt-5.4-mini` + `medium`；一般實作/測試用 `gpt-5.4` + `medium`；review/security 用 `gpt-5.5` + `high`；跨專案/跨 repo/最終驗收/高風險收斂才升 `gpt-5.5` + `xhigh`。
+- `gpt-5.3-codex` 已從目前主路由退休。
+- `.agents/skills/caveman-compress` 已改用 OpenAI Responses API，預設 `CAVEMAN_MODEL=gpt-5.4-mini`、`CAVEMAN_REASONING_EFFORT=medium`；困難壓縮才手動升 `gpt-5.5`。
 
-## 最新狀態（2026-04-23，模型路由更新）
+## 歷史狀態（2026-04-23，模型路由更新，已被 2026-06-02 scoped routing 取代）
 
 - 預設模型改為 `gpt-5.4`：`.codex/config.toml`、`AGENTS.md`、`AGENTS.full.md`、`README.md` 已同步。
 - 三層 Agent 分派改依先前測試結果：探索/文件用 `gpt-5.4-mini`，主 Agent 用 `gpt-5.4`，工程/測試/review/security 用 `gpt-5.3-codex`。
 - `.codex/agents/*.toml` 已同步：`architecture_explorer` / `docs_researcher` → `gpt-5.4-mini`；`implementer` / `test_writer` / `reviewer` / `security_reviewer` → `gpt-5.3-codex`。
 - `benchmarks/results` 舊碎片報告整併為 `benchmark_results.json` / `benchmark_results.md`，保留 19 JSON + 19 Markdown 來源內容。
 
-## 最新狀態（2026-04-16，load simulator + workspace 優化）
+## 歷史狀態（2026-04-16，load simulator + workspace 優化）
 
 - 新增 `scripts/simulate_codex_load.py`：7 階段本地 Codex 載入模擬，含計時、hook 執行測試、token 估算、優化建議，輸出 JSON + Markdown 報告至 `benchmarks/results/`。
 - 修正 `.agents/skills/caveman-compress/SKILL.md`：`name` 欄位從 `compress` 改為 `caveman-compress`，補入 `Use when` / `Do not use when` section。
@@ -23,7 +24,7 @@
 - 移除 `.claude/` 目錄（Claude Code 專屬 artifact），加入 `.gitignore`。
 - Memory.md 拆分：歷史記錄移至 `docs/reports/memory-history.md`，主檔降至 ~500 tokens。
 
-## 最新狀態（2026-04-16，實際 API benchmark 完成 + README 統整）
+## 歷史狀態（2026-04-16，實際 API benchmark 完成 + README 統整）
 
 - **80 次 live API calls** 完成，4 models × 4 levels × 5 prompts，無 dry-run。
 - `gpt-5.3-codex` 改用 Responses API（`/v1/responses`）測試，成功。
@@ -32,7 +33,7 @@
 - API key 儲存於 `.env.local`（已 gitignore），未推送至 GitHub。
 - 已推送：`origin/codex/integrate-caveman-main-20260416`。
 
-## 最新狀態（2026-04-16，caveman 整合驗證閉環完成）
+## 歷史狀態（2026-04-16，caveman 整合驗證閉環完成）
 
 - 分支：`codex/integrate-caveman-main-20260416`（基於 `claude/codex-workspace-benchmarks-EC65U`）
 - upstream HEAD：`c2ed24b`（`chore: sync SKILL.md copies and auto-activation rules`，2026-04-15）
