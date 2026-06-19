@@ -1,6 +1,10 @@
 __pycache__/
+.pytest_cache/
 *.pyc
+.DS_Store
 .env.local
 .env
 *.env
+*.key
+*.pem
 .claude/
