@@ -1,0 +1,4 @@
+interface:
+  display_name: "ChatGPT 深度 Pilot"
+  short_description: "適用架構與高風險決策的 GPT-5.5 high 深度分析工作流"
+  default_prompt: "使用 $chatgpt-deep-pilot，分析這項決策並明列替代方案、證據與 rollback plan。"

@@ -1,17 +1,5 @@
 {
   "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_note.sh\"",
-            "statusMessage": "載入 Codex workspace 提示"
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -26,24 +14,36 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_note.sh\"",
-            "statusMessage": "整理 Bash 執行後備註"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_validate.sh\"",
+            "statusMessage": "驗證修改檔案語法"
           }
         ]
       }
     ],
-    "UserPromptSubmit": [
+    "PreCompact": [
       {
-        "matcher": ".*",
+        "matcher": "manual|auto",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/user_prompt_submit_caveman.sh\"",
-            "statusMessage": "Caveman per-turn reinforcement"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/context_checkpoint.sh\" pre",
+            "statusMessage": "保存壓縮前工作狀態"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/context_checkpoint.sh\" post",
+            "statusMessage": "恢復壓縮後工作狀態"
           }
         ]
       }
