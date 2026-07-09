@@ -70,7 +70,8 @@ def test_claude_rules_are_mapped_to_codex_project_instructions() -> None:
     assert '## 上下文與 Compact' in text
     assert '## Subagent 與 Multi-Mode' in text
     assert 'Worker 回報是證據，不是完成判定' in text
-    assert '只有使用者明確要求 multi-mode、委派或平行 agent 工作時才啟用' in text
+    assert 'benefit-gated' in text
+    assert '.codex/profiles.json' in text
     for removed in ('CLAUDE.md', 'TodoWrite', 'Haiku', 'Sonnet', 'Opus', '$gate-vote'):
         assert removed not in text
 
@@ -115,6 +116,15 @@ def test_model_routing_is_gpt_55_main_and_gpt_54_worker() -> None:
     assert 'model = "gpt-5.5"' in config
     assert 'model = "gpt-5.4"' in agent
     assert '[agents.multi_mode_agent]' in config
+
+
+def test_v3_profiles_are_available() -> None:
+    profiles = (ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8')
+    profile_ref = (ROOT / '.codex' / 'refs' / 'model-profiles.md').read_text(encoding='utf-8')
+    assert '"schema_version": "the-loop-harness-v3.codex-profiles.1"' in profiles
+    assert '"unverified_success"' in profiles
+    assert 'Model Profiles v3' in profile_ref
+    assert 'the-loop-harness-v3/EVAL-PACK.md' in profile_ref
 
 
 def test_skills_do_not_contain_claude_runtime_syntax() -> None:

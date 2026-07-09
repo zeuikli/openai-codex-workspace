@@ -40,11 +40,14 @@ REQUIRED_MARKERS = {
     'multi-mode-skill': (
         'multi_mode_agent',
         '使用者未明確要求 agent、委派或平行工作時不 spawn',
+        'benefit-gated',
         '`cost`',
         '`quality`',
         '`ceiling`',
         '`frontier`',
         'PROFILE_CONTRACT',
+        'delegation_benefit',
+        'return_schema',
         'scripts/validate_task.py',
         '不得直接叫用 `multi_mode_agent`',
         '主 thread 重跑關鍵驗證',
@@ -56,7 +59,7 @@ GOTCHA_MARKERS = {
     'chatgpt-deep-pilot': ('rollback', '主 thread'),
     'chatgpt-fast-pilot': ('不用擴大 scope', 'git diff --check'),
     'chatgpt-frontier-pilot': ('scope drift', 'rejected-claims ledger'),
-    'multi-mode-skill': ('不得委派', '主 thread 重跑關鍵驗證'),
+    'multi-mode-skill': ('benefit-gated', '主 thread 重跑關鍵驗證'),
 }
 
 

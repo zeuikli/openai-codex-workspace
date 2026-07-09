@@ -1,0 +1,108 @@
+{
+  "schema_version": "the-loop-harness-v3.codex-profiles.1",
+  "source": "the-loop-harness-v3/PROFILES-v3.md",
+  "updated": "2026-07-09",
+  "principles": {
+    "behavior_guidance": "inverse_to_capability",
+    "verification_gate": "proportional_to_capability",
+    "self_reported_success": "unverified_success"
+  },
+  "profiles": {
+    "cost": {
+      "guidance_density": "high",
+      "ask_rate": "ask_before_ambiguous_or_architectural_choices",
+      "diff_soft_limit_lines": 30,
+      "delegation": "terminal_worker",
+      "verification_depth": ["basic_test", "structural_check"],
+      "eval_hack_risk": "low",
+      "unknowns_protocol": "interview_required"
+    },
+    "quality": {
+      "guidance_density": "medium",
+      "ask_rate": "self_decide_small_choices_and_note",
+      "diff_soft_limit_lines": 120,
+      "delegation": "explicit_user_request_and_named_benefit_required",
+      "verification_depth": ["basic_test", "healthcheck_or_key_path_rerun"],
+      "eval_hack_risk": "medium",
+      "unknowns_protocol": "interview_common_blindspot_by_domain"
+    },
+    "ceiling": {
+      "guidance_density": "low",
+      "ask_rate": "self_decide_small_choices_and_note",
+      "diff_soft_limit_lines": 300,
+      "delegation": "explicit_user_request_and_named_benefit_required",
+      "verification_depth": ["basic_test", "cross_review", "key_path_rerun"],
+      "eval_hack_risk": "medium_high",
+      "unknowns_protocol": "blindspot_interview_prototype_by_risk"
+    },
+    "frontier": {
+      "guidance_density": "lowest",
+      "ask_rate": "broader_self_decision_with_scope_and_safety_gates",
+      "diff_soft_limit_lines": null,
+      "delegation": "explicit_user_request_and_named_benefit_required",
+      "verification_depth": ["basic_test", "cross_review", "adversarial_audit"],
+      "eval_hack_risk": "highest",
+      "unknowns_protocol": "autonomous_blindspot_pass"
+    }
+  },
+  "model_mapping": {
+    "main_thread": {
+      "profile": "frontier",
+      "model": "gpt-5.5",
+      "reasoning_effort": "medium",
+      "source": ".codex/config.toml"
+    },
+    "multi_mode_agent": {
+      "profile": "quality",
+      "model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/multi_mode_agent.toml"
+    },
+    "fast_implementer": {
+      "profile": "cost",
+      "model": "gpt-5.4-mini",
+      "reasoning_effort": "low",
+      "source": ".codex/agents/fast_implementer.toml"
+    },
+    "implementer": {
+      "profile": "quality",
+      "model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/implementer.toml"
+    },
+    "reviewer": {
+      "profile": "frontier",
+      "model": "gpt-5.5",
+      "reasoning_effort": "high",
+      "source": ".codex/agents/reviewer.toml"
+    },
+    "security_auditor": {
+      "profile": "frontier",
+      "model": "gpt-5.5",
+      "reasoning_effort": "high",
+      "source": ".codex/agents/security_auditor.toml"
+    },
+    "senior_architect": {
+      "profile": "frontier",
+      "model": "gpt-5.5",
+      "reasoning_effort": "high",
+      "source": ".codex/agents/senior_architect.toml"
+    }
+  },
+  "eval_pack": {
+    "source": "the-loop-harness-v3/EVAL-PACK.md",
+    "fixtures": [
+      "unverified_success",
+      "role_confusion",
+      "scope_creep",
+      "unsafe_delete",
+      "judge_bias",
+      "memory_poison",
+      "eval_hack",
+      "secret_output",
+      "off_rails",
+      "compact_resume"
+    ],
+    "regression_rule": "criteria_passed_delta_and_fail_axes_set"
+  }
+}

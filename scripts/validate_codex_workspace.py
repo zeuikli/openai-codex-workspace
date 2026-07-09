@@ -86,17 +86,19 @@ def validate_workspace(root: Path) -> list[str]:
         'README.md': (
             '## 繁體中文',
             '## English',
+            'The Loop Harness v3',
             '五個 repo-scoped skills',
             'five repo-scoped skills',
             '十三個 project-scoped custom agents',
             'thirteen project-scoped custom agents',
+            '.codex/profiles.json',
             'scripts/validate_task.py',
             'MIT License',
         ),
         'Memory.md': (
             '## 繁體中文',
             '## English',
-            '合約驅動委派',
+            'benefit-gated',
             'contract-driven delegation',
             '待辦與殘餘風險',
             'Remaining Actions and Risks',
@@ -130,8 +132,9 @@ def validate_workspace(root: Path) -> list[str]:
             '## 上下文與 Compact',
             '## Subagent 與 Multi-Mode',
             '五個 `.agents/skills/` 與十三個 `.codex/agents/*.toml`',
-            '只有使用者明確要求 multi-mode、委派或平行 agent 工作時才啟用',
+            'benefit-gated',
             'Worker 回報是證據，不是完成判定',
+            '.codex/profiles.json',
             '跨 session 的架構決策、驗證基線與殘餘風險記入 `Memory.md`',
         ):
             if marker not in agents_text:
@@ -227,6 +230,9 @@ def validate_workspace(root: Path) -> list[str]:
             task_validator = skill_file.parent / 'scripts' / 'validate_task.py'
             if 'scripts/validate_task.py' not in skill_text:
                 errors.append('Multi-mode skill must invoke scripts/validate_task.py')
+            for marker in ('benefit-gated', 'delegation_benefit', 'return_schema', 'unverified_success'):
+                if marker not in skill_text:
+                    errors.append(f'Multi-mode skill missing v3 marker: {marker}')
             if not task_validator.exists():
                 errors.append('Multi-mode skill missing scripts/validate_task.py')
             elif not os.access(task_validator, os.X_OK):
@@ -308,6 +314,36 @@ def validate_workspace(root: Path) -> list[str]:
             errors.append('Missing canonical features.hooks in .codex/config.toml')
         if isinstance(features, dict) and 'multi_agent' in features:
             errors.append('features.multi_agent must remain absent')
+
+    profiles_file = root / '.codex' / 'profiles.json'
+    profiles_ref = root / '.codex' / 'refs' / 'model-profiles.md'
+    if not profiles_ref.exists():
+        errors.append('Missing .codex/refs/model-profiles.md')
+    else:
+        profile_ref_text = profiles_ref.read_text(encoding='utf-8')
+        for marker in ('Model Profiles v3', 'wired SSoT', 'the-loop-harness-v3/EVAL-PACK.md'):
+            if marker not in profile_ref_text:
+                errors.append(f'.codex/refs/model-profiles.md missing marker: {marker}')
+    if not profiles_file.exists():
+        errors.append('Missing .codex/profiles.json')
+    else:
+        try:
+            profiles = json.loads(profiles_file.read_text(encoding='utf-8'))
+        except Exception as exc:
+            errors.append(f'Invalid .codex/profiles.json: {exc}')
+            profiles = {}
+        expected_profiles = {'cost', 'quality', 'ceiling', 'frontier'}
+        actual_profiles = set(profiles.get('profiles', {})) if isinstance(profiles, dict) else set()
+        if actual_profiles != expected_profiles:
+            errors.append('.codex/profiles.json profiles must be cost, quality, ceiling, frontier')
+        if isinstance(profiles, dict):
+            fixtures = profiles.get('eval_pack', {}).get('fixtures', []) if isinstance(profiles.get('eval_pack'), dict) else []
+            for fixture in ('unverified_success', 'role_confusion', 'unsafe_delete', 'eval_hack', 'compact_resume'):
+                if fixture not in fixtures:
+                    errors.append(f'.codex/profiles.json missing eval fixture: {fixture}')
+            mapping = profiles.get('model_mapping', {})
+            if not isinstance(mapping, dict) or 'main_thread' not in mapping or 'multi_mode_agent' not in mapping:
+                errors.append('.codex/profiles.json missing model mapping anchors')
 
     hooks_file = root / '.codex' / 'hooks.json'
     if not hooks_file.exists():
