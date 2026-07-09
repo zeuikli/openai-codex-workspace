@@ -18,7 +18,7 @@ def validate_task(payload: Any) -> list[str]:
     if payload.get('profile') not in PROFILES:
         errors.append('profile must be cost, quality, ceiling, or frontier')
 
-    for key in ('profile_contract', 'goal'):
+    for key in ('profile_contract', 'goal', 'context', 'return_schema', 'delegation_benefit'):
         value = payload.get(key)
         if not isinstance(value, str) or not value.strip():
             errors.append(f'{key} must be a non-empty string')

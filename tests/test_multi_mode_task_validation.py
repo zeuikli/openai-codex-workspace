@@ -23,6 +23,9 @@ def valid_task() -> dict[str, object]:
         'profile': 'ceiling',
         'profile_contract': '比較替代方案並提供 rollback。',
         'goal': '驗證架構選擇。',
+        'context': '讀取架構 ADR 與目前 diff。',
+        'return_schema': 'scope, changes, evidence, open_questions, deviations, residual_risk',
+        'delegation_benefit': '對抗審查',
         'non_goals': ['不修改 production'],
         'allowed_paths': ['src/'],
         'verification': ['pytest -q'],
@@ -37,6 +40,17 @@ def test_missing_profile_contract_fails_closed() -> None:
     task = valid_task()
     task.pop('profile_contract')
     assert 'profile_contract must be a non-empty string' in MODULE.validate_task(task)
+
+
+def test_missing_v3_handoff_fields_fail_closed() -> None:
+    task = valid_task()
+    task.pop('context')
+    task.pop('return_schema')
+    task.pop('delegation_benefit')
+    errors = MODULE.validate_task(task)
+    assert 'context must be a non-empty string' in errors
+    assert 'return_schema must be a non-empty string' in errors
+    assert 'delegation_benefit must be a non-empty string' in errors
 
 
 def test_invalid_profile_is_rejected() -> None:
