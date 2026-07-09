@@ -1,0 +1,4 @@
+interface:
+  display_name: "ChatGPT 平衡 Pilot"
+  short_description: "適用一般多步驟實作與審查的 GPT-5.4 品質成本平衡工作流"
+  default_prompt: "使用 $chatgpt-balanced-pilot，以 checkpoint 和完整 diff review 實作這項任務。"

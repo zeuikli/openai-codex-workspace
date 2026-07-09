@@ -1,0 +1,4 @@
+interface:
+  display_name: "ChatGPT 最高強度 Pilot"
+  short_description: "適用最高強度稽核的 GPT-5.5 xhigh trace-first 雙重驗證工作流"
+  default_prompt: "使用 $chatgpt-frontier-pilot，執行 trace-first 稽核與兩種獨立驗證。"

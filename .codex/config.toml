@@ -1,0 +1,66 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "cached"
+
+[features]
+hooks = true
+
+[agents]
+max_threads = 4
+max_depth = 1
+
+[agents.multi_mode_agent]
+description = "僅供 multi-mode-skill 以已驗證 task envelope 委派的 GPT-5.4 worker"
+config_file = "./agents/multi_mode_agent.toml"
+
+[agents.doc_writer]
+description = "依已驗證變更更新文件"
+config_file = "./agents/doc_writer.toml"
+
+[agents.fast_implementer]
+description = "執行低風險小型程式修改"
+config_file = "./agents/fast_implementer.toml"
+
+[agents.implementer]
+description = "依完整規格實作並驗證"
+config_file = "./agents/implementer.toml"
+
+[agents.memory_compactor]
+description = "保留高價值 anchors 的 Memory 壓縮"
+config_file = "./agents/memory_compactor.toml"
+
+[agents.quick_code_reviewer]
+description = "唯讀單檔正確性審查"
+config_file = "./agents/quick_code_reviewer.toml"
+
+[agents.researcher]
+description = "唯讀 codebase 探索與證據蒐集"
+config_file = "./agents/researcher.toml"
+
+[agents.reviewer]
+description = "唯讀跨模組架構與技術選型審查"
+config_file = "./agents/reviewer.toml"
+
+[agents.security_auditor]
+description = "唯讀完整安全稽核與威脅模型"
+config_file = "./agents/security_auditor.toml"
+
+[agents.security_reviewer]
+description = "唯讀快速安全審查"
+config_file = "./agents/security_reviewer.toml"
+
+[agents.convergence_judge]
+description = "唯讀 Goal 收斂判定"
+config_file = "./agents/convergence_judge.toml"
+
+[agents.test_writer]
+description = "只修改測試路徑的測試實作"
+config_file = "./agents/test_writer.toml"
+
+[agents.senior_architect]
+description = "唯讀 career-informed 架構顧問"
+config_file = "./agents/senior_architect.toml"
