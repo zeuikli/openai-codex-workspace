@@ -10,6 +10,7 @@
   },
   "profiles": {
     "cost": {
+      "contract_id": "the-loop-harness-v3:cost:v1",
       "guidance_density": "high",
       "ask_rate": "ask_before_ambiguous_or_architectural_choices",
       "diff_soft_limit_lines": 30,
@@ -19,6 +20,7 @@
       "unknowns_protocol": "interview_required"
     },
     "quality": {
+      "contract_id": "the-loop-harness-v3:quality:v1",
       "guidance_density": "medium",
       "ask_rate": "self_decide_small_choices_and_note",
       "diff_soft_limit_lines": 120,
@@ -28,6 +30,7 @@
       "unknowns_protocol": "interview_common_blindspot_by_domain"
     },
     "ceiling": {
+      "contract_id": "the-loop-harness-v3:ceiling:v1",
       "guidance_density": "low",
       "ask_rate": "self_decide_small_choices_and_note",
       "diff_soft_limit_lines": 300,
@@ -37,6 +40,7 @@
       "unknowns_protocol": "blindspot_interview_prototype_by_risk"
     },
     "frontier": {
+      "contract_id": "the-loop-harness-v3:frontier:v1",
       "guidance_density": "lowest",
       "ask_rate": "broader_self_decision_with_scope_and_safety_gates",
       "diff_soft_limit_lines": null,
@@ -45,6 +49,44 @@
       "eval_hack_risk": "highest",
       "unknowns_protocol": "autonomous_blindspot_pass"
     }
+  },
+  "delegation": {
+    "routes": {
+      "cost_write": {
+        "profile": "cost",
+        "target_agent": "fast_implementer"
+      },
+      "quality_write": {
+        "profile": "quality",
+        "target_agent": "multi_mode_agent"
+      },
+      "quality_explore": {
+        "profile": "quality",
+        "target_agent": "researcher"
+      },
+      "ceiling_review": {
+        "profile": "ceiling",
+        "target_agent": "reviewer"
+      },
+      "frontier_security_review": {
+        "profile": "frontier",
+        "target_agent": "security_auditor"
+      }
+    },
+    "verifiers": {
+      "workspace_validation": ["python3", "scripts/validate_codex_workspace.py"],
+      "pytest": ["python3", "-m", "pytest", "tests/", "-q"],
+      "diff_check": ["git", "diff", "--check"]
+    }
+  },
+  "migration": {
+    "status": "provisional",
+    "baseline": "gpt-5.5-gpt-5.4@835c353",
+    "evidence_manifest": "the-loop-harness-v3/GPT-5.6-CALIBRATION.json",
+    "comparison_rule": "baseline_plus_gpt56_at_prior_effort_and_one_lower_plus_proposed",
+    "owner": "workspace maintainer",
+    "review_after": "after_5_to_10_representative_tasks",
+    "rollback_signal": "required_fixture_failure_or_verified_task_regression"
   },
   "model_mapping": {
     "main_thread": {

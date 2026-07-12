@@ -18,19 +18,27 @@ EXPECTED_SKILLS = {
 }
 
 EXPECTED_AGENTS = {
-    'convergence_judge': ('gpt-5.6-luna', 'medium', 'read-only'),
-    'doc_writer': ('gpt-5.6-luna', 'medium', 'workspace-write'),
-    'fast_implementer': ('gpt-5.6-luna', 'medium', 'workspace-write'),
-    'implementer': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
-    'memory_compactor': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
-    'multi_mode_agent': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
-    'quick_code_reviewer': ('gpt-5.6-luna', 'xhigh', 'read-only'),
-    'researcher': ('gpt-5.6-terra', 'medium', 'read-only'),
-    'reviewer': ('gpt-5.6-sol', 'medium', 'read-only'),
-    'security_auditor': ('gpt-5.6-sol', 'high', 'read-only'),
-    'security_reviewer': ('gpt-5.6-sol', 'medium', 'read-only'),
-    'senior_architect': ('gpt-5.6-sol', 'medium', 'read-only'),
-    'test_writer': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
+    'convergence_judge': 'read-only',
+    'doc_writer': 'workspace-write',
+    'fast_implementer': 'workspace-write',
+    'implementer': 'workspace-write',
+    'memory_compactor': 'workspace-write',
+    'multi_mode_agent': 'workspace-write',
+    'quick_code_reviewer': 'read-only',
+    'researcher': 'read-only',
+    'reviewer': 'read-only',
+    'security_auditor': 'read-only',
+    'security_reviewer': 'read-only',
+    'senior_architect': 'read-only',
+    'test_writer': 'workspace-write',
+}
+
+EXPECTED_ROUTES = {
+    'cost_write': ('cost', 'fast_implementer'),
+    'quality_write': ('quality', 'multi_mode_agent'),
+    'quality_explore': ('quality', 'researcher'),
+    'ceiling_review': ('ceiling', 'reviewer'),
+    'frontier_security_review': ('frontier', 'security_auditor'),
 }
 
 CLAUDE_RUNTIME_TERMS = (
@@ -77,6 +85,76 @@ def parse_simple_toml(text: str) -> dict[str, object]:
         if key:
             (current if current is not None else data)[key.group(1)] = key.group(2).strip()
     return data
+
+
+def validate_calibration_runs(calibration: object) -> list[str]:
+    if not isinstance(calibration, dict):
+        return ['Calibration manifest must be a JSON object']
+    requirements = calibration.get('requirements')
+    runs = calibration.get('runs')
+    if calibration.get('status') != 'complete' or not isinstance(runs, list) or not 5 <= len(runs) <= 10:
+        return ['Stable migration requires a complete 5-10 task calibration manifest']
+    if not isinstance(requirements, dict):
+        return ['Calibration manifest requirements must be an object']
+
+    required_arms = requirements.get('required_arms')
+    required_metrics = requirements.get('metrics')
+    required_fixtures = requirements.get('required_fixtures')
+    if not all(isinstance(value, list) and value for value in (required_arms, required_metrics, required_fixtures)):
+        return ['Calibration manifest run requirements are incomplete']
+
+    errors: list[str] = []
+    task_ids: set[str] = set()
+    for index, run in enumerate(runs):
+        prefix = f'Calibration runs[{index}]'
+        if not isinstance(run, dict):
+            errors.append(f'{prefix} must be an object')
+            continue
+        task_id = run.get('task_id')
+        if not isinstance(task_id, str) or not task_id.strip():
+            errors.append(f'{prefix} missing task_id')
+        elif task_id in task_ids:
+            errors.append(f'{prefix} duplicates task_id: {task_id}')
+        else:
+            task_ids.add(task_id)
+
+        arms = run.get('arms')
+        if not isinstance(arms, dict) or set(arms) != set(required_arms):
+            errors.append(f'{prefix} arms must match required_arms')
+        else:
+            for arm_name in required_arms:
+                arm = arms.get(arm_name)
+                if not isinstance(arm, dict):
+                    errors.append(f'{prefix} arm {arm_name} must be an object')
+                    continue
+                if not isinstance(arm.get('model'), str) or not isinstance(arm.get('reasoning_effort'), str):
+                    errors.append(f'{prefix} arm {arm_name} missing model or reasoning_effort')
+                metrics = arm.get('metrics')
+                if not isinstance(metrics, dict) or set(metrics) != set(required_metrics):
+                    errors.append(f'{prefix} arm {arm_name} metrics must match requirements')
+                elif any(value is None for value in metrics.values()):
+                    errors.append(f'{prefix} arm {arm_name} metrics must not contain null')
+
+        fixtures = run.get('fixtures')
+        if not isinstance(fixtures, dict) or set(fixtures) != set(required_fixtures):
+            errors.append(f'{prefix} fixtures must match required_fixtures')
+        else:
+            for fixture_name in required_fixtures:
+                fixture = fixtures.get(fixture_name)
+                if (
+                    not isinstance(fixture, dict)
+                    or fixture.get('status') != 'passed'
+                    or not isinstance(fixture.get('evidence'), str)
+                    or not fixture['evidence'].strip()
+                ):
+                    errors.append(f'{prefix} fixture {fixture_name} requires passed status and evidence')
+
+        if run.get('acceptance_decision') != 'promote':
+            errors.append(f'{prefix} acceptance_decision must be promote')
+        artifact_sha256 = run.get('artifact_sha256')
+        if not isinstance(artifact_sha256, str) or re.fullmatch(r'[0-9a-f]{64}', artifact_sha256) is None:
+            errors.append(f'{prefix} artifact_sha256 must be 64 lowercase hex characters')
+    return errors
 
 
 def validate_workspace(root: Path) -> list[str]:
@@ -230,7 +308,16 @@ def validate_workspace(root: Path) -> list[str]:
             task_validator = skill_file.parent / 'scripts' / 'validate_task.py'
             if 'scripts/validate_task.py' not in skill_text:
                 errors.append('Multi-mode skill must invoke scripts/validate_task.py')
-            for marker in ('benefit-gated', 'delegation_benefit', 'return_schema', 'unverified_success'):
+            for marker in (
+                'benefit-gated',
+                'delegation_benefit',
+                'return_schema',
+                'unverified_success',
+                'profile_contract_id',
+                'quality_explore',
+                'ceiling_review',
+                'frontier_security_review',
+            ):
                 if marker not in skill_text:
                     errors.append(f'Multi-mode skill missing v3 marker: {marker}')
             if not task_validator.exists():
@@ -245,6 +332,7 @@ def validate_workspace(root: Path) -> list[str]:
         errors.append(f'Missing required custom agent: {path.as_posix()}')
     for path in sorted(actual_agent_files - expected_agent_files):
         errors.append(f'Unexpected custom agent: {path.as_posix()}')
+    agent_configs: dict[str, dict[str, object]] = {}
     for agent_file in sorted(expected_agent_files & actual_agent_files):
         name = agent_file.stem
         try:
@@ -252,15 +340,17 @@ def validate_workspace(root: Path) -> list[str]:
         except (OSError, tomllib.TOMLDecodeError) as exc:
             errors.append(f'Invalid custom agent TOML {name}: {exc}')
             continue
-        model, effort, sandbox = EXPECTED_AGENTS[name]
+        agent_configs[name] = agent
+        sandbox = EXPECTED_AGENTS[name]
         for key, expected in (
             ('name', name),
-            ('model', model),
-            ('model_reasoning_effort', effort),
             ('sandbox_mode', sandbox),
         ):
             if agent.get(key) != expected:
                 errors.append(f'Custom agent {name} {key} must be {expected}')
+        for key in ('model', 'model_reasoning_effort'):
+            if not isinstance(agent.get(key), str) or not agent[key].strip():
+                errors.append(f'Custom agent {name} missing key: {key}')
         for key in ('description', 'developer_instructions'):
             if not isinstance(agent.get(key), str) or not agent[key].strip():
                 errors.append(f'Custom agent {name} missing key: {key}')
@@ -272,7 +362,7 @@ def validate_workspace(root: Path) -> list[str]:
     multi_mode_agent = agents_dir / 'multi_mode_agent.toml'
     if multi_mode_agent.exists():
         text = multi_mode_agent.read_text(encoding='utf-8')
-        for marker in ('multi-mode-skill/scripts/validate_task.py', 'PROFILE: <name>', 'PROFILE_CONTRACT:'):
+        for marker in ('multi-mode-skill/scripts/validate_task.py', 'ROUTE: quality_write', 'PROFILE_CONTRACT_ID:'):
             if marker not in text:
                 errors.append(f'Custom agent missing contract marker: {marker}')
 
@@ -298,6 +388,11 @@ def validate_workspace(root: Path) -> list[str]:
             'unsafe_delete',
             'compact_resume',
         ),
+        root / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json': (
+            'git:835c353',
+            'compare_gpt56_at_prior_effort_and_one_lower',
+            'representative_task_count',
+        ),
     }
     for path, markers in l4_sources.items():
         if not path.exists():
@@ -309,10 +404,16 @@ def validate_workspace(root: Path) -> list[str]:
                 errors.append(f'L4 harness source {path.name} missing marker: {marker}')
 
     config_file = root / '.codex' / 'config.toml'
+    config_runtime: dict[str, object] = {}
     if not config_file.exists():
         errors.append('Missing .codex/config.toml')
     else:
-        config = parse_simple_toml(config_file.read_text(encoding='utf-8'))
+        config_text = config_file.read_text(encoding='utf-8')
+        config = parse_simple_toml(config_text)
+        try:
+            config_runtime = tomllib.loads(config_text)
+        except tomllib.TOMLDecodeError as exc:
+            errors.append(f'Invalid .codex/config.toml: {exc}')
         for key in ('model', 'model_reasoning_effort', 'approval_policy', 'sandbox_mode'):
             if key not in config:
                 errors.append(f'Missing config key: {key}')
@@ -340,6 +441,7 @@ def validate_workspace(root: Path) -> list[str]:
 
     profiles_file = root / '.codex' / 'profiles.json'
     profiles_ref = root / '.codex' / 'refs' / 'model-profiles.md'
+    profile_ref_text = ''
     if not profiles_ref.exists():
         errors.append('Missing .codex/refs/model-profiles.md')
     else:
@@ -370,13 +472,87 @@ def validate_workspace(root: Path) -> list[str]:
             elif set(mapping) != {'main_thread', *EXPECTED_AGENTS}:
                 errors.append('.codex/profiles.json model_mapping must cover main_thread and every expected agent')
             elif isinstance(mapping, dict):
-                for name, (model, effort, _sandbox) in EXPECTED_AGENTS.items():
+                for name in ('main_thread', *EXPECTED_AGENTS):
                     entry = mapping.get(name, {})
                     if not isinstance(entry, dict):
-                        errors.append(f'.codex/profiles.json missing agent mapping: {name}')
+                        errors.append(f'.codex/profiles.json missing mapping: {name}')
                         continue
-                    if entry.get('model') != model or entry.get('reasoning_effort') != effort:
-                        errors.append(f'.codex/profiles.json mapping mismatch for {name}')
+                    profile = entry.get('profile')
+                    model = entry.get('model')
+                    effort = entry.get('reasoning_effort')
+                    expected_source = '.codex/config.toml' if name == 'main_thread' else f'.codex/agents/{name}.toml'
+                    if profile not in expected_profiles:
+                        errors.append(f'.codex/profiles.json invalid profile for {name}')
+                    if entry.get('source') != expected_source:
+                        errors.append(f'.codex/profiles.json invalid source for {name}')
+                    if not isinstance(model, str) or not isinstance(effort, str):
+                        errors.append(f'.codex/profiles.json missing model or effort for {name}')
+                        continue
+                    if name == 'main_thread':
+                        if config_runtime.get('model') != model or config_runtime.get('model_reasoning_effort') != effort:
+                            errors.append('.codex/profiles.json main_thread mapping mismatch with .codex/config.toml')
+                    else:
+                        agent = agent_configs.get(name, {})
+                        if agent.get('model') != model or agent.get('model_reasoning_effort') != effort:
+                            errors.append(f'.codex/profiles.json mapping mismatch with agent TOML for {name}')
+                    label = 'main thread' if name == 'main_thread' else name
+                    row = f'| {label} | {profile} | `{model}` | `{effort}` |'
+                    if row not in profile_ref_text:
+                        errors.append(f'.codex/refs/model-profiles.md mapping mismatch for {name}')
+
+            delegation = profiles.get('delegation', {})
+            routes = delegation.get('routes', {}) if isinstance(delegation, dict) else {}
+            actual_routes = set(routes) if isinstance(routes, dict) else set()
+            if actual_routes != set(EXPECTED_ROUTES):
+                errors.append('.codex/profiles.json delegation routes must match the allowlist')
+            elif isinstance(mapping, dict):
+                for route_name, (profile, target_agent) in EXPECTED_ROUTES.items():
+                    route = routes.get(route_name, {})
+                    if route != {'profile': profile, 'target_agent': target_agent}:
+                        errors.append(f'.codex/profiles.json invalid delegation route: {route_name}')
+                        continue
+                    target = mapping.get(target_agent, {})
+                    if not isinstance(target, dict) or target.get('profile') != profile:
+                        errors.append(f'.codex/profiles.json route profile mismatch: {route_name}')
+            expected_verifiers = {
+                'workspace_validation': ['python3', 'scripts/validate_codex_workspace.py'],
+                'pytest': ['python3', '-m', 'pytest', 'tests/', '-q'],
+                'diff_check': ['git', 'diff', '--check'],
+            }
+            verifiers = delegation.get('verifiers', {}) if isinstance(delegation, dict) else {}
+            if verifiers != expected_verifiers:
+                errors.append('.codex/profiles.json verifier catalog must match the safe allowlist')
+
+            migration = profiles.get('migration', {})
+            if not isinstance(migration, dict) or migration.get('status') not in {'provisional', 'stable', 'rolled_back'}:
+                errors.append('.codex/profiles.json migration status must be provisional, stable, or rolled_back')
+            elif any(not migration.get(key) for key in ('baseline', 'evidence_manifest', 'comparison_rule', 'owner', 'review_after', 'rollback_signal')):
+                errors.append('.codex/profiles.json migration metadata is incomplete')
+            else:
+                manifest_value = migration['evidence_manifest']
+                manifest_path = Path(manifest_value) if isinstance(manifest_value, str) else Path('/')
+                if manifest_path.is_absolute() or '..' in manifest_path.parts:
+                    errors.append('.codex/profiles.json evidence_manifest must be repo-relative')
+                else:
+                    calibration_file = root / manifest_path
+                    if not calibration_file.exists():
+                        errors.append(f'Missing calibration manifest: {manifest_value}')
+                    else:
+                        try:
+                            calibration = json.loads(calibration_file.read_text(encoding='utf-8'))
+                        except Exception as exc:
+                            errors.append(f'Invalid calibration manifest: {exc}')
+                            calibration = {}
+                        requirements = calibration.get('requirements', {}) if isinstance(calibration, dict) else {}
+                        runs = calibration.get('runs', []) if isinstance(calibration, dict) else []
+                        if requirements.get('representative_task_count') != {'minimum': 5, 'maximum': 10}:
+                            errors.append('Calibration manifest must require 5-10 representative tasks')
+                        if requirements.get('compare_gpt56_at_prior_effort_and_one_lower') is not True:
+                            errors.append('Calibration manifest must compare GPT-5.6 at prior effort and one lower')
+                        if requirements.get('include_proposed_mapping') is not True:
+                            errors.append('Calibration manifest must include the proposed mapping arm')
+                        if migration.get('status') == 'stable':
+                            errors.extend(validate_calibration_runs(calibration))
 
     hooks_file = root / '.codex' / 'hooks.json'
     if not hooks_file.exists():

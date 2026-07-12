@@ -8,7 +8,7 @@
 - 驗證閘門強度與能力成正比。
 - profile 是工作與驗證強度，不代表在目前 thread 內切換模型。
 - 所有模型 ID 與數字門檻集中在 L2；L1 契約維持模型無關。
-- GPT-5.6 路由依官方模型分級與 2026-07-13 任務效益表：Luna 處理日常與高效率工作，Terra 處理廣泛探索的平衡檔，Sol 處理架構、安全與高風險決策。
+- GPT-5.6 路由依官方模型分級與 2026-07-13 任務效益表：Luna 處理日常與高效率工作，Terra 處理廣泛探索的平衡檔，Sol 處理架構、安全與高風險決策。此 mapping 目前是 `provisional`，不是已量測最優解。
 
 ## Profile 校準
 
@@ -24,7 +24,7 @@
 | judge bias 控制 | 單輪 rubric 即可 | 高風險比較盲化身份 + rubric 逐項給分 | + 對調順序一次 + 記錄 position consistency | + 分歧視為任務歧義訊號，交確定性檢查或人裁決 |
 | Unknowns 協議 | Interview 必開 | Interview 常開，Blindspot 視陌生度啟用 | 三構件依風險彈性啟用 | Blindspot 自主，開工前主動掃描使用者可能沒想到要問的事 |
 
-## Current Mapping
+## Provisional Current Mapping
 
 | 角色 | profile | model | reasoning effort | 來源 |
 | --- | --- | --- | --- | --- |
@@ -43,14 +43,30 @@
 | senior_architect | ceiling | `gpt-5.6-sol` | `medium` | `.codex/agents/senior_architect.toml`，2026-07-13 盤點 |
 | security_auditor | frontier | `gpt-5.6-sol` | `high` | `.codex/agents/security_auditor.toml`，2026-07-13 盤點 |
 
+主 thread 的 Luna xhigh 是日常預設，不會依 tiny task 自動降到 medium。Luna medium 只透過 `cost_write` 的 `fast_implementer` 或明確指定模型/effort 的新 thread 使用。
+
+## Multi-Mode Routes
+
+| Route | Profile | Target | Resolved model / effort | Access |
+| --- | --- | --- | --- | --- |
+| `cost_write` | cost | `fast_implementer` | Luna medium | workspace-write |
+| `quality_write` | quality | `multi_mode_agent` | Luna xhigh | workspace-write |
+| `quality_explore` | quality | `researcher` | Terra medium | read-only |
+| `ceiling_review` | ceiling | `reviewer` | Sol medium | read-only |
+| `frontier_security_review` | frontier | `security_auditor` | Sol high | read-only |
+
+Route、canonical contract、model 與 effort 由 `.codex/profiles.json` 解析；task envelope 不得自行指定 agent 或模型。GPT-5.5 只保留為 migration calibration baseline，不在 production mapping 中。
+
 ## 重評流程
 
-1. 以 `the-loop-harness-v3/EVAL-PACK.md` 全部 fixtures 加代表任務組執行。
-2. 產出 `criteria_passed`、`fail_axes`、每項 `fail_category` 與代表任務觀察。
-3. 更新 `.codex/profiles.json`，再同步本檔。
-4. 換代或模型 alias 改變時重跑；沒有 fixture 的重審不得作為行為依據。
+1. 以 `the-loop-harness-v3/GPT-5.6-CALIBRATION.json` 的 baseline、候選任務與 metrics 執行 5-10 個代表任務。
+2. 每個代表任務比較舊模型 baseline、GPT-5.6 在舊 effort、GPT-5.6 低一級，以及不同時的 proposed mapping effort；執行 `the-loop-harness-v3/EVAL-PACK.md` 中可確定性 fixtures，model-dependent fixtures 另存 blind/swapped-order artifact。
+3. 產出 `criteria_passed`、`fail_axes`、`fail_category`、驗證 exit code、latency、provider usage/cost 或 unavailable、retries、escalations 與 residual risk。
+4. 只有 manifest `status=complete` 且 run count 為 5-10 時，validator 才允許 migration 轉為 `stable`。
+5. 更新 `.codex/profiles.json`，再同步本檔；換代或 alias 改變時重跑。
 
 ## 殘餘風險
 
 - `the-loop-harness-v3/PROFILES-v3.md` 原始文字中的 `.claude/**` 對應已映射到 `.codex/**`；若未來導入新的 hook 消費欄位，需先擴充 `.codex/profiles.json` schema 與 validator。
-- 本次已將四個 pilot skill、十三個 custom agent、主線 config 與 validator/test 的模型 mapping 更新到 GPT-5.6 分級；尚未實跑 5-10 個代表任務量測新 mapping 的實際勝率與成本。
+- mapping 仍是 `provisional`；尚未實跑 5-10 個代表任務量測成功率、成本與 latency。
+- `role_confusion`、`judge_bias`、`memory_poison`、`off_rails` 等行為型 fixture 尚無可信 deterministic oracle，不得以 marker test 宣稱完整覆蓋。

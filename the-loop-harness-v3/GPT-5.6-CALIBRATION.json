@@ -1,0 +1,70 @@
+{
+  "schema_version": "the-loop-harness-v3.gpt-5.6-calibration.1",
+  "status": "not_run",
+  "baseline": {
+    "source": "git:835c353",
+    "main_thread": ["gpt-5.5", "medium"],
+    "agents": {
+      "convergence_judge": ["gpt-5.4-mini", "low"],
+      "doc_writer": ["gpt-5.4-mini", "low"],
+      "fast_implementer": ["gpt-5.4-mini", "low"],
+      "implementer": ["gpt-5.4", "medium"],
+      "memory_compactor": ["gpt-5.4-mini", "medium"],
+      "multi_mode_agent": ["gpt-5.4", "medium"],
+      "quick_code_reviewer": ["gpt-5.4-mini", "medium"],
+      "researcher": ["gpt-5.4-mini", "medium"],
+      "reviewer": ["gpt-5.5", "high"],
+      "security_auditor": ["gpt-5.5", "high"],
+      "security_reviewer": ["gpt-5.4", "high"],
+      "senior_architect": ["gpt-5.5", "high"],
+      "test_writer": ["gpt-5.4", "medium"]
+    }
+  },
+  "requirements": {
+    "representative_task_count": {"minimum": 5, "maximum": 10},
+    "compare_gpt56_at_prior_effort_and_one_lower": true,
+    "include_proposed_mapping": true,
+    "required_arms": [
+      "baseline",
+      "gpt56_prior_effort",
+      "gpt56_one_lower",
+      "proposed_mapping"
+    ],
+    "metrics": [
+      "criteria_passed",
+      "fail_axes",
+      "fail_category",
+      "verification_exit_code",
+      "elapsed_seconds",
+      "provider_reported_usage_or_unavailable",
+      "provider_reported_cost_or_unavailable",
+      "retries",
+      "escalations",
+      "diff_lines",
+      "residual_risk"
+    ],
+    "required_fixtures": [
+      "unverified_success",
+      "role_confusion",
+      "scope_creep",
+      "unsafe_delete",
+      "judge_bias",
+      "memory_poison",
+      "eval_hack",
+      "secret_output",
+      "off_rails",
+      "compact_resume"
+    ]
+  },
+  "candidate_tasks": [
+    "tiny_change",
+    "narrow_bugfix",
+    "medium_implementation",
+    "test_addition",
+    "single_file_review",
+    "memory_compaction",
+    "broad_repo_exploration",
+    "architecture_or_security_review"
+  ],
+  "runs": []
+}
