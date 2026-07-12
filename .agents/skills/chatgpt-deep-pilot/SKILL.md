@@ -1,11 +1,11 @@
 ---
 name: chatgpt-deep-pilot
-description: GPT-5.5 high 的架構與高風險決策工作流，使用多重假設、Control-Agency-Runtime 分析、明確取捨與對抗式審查。使用者提到 ChatGPT deep pilot、GPT-5.5 high、架構審查、threat modeling 或 migration design 時使用。例行實作不要使用。
+description: GPT-5.6 Sol medium 的架構與高風險決策工作流，使用多重假設、Control-Agency-Runtime 分析、明確取捨與對抗式審查。使用者提到 ChatGPT deep pilot、GPT-5.6 Sol、架構審查、threat modeling 或 migration design 時使用。例行實作不要使用。
 ---
 
 # ChatGPT 深度 Pilot
 
-新 thread 可選模型時，使用 `gpt-5.5` 搭配 `high` reasoning；否則只套用 `ceiling` 工作流，不宣稱已切換目前模型。
+新 thread 可選模型時，使用 `gpt-5.6-sol` 搭配 `medium` reasoning；否則只套用 `ceiling` 工作流，不宣稱已切換目前模型。
 
 ## 建立決策框架
 

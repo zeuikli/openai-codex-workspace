@@ -1,11 +1,11 @@
 ---
 name: chatgpt-balanced-pilot
-description: GPT-5.4 的品質與成本平衡工作流，適合一般多步驟實作、除錯與合成，包含 decision log、checkpoint、來源驗證與 diff review。使用者提到 ChatGPT balanced pilot、GPT-5.4 routing 或品質模式時使用。快速小改或架構級審查不要使用。
+description: GPT-5.6 Luna xhigh 的日常主力工作流，適合一般多步驟實作、除錯與合成，包含 decision log、checkpoint、來源驗證與 diff review。使用者提到 ChatGPT balanced pilot、GPT-5.6 Luna routing 或品質模式時使用。快速小改或架構級審查不要使用。
 ---
 
 # ChatGPT 平衡 Pilot
 
-新 thread 或 agent 可選模型時，使用 `gpt-5.4` 搭配 `medium` reasoning；否則只套用 `quality` 工作流，不宣稱已切換目前模型。
+新 thread 或 agent 可選模型時，使用 `gpt-5.6-luna` 搭配 `xhigh` reasoning；否則只套用 `quality` 工作流，不宣稱已切換目前模型。
 
 ## 開工前
 

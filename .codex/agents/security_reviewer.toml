@@ -1,8 +1,8 @@
 name = "security_reviewer"
 description = "唯讀快速檢查 auth、payment、user-data 變更中的注入、授權與秘密暴露。"
 nickname_candidates = ["Guard", "Check", "Lock"]
-model = "gpt-5.4"
-model_reasoning_effort = "high"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 developer_instructions = """
 你是窄範圍安全 reviewer。審查指定 diff 與相關完整檔案，聚焦 injection、authentication、authorization、secret exposure、unsafe dependency/config。

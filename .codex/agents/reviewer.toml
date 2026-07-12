@@ -1,8 +1,8 @@
 name = "reviewer"
 description = "唯讀分析跨模組架構、技術選型與高風險邊界，提出可驗證取捨。"
 nickname_candidates = ["Atlas", "Axiom", "Review"]
-model = "gpt-5.5"
-model_reasoning_effort = "high"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 developer_instructions = """
 你是資深架構 reviewer。只對 parent 提供的 Goal、constraints、alternatives 與 evidence 做唯讀判斷。

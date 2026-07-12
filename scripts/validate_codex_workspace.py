@@ -18,19 +18,19 @@ EXPECTED_SKILLS = {
 }
 
 EXPECTED_AGENTS = {
-    'convergence_judge': ('gpt-5.4-mini', 'low', 'read-only'),
-    'doc_writer': ('gpt-5.4-mini', 'low', 'workspace-write'),
-    'fast_implementer': ('gpt-5.4-mini', 'low', 'workspace-write'),
-    'implementer': ('gpt-5.4', 'medium', 'workspace-write'),
-    'memory_compactor': ('gpt-5.4-mini', 'medium', 'workspace-write'),
-    'multi_mode_agent': ('gpt-5.4', 'medium', 'workspace-write'),
-    'quick_code_reviewer': ('gpt-5.4-mini', 'medium', 'read-only'),
-    'researcher': ('gpt-5.4-mini', 'medium', 'read-only'),
-    'reviewer': ('gpt-5.5', 'high', 'read-only'),
-    'security_auditor': ('gpt-5.5', 'high', 'read-only'),
-    'security_reviewer': ('gpt-5.4', 'high', 'read-only'),
-    'senior_architect': ('gpt-5.5', 'high', 'read-only'),
-    'test_writer': ('gpt-5.4', 'medium', 'workspace-write'),
+    'convergence_judge': ('gpt-5.6-luna', 'medium', 'read-only'),
+    'doc_writer': ('gpt-5.6-luna', 'medium', 'workspace-write'),
+    'fast_implementer': ('gpt-5.6-luna', 'medium', 'workspace-write'),
+    'implementer': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
+    'memory_compactor': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
+    'multi_mode_agent': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
+    'quick_code_reviewer': ('gpt-5.6-luna', 'xhigh', 'read-only'),
+    'researcher': ('gpt-5.6-terra', 'medium', 'read-only'),
+    'reviewer': ('gpt-5.6-sol', 'medium', 'read-only'),
+    'security_auditor': ('gpt-5.6-sol', 'high', 'read-only'),
+    'security_reviewer': ('gpt-5.6-sol', 'medium', 'read-only'),
+    'senior_architect': ('gpt-5.6-sol', 'medium', 'read-only'),
+    'test_writer': ('gpt-5.6-luna', 'xhigh', 'workspace-write'),
 }
 
 CLAUDE_RUNTIME_TERMS = (
@@ -285,6 +285,29 @@ def validate_workspace(root: Path) -> list[str]:
             if f'## {phase}' not in loop_text:
                 errors.append(f'Harness The Loop missing phase: {phase}')
 
+    l4_sources = {
+        root / 'the-loop-harness-v3' / 'PROFILES-v3.md': (
+            'GPT-5.6 Routing',
+            'gpt-5.6-luna',
+            'gpt-5.6-terra',
+            'gpt-5.6-sol',
+        ),
+        root / 'the-loop-harness-v3' / 'EVAL-PACK.md': (
+            'unverified_success',
+            'role_confusion',
+            'unsafe_delete',
+            'compact_resume',
+        ),
+    }
+    for path, markers in l4_sources.items():
+        if not path.exists():
+            errors.append(f'Missing L4 harness source: {path.as_posix()}')
+            continue
+        text = path.read_text(encoding='utf-8')
+        for marker in markers:
+            if marker not in text:
+                errors.append(f'L4 harness source {path.name} missing marker: {marker}')
+
     config_file = root / '.codex' / 'config.toml'
     if not config_file.exists():
         errors.append('Missing .codex/config.toml')
@@ -344,6 +367,16 @@ def validate_workspace(root: Path) -> list[str]:
             mapping = profiles.get('model_mapping', {})
             if not isinstance(mapping, dict) or 'main_thread' not in mapping or 'multi_mode_agent' not in mapping:
                 errors.append('.codex/profiles.json missing model mapping anchors')
+            elif set(mapping) != {'main_thread', *EXPECTED_AGENTS}:
+                errors.append('.codex/profiles.json model_mapping must cover main_thread and every expected agent')
+            elif isinstance(mapping, dict):
+                for name, (model, effort, _sandbox) in EXPECTED_AGENTS.items():
+                    entry = mapping.get(name, {})
+                    if not isinstance(entry, dict):
+                        errors.append(f'.codex/profiles.json missing agent mapping: {name}')
+                        continue
+                    if entry.get('model') != model or entry.get('reasoning_effort') != effort:
+                        errors.append(f'.codex/profiles.json mapping mismatch for {name}')
 
     hooks_file = root / '.codex' / 'hooks.json'
     if not hooks_file.exists():
