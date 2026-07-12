@@ -2,6 +2,16 @@
 
 ## 繁體中文
 
+### 最後紀錄（2026-07-13，多模型對抗校準）
+
+- 使用者明確要求以 `gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna` 與 `gpt-5.5` 互相攻擊、審閱與修正 Harness。四個隔離 reviewer 分別以 Sol high、Terra medium、Luna xhigh 與 GPT-5.5 high 執行唯讀審閱，再以四種不同順序做匿名候選修正交叉審閱；worker 結果只作中間證據，主 thread 以檔案與測試重驗。
+- 已修正 `multi-mode-skill` 原本只會 spawn Luna `multi_mode_agent`、卻宣稱可升級 Terra/Sol 的不可達 routing。`.codex/profiles.json` 現在以受限 route ID 解析 `cost_write`、`quality_write`、`quality_explore`、`ceiling_review` 與 `frontier_security_review`；task caller 不能自行指定 agent、model 或 effort。
+- `validate_task.py` 現在驗證 route/profile/canonical contract、完整 Done contract、repo-relative paths、write route 的 control-plane/Memory/secret path 禁止與 verifier ID allowlist，並輸出完整 resolved dispatch。這是 mechanical input gate；host-level spawn 與實際模型身分仍需 runtime 回報，不由 repo validator 冒充證明。
+- GPT-5.6 mapping 已標記為 `provisional`。新增 `the-loop-harness-v3/GPT-5.6-CALIBRATION.json` 保存 commit `835c353` 的 GPT-5.5/5.4 baseline，要求 5-10 個代表任務比較舊 baseline、GPT-5.6 舊 effort、低一級與 proposed mapping。Stable promotion 需逐 run 驗證四個 arms、全部 metrics/fixtures、evidence hash 與 promote decision；五個空 run 會 fail closed。
+- `.codex/profiles.json` 現在會和 main config、十三個 agent TOML、profile/source 欄位與人讀 mapping table 雙向核對；validator 不再以另一份 model/effort hard-coded table 自我背書。
+- 驗證：`python3 -m pytest tests/ -q` 為 `49 passed`；`python3 scripts/validate_codex_workspace.py`、合法 Terra route envelope smoke、官方 `quick_validate.py`、`git diff --check` 與三支 hook `bash -n` 均通過。`bash -n` 仍有本機 `LC_ALL=C.UTF-8` locale warning。
+- 殘餘風險：尚未執行 calibration manifest 的 5-10 個真實代表任務，因此不能宣稱 Luna/Terra/Sol mapping 已證明更快、更省或更準。`role_confusion`、`judge_bias`、`memory_poison`、`off_rails` 等 model-dependent fixtures 仍需可保存 artifact 的 runtime eval 或人工 oracle。
+
 ### 最後紀錄（2026-07-13）
 
 - 已依 OpenAI GPT-5.6 官方模型分級與使用者提供的任務效益表，將主線、五個 pilot skills、`multi-mode-skill`、十三個 custom agents、`.codex/profiles.json`、`.codex/refs/model-profiles.md`、README、validator 與測試的模型 mapping 從 GPT-5.4/5.5 更新為 GPT-5.6。
@@ -41,6 +51,16 @@
 - 無新增待辦；需保留或刪除舊 stash 可由使用者後續決定。
 
 ## English
+
+### Last Record (2026-07-13, multi-model adversarial calibration)
+
+- The user explicitly requested mutual attack, review, and revision using `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and `gpt-5.5`. Four isolated read-only reviewers used Sol high, Terra medium, Luna xhigh, and GPT-5.5 high, followed by a blinded candidate cross-review in four different orders. Worker reports remained intermediate evidence; the main thread revalidated files and tests.
+- Fixed the unreachable escalation in `multi-mode-skill`, which always spawned the Luna `multi_mode_agent` while claiming Terra/Sol escalation. `.codex/profiles.json` now resolves constrained route IDs for `cost_write`, `quality_write`, `quality_explore`, `ceiling_review`, and `frontier_security_review`; callers cannot select agent, model, or effort directly.
+- `validate_task.py` now validates route/profile/canonical contract, the complete Done contract, repo-relative paths, write-route exclusions for control-plane/Memory/secret paths, and verifier IDs, then emits a complete resolved dispatch. This is a mechanical input gate; host-level spawning and actual model identity still require runtime reporting and are not claimed as repo-validator proof.
+- The GPT-5.6 mapping is now `provisional`. New `the-loop-harness-v3/GPT-5.6-CALIBRATION.json` preserves the GPT-5.5/5.4 baseline from commit `835c353` and requires 5-10 representative tasks comparing the old baseline, GPT-5.6 at the prior effort, one lower effort, and the proposed mapping. Stable promotion validates four arms, all metrics/fixtures, an evidence hash, and a promote decision for every run; five empty runs fail closed.
+- `.codex/profiles.json` is now checked bidirectionally against the main config, all thirteen agent TOMLs, profile/source fields, and the human mapping table. The validator no longer self-endorses model/effort choices through a second hard-coded mapping table.
+- Validation: `python3 -m pytest tests/ -q` reports `49 passed`; workspace validation, a valid Terra route-envelope smoke, official `quick_validate.py`, `git diff --check`, and `bash -n` for all three hooks pass. `bash -n` still emits the local `LC_ALL=C.UTF-8` locale warning.
+- Residual risk: the 5-10 real representative calibration tasks have not been run, so the Luna/Terra/Sol mapping is not proven faster, cheaper, or more accurate. Model-dependent fixtures such as `role_confusion`, `judge_bias`, `memory_poison`, and `off_rails` still need artifact-backed runtime evaluation or a human oracle.
 
 ### Last Record (2026-07-13)
 

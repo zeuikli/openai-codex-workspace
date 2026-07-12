@@ -1,6 +1,13 @@
+import json
+import shutil
 from pathlib import Path
 
-from scripts.validate_codex_workspace import EXPECTED_AGENTS, EXPECTED_SKILLS, validate_workspace
+from scripts.validate_codex_workspace import (
+    EXPECTED_AGENTS,
+    EXPECTED_SKILLS,
+    validate_calibration_runs,
+    validate_workspace,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,11 +43,13 @@ def test_only_expected_custom_agents_exist() -> None:
 
 def test_custom_agents_are_mapped_and_use_expected_models_and_sandboxes() -> None:
     config = (ROOT / '.codex' / 'config.toml').read_text(encoding='utf-8')
-    for name, (model, effort, sandbox) in EXPECTED_AGENTS.items():
+    profiles = json.loads((ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8'))
+    for name, sandbox in EXPECTED_AGENTS.items():
+        mapping = profiles['model_mapping'][name]
         text = (ROOT / '.codex' / 'agents' / f'{name}.toml').read_text(encoding='utf-8')
         assert f'name = "{name}"' in text
-        assert f'model = "{model}"' in text
-        assert f'model_reasoning_effort = "{effort}"' in text
+        assert f'model = "{mapping["model"]}"' in text
+        assert f'model_reasoning_effort = "{mapping["reasoning_effort"]}"' in text
         assert f'sandbox_mode = "{sandbox}"' in text
         assert 'developer_instructions = """' in text
         assert f'[agents.{name}]' in config
@@ -138,6 +147,62 @@ def test_v3_profiles_are_available() -> None:
     assert 'the-loop-harness-v3/EVAL-PACK.md' in profile_ref
     for name in ('convergence_judge', 'doc_writer', 'security_reviewer', 'test_writer'):
         assert f'"{name}"' in profiles
+
+
+def copy_workspace(tmp_path: Path) -> Path:
+    target = tmp_path / 'workspace'
+    shutil.copytree(ROOT, target, ignore=shutil.ignore_patterns('.git', '.pytest_cache', '__pycache__'))
+    return target
+
+
+def test_validator_rejects_main_thread_mapping_drift(tmp_path: Path) -> None:
+    target = copy_workspace(tmp_path)
+    config = target / '.codex' / 'config.toml'
+    config.write_text(
+        config.read_text(encoding='utf-8').replace('model = "gpt-5.6-luna"', 'model = "gpt-5.6-sol"', 1),
+        encoding='utf-8',
+    )
+    errors = validate_workspace(target)
+    assert '.codex/profiles.json main_thread mapping mismatch with .codex/config.toml' in errors
+
+
+def test_validator_rejects_route_and_human_mapping_drift(tmp_path: Path) -> None:
+    target = copy_workspace(tmp_path)
+    profiles_file = target / '.codex' / 'profiles.json'
+    profiles = json.loads(profiles_file.read_text(encoding='utf-8'))
+    profiles['delegation']['routes']['quality_explore']['target_agent'] = 'multi_mode_agent'
+    profiles_file.write_text(json.dumps(profiles, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    profile_ref = target / '.codex' / 'refs' / 'model-profiles.md'
+    profile_ref.write_text(
+        profile_ref.read_text(encoding='utf-8').replace('| researcher | quality |', '| researcher | ceiling |'),
+        encoding='utf-8',
+    )
+    errors = validate_workspace(target)
+    assert '.codex/profiles.json invalid delegation route: quality_explore' in errors
+    assert '.codex/refs/model-profiles.md mapping mismatch for researcher' in errors
+
+
+def test_validator_rejects_stable_migration_without_calibration(tmp_path: Path) -> None:
+    target = copy_workspace(tmp_path)
+    profiles_file = target / '.codex' / 'profiles.json'
+    profiles = json.loads(profiles_file.read_text(encoding='utf-8'))
+    profiles['migration']['status'] = 'stable'
+    profiles_file.write_text(json.dumps(profiles, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    errors = validate_workspace(target)
+    assert 'Stable migration requires a complete 5-10 task calibration manifest' in errors
+
+
+def test_calibration_rejects_empty_completed_runs() -> None:
+    calibration = json.loads(
+        (ROOT / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json').read_text(encoding='utf-8')
+    )
+    calibration['status'] = 'complete'
+    calibration['runs'] = [{} for _ in range(5)]
+    errors = validate_calibration_runs(calibration)
+    assert 'Calibration runs[0] missing task_id' in errors
+    assert 'Calibration runs[0] arms must match required_arms' in errors
+    assert 'Calibration runs[0] fixtures must match required_fixtures' in errors
+    assert 'Calibration runs[0] artifact_sha256 must be 64 lowercase hex characters' in errors
 
 
 def test_skills_do_not_contain_claude_runtime_syntax() -> None:

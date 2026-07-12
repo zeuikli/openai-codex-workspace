@@ -10,10 +10,11 @@
 
 模型路由：
 
-- 主線：`gpt-5.6-luna` + `xhigh`
-- Worker：`multi_mode_agent`，固定 `gpt-5.6-luna` + `xhigh`
+- 主線：provisional `gpt-5.6-luna` + `xhigh` 日常預設；不會依 tiny task 自動降 effort
+- Write routes：`cost_write` 使用 Luna medium；`quality_write` 使用 Luna xhigh
+- Read-only routes：`quality_explore` 使用 Terra medium；`ceiling_review` 使用 Sol medium；`frontier_security_review` 使用 Sol high
 - Router skill：`.agents/skills/multi-mode-skill/SKILL.md`
-- Escalation：微小變更用 Luna medium；一般 bug fix 與明確功能用 Luna xhigh；廣泛探索可用 Terra medium；架構、auth、migration 與高風險任務用 Sol medium；前一步失敗或最高風險稽核用 Sol high。
+- GPT-5.5：只保留為 migration calibration baseline，不在 production agent mapping 中。
 
 ### Skills 與 Agent
 
@@ -24,7 +25,7 @@
 
 十三個 custom agents 依角色採用 `gpt-5.6-luna`、`gpt-5.6-terra` 或 `gpt-5.6-sol`。研究、審查、安全與架構角色固定 `read-only`；實作、測試、文件、Memory 壓縮與 multi-mode worker 使用 `workspace-write`。
 
-`multi-mode-skill` 使用 benefit-gated 合約驅動委派。必須先有明確使用者要求與具名效益，再以 `scripts/validate_task.py` 驗證完整 task envelope；不支援直接叫用 worker。Worker 回報是證據，不是完成判定，主 thread 必須重跑關鍵驗證。
+`multi-mode-skill` 使用 benefit-gated 合約驅動委派。必須先有明確使用者要求與具名效益，再以 `scripts/validate_task.py` 驗證 route、canonical contract、repo-relative paths 與 verifier IDs；不支援直接叫用 route target。Worker 回報是證據，不是完成判定，主 thread 必須重跑關鍵驗證。
 
 ### 核心結構
 
@@ -73,10 +74,11 @@ Its sole L1 execution contract is [Harness The Loop v3](HARNESS-THE-LOOP.md): `O
 
 Model routing:
 
-- Main thread: `gpt-5.6-luna` + `xhigh`
-- Worker: `multi_mode_agent`, fixed to `gpt-5.6-luna` + `xhigh`
+- Main thread: provisional `gpt-5.6-luna` + `xhigh` daily default; tiny tasks do not automatically lower effort
+- Write routes: Luna medium through `cost_write`; Luna xhigh through `quality_write`
+- Read-only routes: Terra medium through `quality_explore`; Sol medium through `ceiling_review`; Sol high through `frontier_security_review`
 - Router skill: `.agents/skills/multi-mode-skill/SKILL.md`
-- Escalation: use Luna medium for tiny changes; Luna xhigh for general bug fixes and clear features; Terra medium for broad exploration; Sol medium for architecture, auth, migrations, and high-risk work; Sol high after a failed prior step or for maximum-risk audits.
+- GPT-5.5 is retained only as the migration calibration baseline, not as a production agent mapping.
 
 ### Skills and Agents
 
@@ -87,7 +89,7 @@ Only five skills are retained:
 
 The thirteen custom agents use `gpt-5.6-luna`, `gpt-5.6-terra`, or `gpt-5.6-sol` according to role. Research, review, security, and architecture roles are fixed to `read-only`; implementation, test, documentation, memory-compaction, and multi-mode workers use `workspace-write`.
 
-`multi-mode-skill` uses benefit-gated contract-driven delegation. Delegation requires an explicit user request plus a named benefit, then `scripts/validate_task.py` must validate the complete task envelope; direct worker invocation is unsupported. Worker output is evidence, not completion, and the main thread must rerun key verification.
+`multi-mode-skill` uses benefit-gated contract-driven delegation. Delegation requires an explicit user request plus a named benefit, then `scripts/validate_task.py` validates the route, canonical contract, repo-relative paths, and verifier IDs; direct route-target invocation is unsupported. Worker output is evidence, not completion, and the main thread must rerun key verification.
 
 ### Core Layout
 
