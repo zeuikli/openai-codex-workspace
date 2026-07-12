@@ -132,7 +132,11 @@ def test_write_route_requires_exact_change_and_blocks_control_paths() -> None:
     assert 'exact_change must be a non-empty string for write routes' in MODULE.validate_task(task)
     task['exact_change'] = 'Rename one local symbol without behavior change.'
     assert MODULE.validate_task(task) == []
-    for path in ('.codex/profiles.json', 'Memory.md', '.env.local', 'secrets/token.txt', 'certs/client.pem'):
+    for path in (
+        '.codex/profiles.json', 'Memory.md', '.env.local', 'secrets/token.txt',
+        'certs/client.pem', '.npmrc', '.netrc', '.ssh/id_rsa',
+        'config/service-account.json', 'auth/token.json',
+    ):
         task['allowed_paths'] = [path]
         assert any('write route cannot target' in error for error in MODULE.validate_task(task)), path
 

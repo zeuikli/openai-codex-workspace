@@ -25,7 +25,7 @@
 
 十三個 custom agents 依角色採用 `gpt-5.6-luna`、`gpt-5.6-terra` 或 `gpt-5.6-sol`。研究、審查、安全與架構角色固定 `read-only`；實作、測試、文件、Memory 壓縮與 multi-mode worker 使用 `workspace-write`。
 
-`multi-mode-skill` 使用 benefit-gated 合約驅動委派。必須先有明確使用者要求與具名效益，再以 `scripts/validate_task.py` 驗證 route、canonical contract、repo-relative paths 與 verifier IDs；不支援直接叫用 route target。Worker 回報是證據，不是完成判定，主 thread 必須重跑關鍵驗證。
+`multi-mode-skill` 使用 benefit-gated 合約驅動委派。必須先有明確使用者要求與具名效益，再以 `scripts/validate_task.py` 驗證 route、canonical contract、repo-relative paths 與 verifier IDs；直接 agent invocation 不具 route 保證。Worker 回報是證據，不是完成判定，主 thread 必須重跑關鍵驗證。
 
 ### 核心結構
 
@@ -89,7 +89,7 @@ Only five skills are retained:
 
 The thirteen custom agents use `gpt-5.6-luna`, `gpt-5.6-terra`, or `gpt-5.6-sol` according to role. Research, review, security, and architecture roles are fixed to `read-only`; implementation, test, documentation, memory-compaction, and multi-mode workers use `workspace-write`.
 
-`multi-mode-skill` uses benefit-gated contract-driven delegation. Delegation requires an explicit user request plus a named benefit, then `scripts/validate_task.py` validates the route, canonical contract, repo-relative paths, and verifier IDs; direct route-target invocation is unsupported. Worker output is evidence, not completion, and the main thread must rerun key verification.
+`multi-mode-skill` uses benefit-gated contract-driven delegation. Delegation requires an explicit user request plus a named benefit, then `scripts/validate_task.py` validates the route, canonical contract, repo-relative paths, and verifier IDs; direct agent invocation has no route guarantee. Worker output is evidence, not completion, and the main thread must rerun key verification.
 
 ### Core Layout
 

@@ -13,9 +13,17 @@ ROOT = Path(__file__).resolve().parents[4]
 PROFILES_FILE = ROOT / '.codex' / 'profiles.json'
 PATH_META_RE = re.compile(r'[\\*?{}\[\]$`;&|<>\x00-\x1f]')
 WRITE_ROUTES = {'cost_write', 'quality_write'}
-PROTECTED_ROOTS = {'.git', '.codex', '.agents', 'the-loop-harness-v3'}
+PROTECTED_ROOTS = {
+    '.agents', '.aws', '.azure', '.config', '.git', '.kube', '.ssh',
+    '.codex', 'the-loop-harness-v3',
+}
 PROTECTED_FILES = {'AGENTS.md', 'HARNESS-THE-LOOP.md', 'Memory.md'}
 SECRET_SUFFIXES = {'.key', '.pem', '.p12', '.pfx', '.crt', '.cer'}
+SECRET_FILES = {
+    '.netrc', '.npmrc', '.pypirc', 'auth.json', 'credentials.json',
+    'id_ed25519', 'id_rsa', 'service-account.json', 'token.json',
+}
+SECRET_NAME_RE = re.compile(r'(^|[-_.])(credential|password|private[-_]?key|secret|token)([-_.]|$)', re.I)
 
 
 def load_profiles() -> dict[str, Any]:
@@ -86,7 +94,12 @@ def validate_allowed_path(raw_path: str, route: str | None) -> str | None:
             return f'write route cannot target protected control path: {raw_path}'
         if any(part.startswith('.env') for part in path.parts):
             return f'write route cannot target secret path: {raw_path}'
-        if path.suffix.lower() in SECRET_SUFFIXES or lowered_parts & {'credentials', 'secrets', 'private-keys'}:
+        if (
+            basename.lower() in SECRET_FILES
+            or path.suffix.lower() in SECRET_SUFFIXES
+            or lowered_parts & {'credentials', 'secrets', 'private-keys'}
+            or SECRET_NAME_RE.search(basename)
+        ):
             return f'write route cannot target secret path: {raw_path}'
     return None
 

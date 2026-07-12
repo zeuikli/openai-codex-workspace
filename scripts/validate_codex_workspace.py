@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -39,6 +40,49 @@ EXPECTED_ROUTES = {
     'quality_explore': ('quality', 'researcher'),
     'ceiling_review': ('ceiling', 'reviewer'),
     'frontier_security_review': ('frontier', 'security_auditor'),
+}
+
+EXPECTED_HARNESS_EVALS = {
+    'unverified_success',
+    'role_confusion',
+    'scope_creep',
+    'unsafe_delete',
+    'judge_bias',
+    'memory_poison',
+    'eval_hack',
+    'secret_output',
+    'off_rails',
+    'compact_resume',
+}
+
+CALIBRATION_ARMS = {
+    'baseline',
+    'gpt56_prior_effort',
+    'gpt56_one_lower',
+    'proposed_mapping',
+}
+
+CALIBRATION_METRICS = {
+    'criteria_passed',
+    'fail_axes',
+    'fail_category',
+    'verification_exit_code',
+    'elapsed_seconds',
+    'provider_reported_usage_or_unavailable',
+    'provider_reported_cost_or_unavailable',
+    'retries',
+    'escalations',
+    'diff_lines',
+    'residual_risk',
+}
+
+LOWER_EFFORT = {
+    'low': 'none',
+    'medium': 'low',
+    'high': 'medium',
+    'xhigh': 'high',
+    'max': 'xhigh',
+    'ultra': 'max',
 }
 
 CLAUDE_RUNTIME_TERMS = (
@@ -87,7 +131,11 @@ def parse_simple_toml(text: str) -> dict[str, object]:
     return data
 
 
-def validate_calibration_runs(calibration: object) -> list[str]:
+def validate_calibration_runs(
+    calibration: object,
+    candidate_mapping: object | None = None,
+    root: Path | None = None,
+) -> list[str]:
     if not isinstance(calibration, dict):
         return ['Calibration manifest must be a JSON object']
     requirements = calibration.get('requirements')
@@ -100,8 +148,19 @@ def validate_calibration_runs(calibration: object) -> list[str]:
     required_arms = requirements.get('required_arms')
     required_metrics = requirements.get('metrics')
     required_fixtures = requirements.get('required_fixtures')
-    if not all(isinstance(value, list) and value for value in (required_arms, required_metrics, required_fixtures)):
-        return ['Calibration manifest run requirements are incomplete']
+    if set(required_arms or ()) != CALIBRATION_ARMS:
+        return ['Calibration required_arms must match the pinned validator contract']
+    if set(required_metrics or ()) != CALIBRATION_METRICS:
+        return ['Calibration metrics must match the pinned validator contract']
+    if set(required_fixtures or ()) != EXPECTED_HARNESS_EVALS:
+        return ['Calibration required_fixtures must match the minimum eval pack']
+    if not isinstance(candidate_mapping, dict):
+        return ['Stable migration requires the candidate model mapping']
+
+    baseline = calibration.get('baseline')
+    baseline_agents = baseline.get('agents') if isinstance(baseline, dict) else None
+    if not isinstance(baseline, dict) or not isinstance(baseline_agents, dict):
+        return ['Calibration baseline mapping is incomplete']
 
     errors: list[str] = []
     task_ids: set[str] = set()
@@ -118,6 +177,25 @@ def validate_calibration_runs(calibration: object) -> list[str]:
         else:
             task_ids.add(task_id)
 
+        target = run.get('target')
+        if target == 'main_thread':
+            baseline_pair = baseline.get('main_thread')
+        elif isinstance(target, str):
+            baseline_pair = baseline_agents.get(target)
+        else:
+            baseline_pair = None
+        candidate = candidate_mapping.get(target) if isinstance(target, str) else None
+        if (
+            not isinstance(target, str)
+            or not isinstance(baseline_pair, list)
+            or len(baseline_pair) != 2
+            or not all(isinstance(value, str) for value in baseline_pair)
+            or not isinstance(candidate, dict)
+        ):
+            errors.append(f'{prefix} target must resolve in baseline and candidate mappings')
+            baseline_pair = None
+            candidate = None
+
         arms = run.get('arms')
         if not isinstance(arms, dict) or set(arms) != set(required_arms):
             errors.append(f'{prefix} arms must match required_arms')
@@ -132,8 +210,33 @@ def validate_calibration_runs(calibration: object) -> list[str]:
                 metrics = arm.get('metrics')
                 if not isinstance(metrics, dict) or set(metrics) != set(required_metrics):
                     errors.append(f'{prefix} arm {arm_name} metrics must match requirements')
-                elif any(value is None for value in metrics.values()):
-                    errors.append(f'{prefix} arm {arm_name} metrics must not contain null')
+                else:
+                    integer_metrics = ('verification_exit_code', 'retries', 'escalations', 'diff_lines')
+                    list_metrics = ('criteria_passed', 'fail_axes', 'residual_risk')
+                    if any(type(metrics[name]) is not int for name in integer_metrics):
+                        errors.append(f'{prefix} arm {arm_name} integer metrics must be integers')
+                    if not isinstance(metrics['elapsed_seconds'], (int, float)) or isinstance(metrics['elapsed_seconds'], bool):
+                        errors.append(f'{prefix} arm {arm_name} elapsed_seconds must be numeric')
+                    if any(not isinstance(metrics[name], list) for name in list_metrics):
+                        errors.append(f'{prefix} arm {arm_name} list metrics must be arrays')
+                    if not isinstance(metrics['fail_category'], str):
+                        errors.append(f'{prefix} arm {arm_name} fail_category must be a string')
+                    for name in ('provider_reported_usage_or_unavailable', 'provider_reported_cost_or_unavailable'):
+                        if not isinstance(metrics[name], (str, int, float, dict)) or isinstance(metrics[name], bool):
+                            errors.append(f'{prefix} arm {arm_name} {name} has an invalid type')
+
+            if baseline_pair is not None and candidate is not None:
+                expected_arms = {
+                    'baseline': tuple(baseline_pair),
+                    'gpt56_prior_effort': (candidate.get('model'), baseline_pair[1]),
+                    'gpt56_one_lower': (candidate.get('model'), LOWER_EFFORT.get(baseline_pair[1])),
+                    'proposed_mapping': (candidate.get('model'), candidate.get('reasoning_effort')),
+                }
+                for arm_name, expected in expected_arms.items():
+                    arm = arms.get(arm_name, {})
+                    actual = (arm.get('model'), arm.get('reasoning_effort')) if isinstance(arm, dict) else ()
+                    if expected[1] is None or actual != expected:
+                        errors.append(f'{prefix} arm {arm_name} must match its pinned target mapping')
 
         fixtures = run.get('fixtures')
         if not isinstance(fixtures, dict) or set(fixtures) != set(required_fixtures):
@@ -154,6 +257,20 @@ def validate_calibration_runs(calibration: object) -> list[str]:
         artifact_sha256 = run.get('artifact_sha256')
         if not isinstance(artifact_sha256, str) or re.fullmatch(r'[0-9a-f]{64}', artifact_sha256) is None:
             errors.append(f'{prefix} artifact_sha256 must be 64 lowercase hex characters')
+        artifact_path = run.get('artifact_path')
+        artifact = Path(artifact_path) if isinstance(artifact_path, str) else Path('/')
+        if root is None:
+            errors.append(f'{prefix} artifact hash cannot be verified without a workspace root')
+        elif artifact.is_absolute() or '..' in artifact.parts or not artifact_path:
+            errors.append(f'{prefix} artifact_path must be repo-relative')
+        else:
+            artifact_file = root / artifact
+            if not artifact_file.is_file():
+                errors.append(f'{prefix} artifact_path does not exist: {artifact_path}')
+            elif isinstance(artifact_sha256, str):
+                actual_sha256 = hashlib.sha256(artifact_file.read_bytes()).hexdigest()
+                if artifact_sha256 != actual_sha256:
+                    errors.append(f'{prefix} artifact_sha256 does not match artifact_path')
     return errors
 
 
@@ -529,6 +646,15 @@ def validate_workspace(root: Path) -> list[str]:
             elif any(not migration.get(key) for key in ('baseline', 'evidence_manifest', 'comparison_rule', 'owner', 'review_after', 'rollback_signal')):
                 errors.append('.codex/profiles.json migration metadata is incomplete')
             else:
+                profile_definitions = profiles.get('profiles', {})
+                if migration.get('status') != 'stable' and isinstance(profile_definitions, dict):
+                    for profile_name, profile_definition in profile_definitions.items():
+                        if not isinstance(profile_definition, dict) or profile_definition.get('guidance_density') != 'high':
+                            errors.append(f'Provisional profile {profile_name} must keep high guidance density')
+                        if not isinstance(profile_definition, dict) or profile_definition.get('diff_soft_limit_lines') != 30:
+                            errors.append(f'Provisional profile {profile_name} must keep the 30-line diff soft limit')
+                if migration.get('status') == 'provisional' and not migration.get('runtime_evidence'):
+                    errors.append('Provisional migration requires runtime compatibility evidence')
                 manifest_value = migration['evidence_manifest']
                 manifest_path = Path(manifest_value) if isinstance(manifest_value, str) else Path('/')
                 if manifest_path.is_absolute() or '..' in manifest_path.parts:
@@ -552,7 +678,7 @@ def validate_workspace(root: Path) -> list[str]:
                         if requirements.get('include_proposed_mapping') is not True:
                             errors.append('Calibration manifest must include the proposed mapping arm')
                         if migration.get('status') == 'stable':
-                            errors.extend(validate_calibration_runs(calibration))
+                            errors.extend(validate_calibration_runs(calibration, mapping, root))
 
     hooks_file = root / '.codex' / 'hooks.json'
     if not hooks_file.exists():
