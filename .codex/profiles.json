@@ -21,9 +21,9 @@
     },
     "quality": {
       "contract_id": "the-loop-harness-v3:quality:v1",
-      "guidance_density": "medium",
+      "guidance_density": "high",
       "ask_rate": "self_decide_small_choices_and_note",
-      "diff_soft_limit_lines": 120,
+      "diff_soft_limit_lines": 30,
       "delegation": "explicit_user_request_and_named_benefit_required",
       "verification_depth": ["basic_test", "healthcheck_or_key_path_rerun"],
       "eval_hack_risk": "medium",
@@ -31,9 +31,9 @@
     },
     "ceiling": {
       "contract_id": "the-loop-harness-v3:ceiling:v1",
-      "guidance_density": "low",
+      "guidance_density": "high",
       "ask_rate": "self_decide_small_choices_and_note",
-      "diff_soft_limit_lines": 300,
+      "diff_soft_limit_lines": 30,
       "delegation": "explicit_user_request_and_named_benefit_required",
       "verification_depth": ["basic_test", "cross_review", "key_path_rerun"],
       "eval_hack_risk": "medium_high",
@@ -41,9 +41,9 @@
     },
     "frontier": {
       "contract_id": "the-loop-harness-v3:frontier:v1",
-      "guidance_density": "lowest",
+      "guidance_density": "high",
       "ask_rate": "broader_self_decision_with_scope_and_safety_gates",
-      "diff_soft_limit_lines": null,
+      "diff_soft_limit_lines": 30,
       "delegation": "explicit_user_request_and_named_benefit_required",
       "verification_depth": ["basic_test", "cross_review", "adversarial_audit"],
       "eval_hack_risk": "highest",
@@ -86,7 +86,8 @@
     "comparison_rule": "baseline_plus_gpt56_at_prior_effort_and_one_lower_plus_proposed",
     "owner": "workspace maintainer",
     "review_after": "after_5_to_10_representative_tasks",
-    "rollback_signal": "required_fixture_failure_or_verified_task_regression"
+    "rollback_signal": "required_fixture_failure_or_verified_task_regression",
+    "runtime_evidence": "codex-cli 0.144.1 explicit gpt-5.6-luna xhigh read-only smoke exit 0"
   },
   "model_mapping": {
     "main_thread": {

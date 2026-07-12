@@ -66,5 +66,10 @@
     "broad_repo_exploration",
     "architecture_or_security_review"
   ],
+  "run_contract": {
+    "target": "main_thread or an agent key present in both baseline and model_mapping",
+    "artifact_path": "repo-relative evidence artifact whose SHA-256 is recorded in artifact_sha256",
+    "acceptance_decision": "promote only after every pinned fixture passes"
+  },
   "runs": []
 }

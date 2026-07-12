@@ -1,9 +1,11 @@
+import hashlib
 import json
 import shutil
 from pathlib import Path
 
 from scripts.validate_codex_workspace import (
     EXPECTED_AGENTS,
+    EXPECTED_HARNESS_EVALS,
     EXPECTED_SKILLS,
     validate_calibration_runs,
     validate_workspace,
@@ -198,11 +200,85 @@ def test_calibration_rejects_empty_completed_runs() -> None:
     )
     calibration['status'] = 'complete'
     calibration['runs'] = [{} for _ in range(5)]
-    errors = validate_calibration_runs(calibration)
+    profiles = json.loads((ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8'))
+    errors = validate_calibration_runs(calibration, profiles['model_mapping'], ROOT)
     assert 'Calibration runs[0] missing task_id' in errors
     assert 'Calibration runs[0] arms must match required_arms' in errors
     assert 'Calibration runs[0] fixtures must match required_fixtures' in errors
     assert 'Calibration runs[0] artifact_sha256 must be 64 lowercase hex characters' in errors
+
+
+def test_calibration_requirements_cannot_self_authorize_fake_evidence() -> None:
+    calibration = {
+        'status': 'complete',
+        'requirements': {
+            'required_arms': ['fake'],
+            'metrics': ['fake'],
+            'required_fixtures': ['fake'],
+        },
+        'runs': [{} for _ in range(5)],
+    }
+    errors = validate_calibration_runs(calibration, {}, ROOT)
+    assert errors == ['Calibration required_arms must match the pinned validator contract']
+
+
+def test_calibration_accepts_pinned_target_mapping_and_artifact(tmp_path: Path) -> None:
+    calibration = json.loads(
+        (ROOT / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json').read_text(encoding='utf-8')
+    )
+    profiles = json.loads((ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8'))
+    artifact = tmp_path / 'evidence.json'
+    artifact.write_text('{"verified":true}', encoding='utf-8')
+    metrics = {
+        'criteria_passed': ['done_when'],
+        'fail_axes': [],
+        'fail_category': '',
+        'verification_exit_code': 0,
+        'elapsed_seconds': 1.0,
+        'provider_reported_usage_or_unavailable': 'unavailable',
+        'provider_reported_cost_or_unavailable': 'unavailable',
+        'retries': 0,
+        'escalations': 0,
+        'diff_lines': 1,
+        'residual_risk': [],
+    }
+    fixtures = {
+        name: {'status': 'passed', 'evidence': 'artifact:evidence.json'}
+        for name in EXPECTED_HARNESS_EVALS
+    }
+    arms = {
+        'baseline': {'model': 'gpt-5.5', 'reasoning_effort': 'medium', 'metrics': metrics},
+        'gpt56_prior_effort': {'model': 'gpt-5.6-luna', 'reasoning_effort': 'medium', 'metrics': metrics},
+        'gpt56_one_lower': {'model': 'gpt-5.6-luna', 'reasoning_effort': 'low', 'metrics': metrics},
+        'proposed_mapping': {'model': 'gpt-5.6-luna', 'reasoning_effort': 'xhigh', 'metrics': metrics},
+    }
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    calibration['status'] = 'complete'
+    calibration['runs'] = [
+        {
+            'task_id': f'task-{index}',
+            'target': 'main_thread',
+            'arms': arms,
+            'fixtures': fixtures,
+            'acceptance_decision': 'promote',
+            'artifact_path': 'evidence.json',
+            'artifact_sha256': digest,
+        }
+        for index in range(5)
+    ]
+    assert validate_calibration_runs(calibration, profiles['model_mapping'], tmp_path) == []
+
+
+def test_validator_rejects_relaxed_profile_before_stable_calibration(tmp_path: Path) -> None:
+    target = copy_workspace(tmp_path)
+    profiles_file = target / '.codex' / 'profiles.json'
+    profiles = json.loads(profiles_file.read_text(encoding='utf-8'))
+    profiles['profiles']['quality']['guidance_density'] = 'medium'
+    profiles['profiles']['quality']['diff_soft_limit_lines'] = 120
+    profiles_file.write_text(json.dumps(profiles), encoding='utf-8')
+    errors = validate_workspace(target)
+    assert 'Provisional profile quality must keep high guidance density' in errors
+    assert 'Provisional profile quality must keep the 30-line diff soft limit' in errors
 
 
 def test_skills_do_not_contain_claude_runtime_syntax() -> None:

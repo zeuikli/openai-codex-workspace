@@ -49,7 +49,7 @@ Route allowlist 以 `.codex/profiles.json` 為準。呼叫者不得直接提供 
 7. 要求回報 scope、changes、evidence、open questions、deviations 與 residual risk。
 8. 主 thread 重跑關鍵驗證；worker 回報是證據，不是完成判定。
 
-不得直接叫用任何 route target，也不得只傳 profile label。完整 task envelope 與 validator 的 `resolved` 結果是 mechanical input gate；worker 的自然語言自檢不能取代它。實際 spawn 與 model 身分仍是 host runtime 行為，必須回報 runtime resolved model/effort；repo validator 不宣稱能證明 host-level dispatch。
+只有完整 task envelope 與 validator 的 `resolved` 結果可宣稱具備 multi-mode route 保證；直接 agent invocation 不屬於此 route contract，也不得只傳 profile label。worker 的自然語言自檢不能取代 mechanical input gate。實際 spawn 與 model 身分仍是 host runtime 行為，必須回報 runtime resolved model/effort；repo validator 不宣稱能證明 host-level dispatch。
 
 最多使用 config 設定的四個 concurrent threads，不要求 nested delegation；巢狀委派需使用者顯式授權。
 

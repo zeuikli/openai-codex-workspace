@@ -55,7 +55,7 @@ REQUIRED_MARKERS = {
         'delegation_benefit',
         'return_schema',
         'scripts/validate_task.py',
-        '不得直接叫用任何 route target',
+        '直接 agent invocation 不屬於此 route contract',
         '主 thread 重跑關鍵驗證',
     ),
 }
