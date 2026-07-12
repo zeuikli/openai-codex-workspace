@@ -1,6 +1,6 @@
 interface:
   display_name: "Multi-Mode 路由"
-  short_description: "在主 thread 與 GPT-5.4 worker 間執行明確且可驗證的委派路由"
+  short_description: "在主 thread 與 GPT-5.6 Luna worker 間執行明確且可驗證的委派路由"
   default_prompt: "使用 $multi-mode-skill，在主 thread 與 worker 間路由這項明確委派的任務。"
 policy:
   allow_implicit_invocation: false

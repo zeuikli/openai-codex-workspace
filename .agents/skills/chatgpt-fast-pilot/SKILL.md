@@ -1,11 +1,11 @@
 ---
 name: chatgpt-fast-pilot
-description: GPT-5.4 mini 的快速低成本工作流，適合規格清楚的小型任務、窄範圍修改與確定性驗證。使用者提到 ChatGPT fast pilot、GPT-5.4 mini routing、快速模式、低成本模式時使用。架構、安全設計或跨模組修改不要使用。
+description: GPT-5.6 Luna medium 的快速低成本工作流，適合規格清楚的小型任務、窄範圍修改與確定性驗證。使用者提到 ChatGPT fast pilot、GPT-5.6 Luna routing、快速模式、低成本模式時使用。架構、安全設計或跨模組修改不要使用。
 ---
 
 # ChatGPT 快速 Pilot
 
-新 thread 或 agent 可選模型時，使用 `gpt-5.4-mini` 搭配 `low` 或 `medium` reasoning；否則只套用 `cost` 工作流，不宣稱已切換目前模型。
+新 thread 或 agent 可選模型時，使用 `gpt-5.6-luna` 搭配 `medium` reasoning；否則只套用 `cost` 工作流，不宣稱已切換目前模型。
 
 ## 前置條件
 

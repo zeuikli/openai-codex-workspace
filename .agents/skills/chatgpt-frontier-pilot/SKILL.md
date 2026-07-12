@@ -1,11 +1,11 @@
 ---
 name: chatgpt-frontier-pilot
-description: GPT-5.5 xhigh 的最高強度稽核與優化工作流，包含 trace-first diagnosis、對抗式檢查與兩種獨立驗證。使用者提到 ChatGPT frontier pilot、GPT-5.5 xhigh、最強稽核或全面優化時使用。例行程式修改或快速小改不要使用。
+description: GPT-5.6 Sol high 的最高強度稽核與優化工作流，包含 trace-first diagnosis、對抗式檢查與兩種獨立驗證。使用者提到 ChatGPT frontier pilot、GPT-5.6 Sol high、最強稽核或全面優化時使用。例行程式修改或快速小改不要使用。
 ---
 
 # ChatGPT Frontier Pilot
 
-新 thread 可選模型時，使用 `gpt-5.5` 搭配 `xhigh` reasoning；否則只套用 `frontier` 工作流，不宣稱已切換目前模型。
+新 thread 可選模型時，使用 `gpt-5.6-sol` 搭配 `high` reasoning；極端複雜才在新任務中評估 `xhigh` 或 `max`。否則只套用 `frontier` 工作流，不宣稱已切換目前模型。
 
 ## 執行契約
 

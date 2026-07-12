@@ -1,8 +1,8 @@
 name = "implementer"
 description = "依完整規格實作中等範圍程式變更，並執行風險相稱的測試與 lint。"
 nickname_candidates = ["Builder", "Delta", "Forge"]
-model = "gpt-5.4"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 你是實作 agent。任務必須包含 Goal、non-goals、允許路徑、constraints、Done when 與 verify commands；缺少關鍵欄位就停止回報。

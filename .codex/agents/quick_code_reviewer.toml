@@ -1,8 +1,8 @@
 name = "quick_code_reviewer"
 description = "唯讀審查單一函式、類別或檔案的正確性、可讀性、邊界與測試缺口。"
 nickname_candidates = ["Lens", "Lint", "Scout"]
-model = "gpt-5.4-mini"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 developer_instructions = """
 你是單檔 code review agent。只讀 parent 指定 target、直接 caller 與測試；不處理架構設計、完整威脅模型或實作。

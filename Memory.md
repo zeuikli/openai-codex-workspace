@@ -2,6 +2,13 @@
 
 ## 繁體中文
 
+### 最後紀錄（2026-07-13）
+
+- 已依 OpenAI GPT-5.6 官方模型分級與使用者提供的任務效益表，將主線、五個 pilot skills、`multi-mode-skill`、十三個 custom agents、`.codex/profiles.json`、`.codex/refs/model-profiles.md`、README、validator 與測試的模型 mapping 從 GPT-5.4/5.5 更新為 GPT-5.6。
+- 新 mapping：微小/低風險任務使用 `gpt-5.6-luna` + `medium`；日常實作、測試、review 與 multi-mode worker 使用 `gpt-5.6-luna` + `xhigh`；廣泛唯讀探索使用 `gpt-5.6-terra` + `medium`；架構、auth、migration 與高風險 review 使用 `gpt-5.6-sol` + `medium`；完整安全稽核與最高風險情境使用 `gpt-5.6-sol` + `high`。
+- `HARNESS-THE-LOOP.md` 的 v3 L1 契約維持模型無關；L2 模型分級集中在 `.codex/profiles.json` 與 `.codex/refs/model-profiles.md`。
+- 殘餘風險：本次是 routing、文件與 validator/test 更新；尚未用 5-10 個代表任務量測新 mapping 的實際成功率、成本與 latency。
+
 ### 最後紀錄（2026-07-09）
 
 - 已將 `the-loop-harness-v3/` 改寫進 workspace：`HARNESS-THE-LOOP.md` 升級為 v3 L1 行為契約，`AGENTS.md` 改為 v3-aware 持久規範，`README.md` 補上 L1/L2/L4 分層。
@@ -34,6 +41,13 @@
 - 無新增待辦；需保留或刪除舊 stash 可由使用者後續決定。
 
 ## English
+
+### Last Record (2026-07-13)
+
+- Updated model mappings from GPT-5.4/5.5 to GPT-5.6 across the main thread, five pilot skills, `multi-mode-skill`, thirteen custom agents, `.codex/profiles.json`, `.codex/refs/model-profiles.md`, README, validator, and tests, using OpenAI GPT-5.6 model guidance plus the user's task-benefit routing table.
+- New mapping: tiny/low-risk tasks use `gpt-5.6-luna` + `medium`; daily implementation, testing, review, and the multi-mode worker use `gpt-5.6-luna` + `xhigh`; broad read-only exploration uses `gpt-5.6-terra` + `medium`; architecture, auth, migration, and high-risk review use `gpt-5.6-sol` + `medium`; full security audits and maximum-risk work use `gpt-5.6-sol` + `high`.
+- `HARNESS-THE-LOOP.md` remains the model-agnostic v3 L1 contract; L2 model routing is centralized in `.codex/profiles.json` and `.codex/refs/model-profiles.md`.
+- Residual risk: this is a routing, documentation, validator, and test update. The new mapping has not yet been measured on 5-10 representative tasks for success rate, cost, or latency.
 
 ### Last Record (2026-07-09)
 

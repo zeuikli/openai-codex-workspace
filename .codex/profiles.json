@@ -1,7 +1,8 @@
 {
   "schema_version": "the-loop-harness-v3.codex-profiles.1",
   "source": "the-loop-harness-v3/PROFILES-v3.md",
-  "updated": "2026-07-09",
+  "updated": "2026-07-13",
+  "model_source": "OpenAI model guidance, GPT-5.6 family, checked 2026-07-13",
   "principles": {
     "behavior_guidance": "inverse_to_capability",
     "verification_gate": "proportional_to_capability",
@@ -47,46 +48,88 @@
   },
   "model_mapping": {
     "main_thread": {
-      "profile": "frontier",
-      "model": "gpt-5.5",
-      "reasoning_effort": "medium",
+      "profile": "quality",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
       "source": ".codex/config.toml"
     },
     "multi_mode_agent": {
       "profile": "quality",
-      "model": "gpt-5.4",
-      "reasoning_effort": "medium",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
       "source": ".codex/agents/multi_mode_agent.toml"
+    },
+    "convergence_judge": {
+      "profile": "cost",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/convergence_judge.toml"
+    },
+    "doc_writer": {
+      "profile": "cost",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/doc_writer.toml"
     },
     "fast_implementer": {
       "profile": "cost",
-      "model": "gpt-5.4-mini",
-      "reasoning_effort": "low",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
       "source": ".codex/agents/fast_implementer.toml"
     },
     "implementer": {
       "profile": "quality",
-      "model": "gpt-5.4",
-      "reasoning_effort": "medium",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
       "source": ".codex/agents/implementer.toml"
     },
+    "memory_compactor": {
+      "profile": "quality",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "source": ".codex/agents/memory_compactor.toml"
+    },
+    "quick_code_reviewer": {
+      "profile": "quality",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "source": ".codex/agents/quick_code_reviewer.toml"
+    },
+    "researcher": {
+      "profile": "quality",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/researcher.toml"
+    },
     "reviewer": {
-      "profile": "frontier",
-      "model": "gpt-5.5",
-      "reasoning_effort": "high",
+      "profile": "ceiling",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "medium",
       "source": ".codex/agents/reviewer.toml"
+    },
+    "security_reviewer": {
+      "profile": "ceiling",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "medium",
+      "source": ".codex/agents/security_reviewer.toml"
     },
     "security_auditor": {
       "profile": "frontier",
-      "model": "gpt-5.5",
+      "model": "gpt-5.6-sol",
       "reasoning_effort": "high",
       "source": ".codex/agents/security_auditor.toml"
     },
     "senior_architect": {
-      "profile": "frontier",
-      "model": "gpt-5.5",
-      "reasoning_effort": "high",
+      "profile": "ceiling",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "medium",
       "source": ".codex/agents/senior_architect.toml"
+    },
+    "test_writer": {
+      "profile": "quality",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "xhigh",
+      "source": ".codex/agents/test_writer.toml"
     }
   },
   "eval_pack": {

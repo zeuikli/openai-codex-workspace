@@ -65,6 +65,15 @@ def test_harness_the_loop_is_complete() -> None:
         assert f'## {phase}' in text
 
 
+def test_v3_l4_sources_are_present() -> None:
+    profiles = (ROOT / 'the-loop-harness-v3' / 'PROFILES-v3.md').read_text(encoding='utf-8')
+    eval_pack = (ROOT / 'the-loop-harness-v3' / 'EVAL-PACK.md').read_text(encoding='utf-8')
+    for marker in ('GPT-5.6 Routing', 'gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'):
+        assert marker in profiles
+    for marker in ('unverified_success', 'role_confusion', 'unsafe_delete', 'compact_resume'):
+        assert marker in eval_pack
+
+
 def test_claude_rules_are_mapped_to_codex_project_instructions() -> None:
     text = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
     assert '## 上下文與 Compact' in text
@@ -110,11 +119,13 @@ def test_validator_rejects_unexpected_custom_agent(tmp_path: Path) -> None:
     assert any('Unexpected custom agent' in error for error in errors)
 
 
-def test_model_routing_is_gpt_55_main_and_gpt_54_worker() -> None:
+def test_model_routing_is_gpt_56_luna_main_and_worker() -> None:
     config = (ROOT / '.codex' / 'config.toml').read_text(encoding='utf-8')
     agent = (ROOT / '.codex' / 'agents' / 'multi_mode_agent.toml').read_text(encoding='utf-8')
-    assert 'model = "gpt-5.5"' in config
-    assert 'model = "gpt-5.4"' in agent
+    assert 'model = "gpt-5.6-luna"' in config
+    assert 'model_reasoning_effort = "xhigh"' in config
+    assert 'model = "gpt-5.6-luna"' in agent
+    assert 'model_reasoning_effort = "xhigh"' in agent
     assert '[agents.multi_mode_agent]' in config
 
 
@@ -125,6 +136,8 @@ def test_v3_profiles_are_available() -> None:
     assert '"unverified_success"' in profiles
     assert 'Model Profiles v3' in profile_ref
     assert 'the-loop-harness-v3/EVAL-PACK.md' in profile_ref
+    for name in ('convergence_judge', 'doc_writer', 'security_reviewer', 'test_writer'):
+        assert f'"{name}"' in profiles
 
 
 def test_skills_do_not_contain_claude_runtime_syntax() -> None:

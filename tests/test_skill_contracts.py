@@ -12,26 +12,29 @@ CJK_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff]')
 
 REQUIRED_MARKERS = {
     'chatgpt-fast-pilot': (
-        'gpt-5.4-mini',
+        'gpt-5.6-luna',
+        '`medium` reasoning',
         '`cost`',
         'git diff --check',
         '使用者未明確要求 agent 或平行工作時不委派',
     ),
     'chatgpt-balanced-pilot': (
-        'gpt-5.4',
+        'gpt-5.6-luna',
+        '`xhigh` reasoning',
         '`quality`',
         'Choice | Rejected | Reason',
         'Review Gate',
     ),
     'chatgpt-deep-pilot': (
-        'gpt-5.5',
-        '`high` reasoning',
+        'gpt-5.6-sol',
+        '`medium` reasoning',
         'Control',
         'rollback',
         'multi_mode_agent',
     ),
     'chatgpt-frontier-pilot': (
-        '`xhigh` reasoning',
+        'gpt-5.6-sol',
+        '`high` reasoning',
         'baseline',
         '兩種獨立方法驗證',
         'rejected-claims ledger',
@@ -141,8 +144,8 @@ def test_multi_mode_agent_contract_and_language() -> None:
     config = (ROOT / '.codex' / 'config.toml').read_text(encoding='utf-8')
     for marker in (
         'name = "multi_mode_agent"',
-        'model = "gpt-5.4"',
-        'model_reasoning_effort = "medium"',
+        'model = "gpt-5.6-luna"',
+        'model_reasoning_effort = "xhigh"',
         'multi-mode-skill/scripts/validate_task.py',
         'PROFILE: <name>',
         'PROFILE_CONTRACT:',

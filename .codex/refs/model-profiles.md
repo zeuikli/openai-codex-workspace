@@ -8,6 +8,7 @@
 - 驗證閘門強度與能力成正比。
 - profile 是工作與驗證強度，不代表在目前 thread 內切換模型。
 - 所有模型 ID 與數字門檻集中在 L2；L1 契約維持模型無關。
+- GPT-5.6 路由依官方模型分級與 2026-07-13 任務效益表：Luna 處理日常與高效率工作，Terra 處理廣泛探索的平衡檔，Sol 處理架構、安全與高風險決策。
 
 ## Profile 校準
 
@@ -27,16 +28,20 @@
 
 | 角色 | profile | model | reasoning effort | 來源 |
 | --- | --- | --- | --- | --- |
-| main thread | frontier | `gpt-5.5` | `medium` | `.codex/config.toml`，2026-07-09 盤點 |
-| fast_implementer | cost | `gpt-5.4-mini` | `low` | `.codex/agents/fast_implementer.toml`，2026-07-09 盤點 |
-| researcher | cost | `gpt-5.4-mini` | `medium` | `.codex/agents/researcher.toml`，2026-07-09 盤點 |
-| quick_code_reviewer | quality | `gpt-5.4-mini` | `medium` | `.codex/agents/quick_code_reviewer.toml`，2026-07-09 盤點 |
-| implementer | quality | `gpt-5.4` | `medium` | `.codex/agents/implementer.toml`，2026-07-09 盤點 |
-| test_writer | quality | `gpt-5.4` | `medium` | `.codex/agents/test_writer.toml`，2026-07-09 盤點 |
-| multi_mode_agent | quality | `gpt-5.4` | `medium` | `.codex/agents/multi_mode_agent.toml`，2026-07-09 盤點 |
-| reviewer | frontier | `gpt-5.5` | `high` | `.codex/agents/reviewer.toml`，2026-07-09 盤點 |
-| security_auditor | frontier | `gpt-5.5` | `high` | `.codex/agents/security_auditor.toml`，2026-07-09 盤點 |
-| senior_architect | frontier | `gpt-5.5` | `high` | `.codex/agents/senior_architect.toml`，2026-07-09 盤點 |
+| main thread | quality | `gpt-5.6-luna` | `xhigh` | `.codex/config.toml`，2026-07-13 盤點 |
+| convergence_judge | cost | `gpt-5.6-luna` | `medium` | `.codex/agents/convergence_judge.toml`，2026-07-13 盤點 |
+| doc_writer | cost | `gpt-5.6-luna` | `medium` | `.codex/agents/doc_writer.toml`，2026-07-13 盤點 |
+| fast_implementer | cost | `gpt-5.6-luna` | `medium` | `.codex/agents/fast_implementer.toml`，2026-07-13 盤點 |
+| researcher | quality | `gpt-5.6-terra` | `medium` | `.codex/agents/researcher.toml`，2026-07-13 盤點 |
+| quick_code_reviewer | quality | `gpt-5.6-luna` | `xhigh` | `.codex/agents/quick_code_reviewer.toml`，2026-07-13 盤點 |
+| implementer | quality | `gpt-5.6-luna` | `xhigh` | `.codex/agents/implementer.toml`，2026-07-13 盤點 |
+| memory_compactor | quality | `gpt-5.6-luna` | `xhigh` | `.codex/agents/memory_compactor.toml`，2026-07-13 盤點 |
+| test_writer | quality | `gpt-5.6-luna` | `xhigh` | `.codex/agents/test_writer.toml`，2026-07-13 盤點 |
+| multi_mode_agent | quality | `gpt-5.6-luna` | `xhigh` | `.codex/agents/multi_mode_agent.toml`，2026-07-13 盤點 |
+| reviewer | ceiling | `gpt-5.6-sol` | `medium` | `.codex/agents/reviewer.toml`，2026-07-13 盤點 |
+| security_reviewer | ceiling | `gpt-5.6-sol` | `medium` | `.codex/agents/security_reviewer.toml`，2026-07-13 盤點 |
+| senior_architect | ceiling | `gpt-5.6-sol` | `medium` | `.codex/agents/senior_architect.toml`，2026-07-13 盤點 |
+| security_auditor | frontier | `gpt-5.6-sol` | `high` | `.codex/agents/security_auditor.toml`，2026-07-13 盤點 |
 
 ## 重評流程
 
@@ -48,4 +53,4 @@
 ## 殘餘風險
 
 - `the-loop-harness-v3/PROFILES-v3.md` 原始文字中的 `.claude/**` 對應已映射到 `.codex/**`；若未來導入新的 hook 消費欄位，需先擴充 `.codex/profiles.json` schema 與 validator。
-- 本次只建立 workspace L2 對應，未合併四個 pilot skill，也未改寫十三個 custom agent 的完整 developer instructions。
+- 本次已將四個 pilot skill、十三個 custom agent、主線 config 與 validator/test 的模型 mapping 更新到 GPT-5.6 分級；尚未實跑 5-10 個代表任務量測新 mapping 的實際勝率與成本。
