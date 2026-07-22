@@ -22,7 +22,7 @@ def valid_task() -> dict[str, object]:
     return {
         'profile': 'ceiling',
         'route': 'ceiling_review',
-        'profile_contract_id': 'the-loop-harness-v3:ceiling:v1',
+        'profile_contract_id': 'the-loop-harness-v4:ceiling:v1',
         'goal': '驗證架構選擇。',
         'context': '讀取架構 ADR 與目前 diff。',
         'constraints': ['保持唯讀'],
@@ -45,7 +45,7 @@ def test_missing_profile_contract_id_fails_closed() -> None:
     assert 'profile_contract_id must be a non-empty string' in MODULE.validate_task(task)
 
 
-def test_missing_v3_handoff_fields_fail_closed() -> None:
+def test_missing_v4_handoff_fields_fail_closed() -> None:
     task = valid_task()
     task.pop('context')
     task.pop('return_schema')
@@ -77,7 +77,7 @@ def test_route_resolves_model_without_caller_selected_privilege() -> None:
     assert resolved == {
         'route': 'ceiling_review',
         'profile': 'ceiling',
-        'profile_contract_id': 'the-loop-harness-v3:ceiling:v1',
+        'profile_contract_id': 'the-loop-harness-v4:ceiling:v1',
         'profile_contract': MODULE.load_profiles()['profiles']['ceiling'],
         'target_agent': 'reviewer',
         'model': 'gpt-5.6-sol',
@@ -102,10 +102,10 @@ def test_route_resolves_model_without_caller_selected_privilege() -> None:
 def test_route_profile_and_contract_must_match() -> None:
     task = valid_task()
     task['profile'] = 'frontier'
-    task['profile_contract_id'] = 'the-loop-harness-v3:frontier:v1'
+    task['profile_contract_id'] = 'the-loop-harness-v4:frontier:v1'
     errors = MODULE.validate_task(task)
     assert 'profile must match route profile: ceiling' in errors
-    assert 'profile_contract_id must match route contract: the-loop-harness-v3:ceiling:v1' in errors
+    assert 'profile_contract_id must match route contract: the-loop-harness-v4:ceiling:v1' in errors
 
 
 def test_paths_must_stay_scoped_to_repository() -> None:
@@ -126,7 +126,7 @@ def test_write_route_requires_exact_change_and_blocks_control_paths() -> None:
     task.update(
         route='cost_write',
         profile='cost',
-        profile_contract_id='the-loop-harness-v3:cost:v1',
+        profile_contract_id='the-loop-harness-v4:cost:v1',
         allowed_paths=['src/'],
     )
     assert 'exact_change must be a non-empty string for write routes' in MODULE.validate_task(task)

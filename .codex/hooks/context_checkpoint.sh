@@ -6,10 +6,10 @@ cat >/dev/null
 
 if [[ "$phase" == "pre" ]]; then
   cat <<'JSON'
-{"hookSpecificOutput":{"hookEventName":"PreCompact","additionalContext":"壓縮前 checkpoint：保留目前 Goal、已驗證結果、未完成步驟與工作樹狀態。"}}
+{"hookSpecificOutput":{"hookEventName":"PreCompact","additionalContext":"v4 checkpoint：保留 Goal、Done-when、已驗證 receipt、未完成風險、Deviations、G-LoopA 狀態與工作樹狀態；Memory consolidation 不得覆寫原始 evidence。"}}
 JSON
 else
   cat <<'JSON'
-{"hookSpecificOutput":{"hookEventName":"PostCompact","additionalContext":"壓縮後先核對最新使用者需求、執行計畫與 git status，再延續未完成工作；不要從頭重做。"}}
+{"hookSpecificOutput":{"hookEventName":"PostCompact","additionalContext":"v4 resume：先重讀 AGENTS.md、Memory.md、HARNESS-THE-LOOP.md，核對最新需求、Done-when、驗證 receipt、git status 與最新 diff；以外部 state anchor 為準，不從壓縮摘要猜測目標。"}}
 JSON
 fi

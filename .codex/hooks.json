@@ -10,6 +10,28 @@
             "statusMessage": "檢查 Bash 指令安全性"
           }
         ]
+      },
+      {
+        "matcher": "Bash|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/taste-reference-lint.sh\"",
+            "statusMessage": "檢查 v4 品味需求 reference"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/blindspot-domain-lint.sh\"",
+            "statusMessage": "檢查 v4 高風險領域 blindspot"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -20,6 +42,16 @@
             "type": "command",
             "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_validate.sh\"",
             "statusMessage": "驗證修改檔案語法"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/literal-specialcase-lint.sh\"",
+            "statusMessage": "檢查 v4 literal special-case"
           }
         ]
       }

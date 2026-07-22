@@ -3,7 +3,11 @@ name: chatgpt-deep-pilot
 description: GPT-5.6 Sol medium 的架構與高風險決策工作流，使用多重假設、Control-Agency-Runtime 分析、明確取捨與對抗式審查。使用者提到 ChatGPT deep pilot、GPT-5.6 Sol、架構審查、threat modeling 或 migration design 時使用。例行實作不要使用。
 ---
 
-# ChatGPT 深度 Pilot
+# ChatGPT 深度 Pilot v4
+
+## v4 核心邊界
+
+以 `Agent = Model + Body + Harness` 分開 Control、Agency、Runtime；對 `[E]` 條文要求 deterministic Body，不能把 prompt advisory 說成 enforce。高風險架構、auth、migration 與 payment 任務必做 Blindspot Pass、rollback/compensation 檢查，並在 G-LoopA 前宣告停止條件。
 
 新 thread 可選模型時，使用 `gpt-5.6-sol` 搭配 `medium` reasoning；否則只套用 `ceiling` 工作流，不宣稱已切換目前模型。
 

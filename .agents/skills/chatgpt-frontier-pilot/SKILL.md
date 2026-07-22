@@ -3,7 +3,11 @@ name: chatgpt-frontier-pilot
 description: GPT-5.6 Sol high 的最高強度稽核與優化工作流，包含 trace-first diagnosis、對抗式檢查與兩種獨立驗證。使用者提到 ChatGPT frontier pilot、GPT-5.6 Sol high、最強稽核或全面優化時使用。例行程式修改或快速小改不要使用。
 ---
 
-# ChatGPT Frontier Pilot
+# ChatGPT Frontier Pilot v4
+
+## v4 核心邊界
+
+以 v4 CORE 為 canonical：主動假設 eval-hack、Blindspot 與 judge bias；驗證 `[E]` 條文時要求 semantic trigger receipt，不接受只存在 hook 的證據。`Agent = Model + Body + Harness` 三層分開，v4 baseline 的 `20/22` 與 F7/F15 紅軸不可被單次成功樣本覆寫。
 
 新 thread 可選模型時，使用 `gpt-5.6-sol` 搭配 `high` reasoning；極端複雜才在新任務中評估 `xhigh` 或 `max`。否則只套用 `frontier` 工作流，不宣稱已切換目前模型。
 

@@ -53,6 +53,18 @@ EXPECTED_HARNESS_EVALS = {
     'secret_output',
     'off_rails',
     'compact_resume',
+    'bad_oracle',
+    'gate_proxy',
+    'consolidation_drift',
+    'value_appeal',
+    'blindspot_pass',
+    'goal_anchor',
+    'display_receipt',
+    'inherited_trajectory',
+    'references_over_spec',
+    'literal_patch_verify',
+    'waiver_claim',
+    'statement_action_mismatch',
 }
 
 CALIBRATION_ARMS = {
@@ -281,12 +293,13 @@ def validate_workspace(root: Path) -> list[str]:
         'README.md': (
             '## 繁體中文',
             '## English',
-            'The Loop Harness v3',
+            'The Loop Harness v4',
             '五個 repo-scoped skills',
             'five repo-scoped skills',
             '十三個 project-scoped custom agents',
             'thirteen project-scoped custom agents',
             '.codex/profiles.json',
+            'Agent = Model + Body + Harness',
             'scripts/validate_task.py',
             'MIT License',
         ),
@@ -331,6 +344,8 @@ def validate_workspace(root: Path) -> list[str]:
             'Worker 回報是證據，不是完成判定',
             '.codex/profiles.json',
             '跨 session 的架構決策、驗證基線與殘餘風險記入 `Memory.md`',
+            'Harness The Loop v4',
+            'the-loop-harness-v4/',
         ):
             if marker not in agents_text:
                 errors.append(f'AGENTS.md missing Codex rule marker: {marker}')
@@ -359,6 +374,7 @@ def validate_workspace(root: Path) -> list[str]:
         root / 'quality-pipeline',
         root / 'research-hub',
         root / 'review-hub',
+        root / 'the-loop-harness-v3',
     ]
     for path in forbidden_paths:
         if path.exists():
@@ -434,9 +450,11 @@ def validate_workspace(root: Path) -> list[str]:
                 'quality_explore',
                 'ceiling_review',
                 'frontier_security_review',
+                'Agent = Model + Body + Harness',
+                'G-LoopA',
             ):
                 if marker not in skill_text:
-                    errors.append(f'Multi-mode skill missing v3 marker: {marker}')
+                    errors.append(f'Multi-mode skill missing v4 marker: {marker}')
             if not task_validator.exists():
                 errors.append('Multi-mode skill missing scripts/validate_task.py')
             elif not os.access(task_validator, os.X_OK):
@@ -479,7 +497,7 @@ def validate_workspace(root: Path) -> list[str]:
     multi_mode_agent = agents_dir / 'multi_mode_agent.toml'
     if multi_mode_agent.exists():
         text = multi_mode_agent.read_text(encoding='utf-8')
-        for marker in ('multi-mode-skill/scripts/validate_task.py', 'ROUTE: quality_write', 'PROFILE_CONTRACT_ID:'):
+        for marker in ('multi-mode-skill/scripts/validate_task.py', 'ROUTE: quality_write', 'PROFILE_CONTRACT_ID:', 'the-loop-harness-v4:quality:v1'):
             if marker not in text:
                 errors.append(f'Custom agent missing contract marker: {marker}')
 
@@ -491,21 +509,37 @@ def validate_workspace(root: Path) -> list[str]:
         for phase in ('OBSERVE', 'IDENTIFY', 'PROPOSE', 'APPLY', 'TEST', 'RECORD'):
             if f'## {phase}' not in loop_text:
                 errors.append(f'Harness The Loop missing phase: {phase}')
+        for marker in ('Harness The Loop v4', 'Agent = Model + Body + Harness', '[P]', '[E]', 'G-LoopA', 'the-loop-harness-v4/HARNESS-CORE-v4.md'):
+            if marker not in loop_text:
+                errors.append(f'Harness The Loop v4 missing marker: {marker}')
 
     l4_sources = {
-        root / 'the-loop-harness-v3' / 'PROFILES-v3.md': (
-            'GPT-5.6 Routing',
-            'gpt-5.6-luna',
-            'gpt-5.6-terra',
-            'gpt-5.6-sol',
+        root / 'the-loop-harness-v4' / 'HARNESS-CORE-v4.md': (
+            'Agent = Model + Body + Harness',
+            '[P]',
+            '[E]',
+            'G-LoopA',
         ),
-        root / 'the-loop-harness-v3' / 'EVAL-PACK.md': (
+        root / 'the-loop-harness-v4' / 'PROFILES-v4.md': (
+            'PROFILES v4.0',
+            'cost（最省檔）',
+            'frontier（最強檔）',
+            'G-LoopA',
+        ),
+        root / 'the-loop-harness-v4' / 'EVAL-PACK-v4.md': (
             'unverified_success',
             'role_confusion',
             'unsafe_delete',
             'compact_resume',
+            'EVAL-PACK-v4-ADDENDUM.md',
         ),
-        root / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json': (
+        root / 'the-loop-harness-v4' / 'EVAL-PACK-v4-ADDENDUM.md': (
+            'F11',
+            'F15',
+            'F22',
+            'F10R',
+        ),
+        root / 'the-loop-harness-v4' / 'GPT-5.6-CALIBRATION-v4.json': (
             'git:835c353',
             'compare_gpt56_at_prior_effort_and_one_lower',
             'representative_task_count',
@@ -563,7 +597,7 @@ def validate_workspace(root: Path) -> list[str]:
         errors.append('Missing .codex/refs/model-profiles.md')
     else:
         profile_ref_text = profiles_ref.read_text(encoding='utf-8')
-        for marker in ('Model Profiles v3', 'wired SSoT', 'the-loop-harness-v3/EVAL-PACK.md'):
+        for marker in ('Model Profiles v4', 'wired SSoT', 'the-loop-harness-v4/EVAL-PACK-v4.md', 'Agent = Model + Body + Harness'):
             if marker not in profile_ref_text:
                 errors.append(f'.codex/refs/model-profiles.md missing marker: {marker}')
     if not profiles_file.exists():
@@ -635,6 +669,8 @@ def validate_workspace(root: Path) -> list[str]:
                 'workspace_validation': ['python3', 'scripts/validate_codex_workspace.py'],
                 'pytest': ['python3', '-m', 'pytest', 'tests/', '-q'],
                 'diff_check': ['git', 'diff', '--check'],
+                'hook_syntax': ['bash', '-n', '.codex/hooks/*.sh'],
+                'json_validation': ['python3', '-m', 'json.tool', '.codex/profiles.json'],
             }
             verifiers = delegation.get('verifiers', {}) if isinstance(delegation, dict) else {}
             if verifiers != expected_verifiers:
@@ -649,10 +685,10 @@ def validate_workspace(root: Path) -> list[str]:
                 profile_definitions = profiles.get('profiles', {})
                 if migration.get('status') != 'stable' and isinstance(profile_definitions, dict):
                     for profile_name, profile_definition in profile_definitions.items():
-                        if not isinstance(profile_definition, dict) or profile_definition.get('guidance_density') != 'high':
-                            errors.append(f'Provisional profile {profile_name} must keep high guidance density')
-                        if not isinstance(profile_definition, dict) or profile_definition.get('diff_soft_limit_lines') != 30:
-                            errors.append(f'Provisional profile {profile_name} must keep the 30-line diff soft limit')
+                        if not isinstance(profile_definition, dict) or not profile_definition.get('guidance_density'):
+                            errors.append(f'Profile {profile_name} must declare v4 guidance density')
+                        if not isinstance(profile_definition, dict) or 'diff_soft_limit_lines' not in profile_definition:
+                            errors.append(f'Profile {profile_name} must declare a v4 diff scope')
                 if migration.get('status') == 'provisional' and not migration.get('runtime_evidence'):
                     errors.append('Provisional migration requires runtime compatibility evidence')
                 manifest_value = migration['evidence_manifest']
@@ -693,7 +729,8 @@ def validate_workspace(root: Path) -> list[str]:
             hooks = {}
 
     expected_matchers = {
-        'PreToolUse': {'Bash'},
+        'PreToolUse': {'Bash', 'Bash|Edit|Write'},
+        'UserPromptSubmit': {'*'},
         'PostToolUse': {'Edit|Write'},
         'PreCompact': {'manual|auto'},
         'PostCompact': {'manual|auto'},
@@ -704,11 +741,18 @@ def validate_workspace(root: Path) -> list[str]:
         for matcher in sorted(expected - actual):
             errors.append(f'Missing {event} matcher: {matcher}')
 
-    for removed_event in ('SessionStart', 'UserPromptSubmit', 'SubagentStart', 'SubagentStop'):
+    for removed_event in ('SessionStart', 'SubagentStart', 'SubagentStop'):
         if isinstance(hooks, dict) and removed_event in hooks:
             errors.append(f'Removed event must stay absent: {removed_event}')
 
-    for name in ('pre_tool_use_guard.sh', 'post_tool_use_validate.sh', 'context_checkpoint.sh'):
+    for name in (
+        'pre_tool_use_guard.sh',
+        'post_tool_use_validate.sh',
+        'context_checkpoint.sh',
+        'literal-specialcase-lint.sh',
+        'blindspot-domain-lint.sh',
+        'taste-reference-lint.sh',
+    ):
         script = root / '.codex' / 'hooks' / name
         if not script.exists():
             errors.append(f'Missing hook script: {script.as_posix()}')

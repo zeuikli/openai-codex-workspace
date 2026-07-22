@@ -15,7 +15,7 @@ PATH_META_RE = re.compile(r'[\\*?{}\[\]$`;&|<>\x00-\x1f]')
 WRITE_ROUTES = {'cost_write', 'quality_write'}
 PROTECTED_ROOTS = {
     '.agents', '.aws', '.azure', '.config', '.git', '.kube', '.ssh',
-    '.codex', 'the-loop-harness-v3',
+    '.codex', 'the-loop-harness-v4',
 }
 PROTECTED_FILES = {'AGENTS.md', 'HARNESS-THE-LOOP.md', 'Memory.md'}
 SECRET_SUFFIXES = {'.key', '.pem', '.p12', '.pfx', '.crt', '.cer'}
