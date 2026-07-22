@@ -3,7 +3,11 @@ name: chatgpt-fast-pilot
 description: GPT-5.6 Luna medium 的快速低成本工作流，適合規格清楚的小型任務、窄範圍修改與確定性驗證。使用者提到 ChatGPT fast pilot、GPT-5.6 Luna routing、快速模式、低成本模式時使用。架構、安全設計或跨模組修改不要使用。
 ---
 
-# ChatGPT 快速 Pilot
+# ChatGPT 快速 Pilot v4
+
+## v4 核心邊界
+
+這是 `Agent = Model + Body + Harness` 中的 Harness guidance，不是模型身分保證。遵循 v4 CORE 的 `[P]/[E]` 分界；自報成功仍是 `unverified_success`，不可逆動作仍需本次確認。小任務也要完成 Johari unknowns 的最低掃描，沒有 external oracle 不建立自主 loop。
 
 新 thread 或 agent 可選模型時，使用 `gpt-5.6-luna` 搭配 `medium` reasoning；否則只套用 `cost` 工作流，不宣稱已切換目前模型。
 

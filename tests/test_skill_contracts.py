@@ -17,6 +17,7 @@ REQUIRED_MARKERS = {
         '`cost`',
         'git diff --check',
         '使用者未明確要求 agent 或平行工作時不委派',
+        'Agent = Model + Body + Harness',
     ),
     'chatgpt-balanced-pilot': (
         'gpt-5.6-luna',
@@ -24,6 +25,7 @@ REQUIRED_MARKERS = {
         '`quality`',
         'Choice | Rejected | Reason',
         'Review Gate',
+        'G-LoopA',
     ),
     'chatgpt-deep-pilot': (
         'gpt-5.6-sol',
@@ -31,6 +33,7 @@ REQUIRED_MARKERS = {
         'Control',
         'rollback',
         'multi_mode_agent',
+        'Agent = Model + Body + Harness',
     ),
     'chatgpt-frontier-pilot': (
         'gpt-5.6-sol',
@@ -57,6 +60,7 @@ REQUIRED_MARKERS = {
         'scripts/validate_task.py',
         '直接 agent invocation 不屬於此 route contract',
         '主 thread 重跑關鍵驗證',
+        'the-loop-harness-v4',
     ),
 }
 
@@ -152,6 +156,7 @@ def test_multi_mode_agent_contract_and_language() -> None:
         'multi-mode-skill/scripts/validate_task.py',
         'ROUTE: quality_write',
         'PROFILE_CONTRACT_ID:',
+        'the-loop-harness-v4:quality:v1',
         'Contract isolation 是 hard gate',
         '中文任務使用台灣繁體中文；英文任務使用英文',
         '不 spawn agents',

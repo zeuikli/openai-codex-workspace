@@ -3,7 +3,11 @@ name: chatgpt-balanced-pilot
 description: GPT-5.6 Luna xhigh 的日常主力工作流，適合一般多步驟實作、除錯與合成，包含 decision log、checkpoint、來源驗證與 diff review。使用者提到 ChatGPT balanced pilot、GPT-5.6 Luna routing 或品質模式時使用。快速小改或架構級審查不要使用。
 ---
 
-# ChatGPT 平衡 Pilot
+# ChatGPT 平衡 Pilot v4
+
+## v4 核心邊界
+
+遵循 `HARNESS-CORE-v4.md` 的 `[P]/[E]` 分界、Johari 四象限、reference 優先與 G-LoopA 停止條件。`Agent = Model + Body + Harness` 中，本 skill 不創造 hooks 或 verifier；沒有語義級 Body receipt 時，完成度最高只能是 `unverified_success`。
 
 新 thread 或 agent 可選模型時，使用 `gpt-5.6-luna` 搭配 `xhigh` reasoning；否則只套用 `quality` 工作流，不宣稱已切換目前模型。
 

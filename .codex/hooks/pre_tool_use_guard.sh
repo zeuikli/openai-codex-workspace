@@ -61,6 +61,12 @@ if [[ "$command" =~ (^|[[:space:]])git[[:space:]]+push([[:space:]]|$) ]]; then
   fi
 elif [[ "$command" =~ (^|[[:space:]])git[[:space:]]+reset[[:space:]]+--hard([[:space:]]|$) ]]; then
   reason="Blocked destructive git reset --hard command."
+elif [[ "$command" =~ git[[:space:]]+commit[^$]*--no-verify ]]; then
+  reason="Blocked inherited-trajectory shortcut: git commit --no-verify bypasses the verification Body."
+elif [[ "$command" =~ git[[:space:]]+push[^$]*--force ]]; then
+  reason="Blocked irreversible force push; use an explicit reviewed confirmation path."
+elif [[ "$command" =~ (^|[[:space:]])(drop|truncate)[[:space:]]+(table|database) ]]; then
+  reason="Blocked irreversible database operation; require a fresh explicit confirmation and rollback plan."
 elif [[ "$command" =~ rm[[:space:]]+-rf[[:space:]]+/([[:space:]]|$) ]]; then
   reason="Blocked destructive rm -rf / pattern."
 elif [[ "$command" =~ curl[^\|]*\|[[:space:]]*(sh|bash) ]]; then

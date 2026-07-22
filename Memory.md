@@ -2,6 +2,14 @@
 
 ## 繁體中文
 
+### 最後紀錄（2026-07-22，Harness v4 升級）
+
+- 已依 `HARNESS-THE-LOOP.md` 與 `AGENTS.md` 將 workspace 的 L1/L2/L4 入口切換至 v4：根目錄契約改指向 `the-loop-harness-v4/HARNESS-CORE-v4.md`，並落實 `Agent = Model + Body + Harness`、`[P]/[E]`、Johari Unknowns、G-LoopA、oracle/gate/receipt 與 `unverified_success` 語意。
+- 已刪除 `the-loop-harness-v3/` 的三個舊 active artifacts（`EVAL-PACK.md`、`PROFILES-v3.md`、`GPT-5.6-CALIBRATION.json`）及其目錄；v4 已補齊 `EVAL-PACK-v4.md`、`EVAL-PACK-v4-ADDENDUM.md`、`PROFILES-v4.md`、`GPT-5.6-CALIBRATION-v4.json` 與完整 v4 reference/review pack。
+- 已同步 `AGENTS.md`、`README.md`、`.codex/profiles.json`、`.codex/refs/model-profiles.md`、五個 `.agents/skills/`、十三個 `.codex/agents/*.toml`、`.codex/hooks.json`、hooks scripts、workspace validator 與 tests；新增 literal special-case、blindspot-domain、taste-reference 三個 advisory hooks，並加強不可逆操作與繞過驗證的 guard。
+- 驗證：暫時 virtualenv 安裝 `pytest 9.1.1`（未寫入 workspace），完整 `pytest tests/ -q` 為 `56 passed`；workspace validator、hook syntax、Python compile、JSON/TOML parse、hook unittest、multi-mode v4 smoke 與 diff 檢查均通過。
+- 殘餘風險：v4 calibration mapping 仍是 provisional；現有 Round 2 baseline 為 20/22、fail axes `[F7, F15]`，n=1 只能作 point estimate，尚未完成 n≥3 full calibration、backlog #13 clean counterfactual 與 ChatGPT surface #14 calibration。無 L3/L4 runtime 的 surface 仍只能提供 advisory enforcement。
+
 ### 最後紀錄（2026-07-13，多模型對抗校準）
 
 - 使用者明確要求以 `gpt-5.6-sol`、`gpt-5.6-terra`、`gpt-5.6-luna` 與 `gpt-5.5` 互相攻擊、審閱與修正 Harness。四個隔離 reviewer 分別以 Sol high、Terra medium、Luna xhigh 與 GPT-5.5 high 執行唯讀審閱，再以四種不同順序做匿名候選修正交叉審閱；worker 結果只作中間證據，主 thread 以檔案與測試重驗。
@@ -52,6 +60,14 @@
 - 無新增待辦；需保留或刪除舊 stash 可由使用者後續決定。
 
 ## English
+
+### Last Record (2026-07-22, Harness v4 migration)
+
+- Migrated the workspace L1/L2/L4 entrypoints to v4 according to `HARNESS-THE-LOOP.md` and `AGENTS.md`, including `Agent = Model + Body + Harness`, `[P]/[E]`, Johari Unknowns, G-LoopA, oracle/gate/receipt, and `unverified_success` semantics.
+- Removed the three active v3 artifacts (`EVAL-PACK.md`, `PROFILES-v3.md`, and `GPT-5.6-CALIBRATION.json`) and the `the-loop-harness-v3/` directory; added the v4 eval packs, profile/calibration artifacts, and complete v4 reference/review pack.
+- Synchronized `AGENTS.md`, `README.md`, `.codex/profiles.json`, `.codex/refs/model-profiles.md`, all five `.agents/skills/`, thirteen custom agents, hooks configuration/scripts, workspace validator, and tests. Added advisory literal-special-case, blindspot-domain, and taste-reference hooks plus stronger irreversible-operation/bypass guards.
+- Verification: installed `pytest 9.1.1` in a temporary virtualenv outside the workspace; full `pytest tests/ -q` reports `56 passed`. Workspace validation, hook syntax, Python compilation, JSON/TOML parsing, hook unit tests, multi-mode v4 smoke, and diff checks pass.
+- Residual risk: v4 calibration mapping remains provisional. The current Round 2 baseline is 20/22 with fail axes `[F7, F15]`; n=1 is only a point estimate, and n≥3 full calibration, backlog #13 clean counterfactual, and ChatGPT surface #14 calibration remain open. Surfaces without L3/L4 runtime provide advisory enforcement only.
 
 ### Last Record (2026-07-13, multi-model adversarial calibration)
 

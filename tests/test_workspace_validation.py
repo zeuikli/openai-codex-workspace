@@ -76,13 +76,19 @@ def test_harness_the_loop_is_complete() -> None:
         assert f'## {phase}' in text
 
 
-def test_v3_l4_sources_are_present() -> None:
-    profiles = (ROOT / 'the-loop-harness-v3' / 'PROFILES-v3.md').read_text(encoding='utf-8')
-    eval_pack = (ROOT / 'the-loop-harness-v3' / 'EVAL-PACK.md').read_text(encoding='utf-8')
-    for marker in ('GPT-5.6 Routing', 'gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'):
+def test_v4_l4_sources_are_present() -> None:
+    core = (ROOT / 'the-loop-harness-v4' / 'HARNESS-CORE-v4.md').read_text(encoding='utf-8')
+    profiles = (ROOT / 'the-loop-harness-v4' / 'PROFILES-v4.md').read_text(encoding='utf-8')
+    eval_pack = (ROOT / 'the-loop-harness-v4' / 'EVAL-PACK-v4.md').read_text(encoding='utf-8')
+    addendum = (ROOT / 'the-loop-harness-v4' / 'EVAL-PACK-v4-ADDENDUM.md').read_text(encoding='utf-8')
+    for marker in ('Agent = Model + Body + Harness', '[P]', '[E]', 'G-LoopA'):
+        assert marker in core
+    for marker in ('PROFILES v4.0', 'gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'):
         assert marker in profiles
     for marker in ('unverified_success', 'role_confusion', 'unsafe_delete', 'compact_resume'):
         assert marker in eval_pack
+    for marker in ('F11', 'F15', 'F22', 'F10R'):
+        assert marker in addendum
 
 
 def test_claude_rules_are_mapped_to_codex_project_instructions() -> None:
@@ -140,13 +146,13 @@ def test_model_routing_is_gpt_56_luna_main_and_worker() -> None:
     assert '[agents.multi_mode_agent]' in config
 
 
-def test_v3_profiles_are_available() -> None:
+def test_v4_profiles_are_available() -> None:
     profiles = (ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8')
     profile_ref = (ROOT / '.codex' / 'refs' / 'model-profiles.md').read_text(encoding='utf-8')
-    assert '"schema_version": "the-loop-harness-v3.codex-profiles.1"' in profiles
+    assert '"schema_version": "the-loop-harness-v4.codex-profiles.1"' in profiles
     assert '"unverified_success"' in profiles
-    assert 'Model Profiles v3' in profile_ref
-    assert 'the-loop-harness-v3/EVAL-PACK.md' in profile_ref
+    assert 'Model Profiles v4' in profile_ref
+    assert 'the-loop-harness-v4/EVAL-PACK-v4.md' in profile_ref
     for name in ('convergence_judge', 'doc_writer', 'security_reviewer', 'test_writer'):
         assert f'"{name}"' in profiles
 
@@ -196,7 +202,7 @@ def test_validator_rejects_stable_migration_without_calibration(tmp_path: Path) 
 
 def test_calibration_rejects_empty_completed_runs() -> None:
     calibration = json.loads(
-        (ROOT / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json').read_text(encoding='utf-8')
+        (ROOT / 'the-loop-harness-v4' / 'GPT-5.6-CALIBRATION-v4.json').read_text(encoding='utf-8')
     )
     calibration['status'] = 'complete'
     calibration['runs'] = [{} for _ in range(5)]
@@ -224,7 +230,7 @@ def test_calibration_requirements_cannot_self_authorize_fake_evidence() -> None:
 
 def test_calibration_accepts_pinned_target_mapping_and_artifact(tmp_path: Path) -> None:
     calibration = json.loads(
-        (ROOT / 'the-loop-harness-v3' / 'GPT-5.6-CALIBRATION.json').read_text(encoding='utf-8')
+        (ROOT / 'the-loop-harness-v4' / 'GPT-5.6-CALIBRATION-v4.json').read_text(encoding='utf-8')
     )
     profiles = json.loads((ROOT / '.codex' / 'profiles.json').read_text(encoding='utf-8'))
     artifact = tmp_path / 'evidence.json'
@@ -269,16 +275,16 @@ def test_calibration_accepts_pinned_target_mapping_and_artifact(tmp_path: Path) 
     assert validate_calibration_runs(calibration, profiles['model_mapping'], tmp_path) == []
 
 
-def test_validator_rejects_relaxed_profile_before_stable_calibration(tmp_path: Path) -> None:
+def test_validator_requires_v4_profile_fields(tmp_path: Path) -> None:
     target = copy_workspace(tmp_path)
     profiles_file = target / '.codex' / 'profiles.json'
     profiles = json.loads(profiles_file.read_text(encoding='utf-8'))
-    profiles['profiles']['quality']['guidance_density'] = 'medium'
-    profiles['profiles']['quality']['diff_soft_limit_lines'] = 120
+    profiles['profiles']['quality'].pop('guidance_density')
+    profiles['profiles']['quality'].pop('diff_soft_limit_lines')
     profiles_file.write_text(json.dumps(profiles), encoding='utf-8')
     errors = validate_workspace(target)
-    assert 'Provisional profile quality must keep high guidance density' in errors
-    assert 'Provisional profile quality must keep the 30-line diff soft limit' in errors
+    assert 'Profile quality must declare v4 guidance density' in errors
+    assert 'Profile quality must declare a v4 diff scope' in errors
 
 
 def test_skills_do_not_contain_claude_runtime_syntax() -> None:

@@ -88,6 +88,38 @@ class CodexHooksBehaviorTest(unittest.TestCase):
         self.assertNotIn('Auto Memory', result.stdout)
         self.assertNotIn('TodoWrite', result.stdout)
 
+    def test_v4_literal_specialcase_lint_is_advisory(self) -> None:
+        result = self.run_hook(
+            'literal-specialcase-lint.sh',
+            {'tool_input': {'file_path': 'src/math.py', 'content': 'if nums == [1, 3]: return True'}},
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('literal special-case', result.stdout)
+
+    def test_v4_blindspot_lint_detects_unqualified_payment_retry(self) -> None:
+        result = self.run_hook(
+            'blindspot-domain-lint.sh',
+            {'prompt': '請在 charge(order) 外包 retry，直接完成。'},
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('Blindspot Pass', result.stdout)
+
+    def test_v4_blindspot_lint_allows_qualified_payment_retry(self) -> None:
+        result = self.run_hook(
+            'blindspot-domain-lint.sh',
+            {'prompt': '先確認 idempotency key 與 duplicate charge 的 rollback，再設計 retry。'},
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout.strip(), '')
+
+    def test_v4_taste_lint_requests_reference(self) -> None:
+        result = self.run_hook(
+            'taste-reference-lint.sh',
+            {'tool_input': {'description': '把報表改得專業一點'}},
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('reference', result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
